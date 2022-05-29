@@ -106,6 +106,10 @@ namespace Chess.Pieces
                             // Debug.Log($"Blocked by Team {move.MoveType.ToString()}");
                             continue;
                         }
+                        if (!(move.MoveType is MoveTypes.L))
+                        {
+                            MovesGroupList[move.groupIndex].Active = false;
+                        }
                     }
 
                     if (!posObj.IsTaken() && move.Overtake == Overtake.Yes) continue;
