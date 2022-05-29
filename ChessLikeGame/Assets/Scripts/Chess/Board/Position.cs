@@ -15,16 +15,15 @@ namespace Chess.Board
         private Collider _collider;
         private bool _isTaken = false;
         private ChessPiece isActiveForChessPiece;
+        private bool isActive;
 
         public void SetPiece(ChessPiece obj)
         {
+            // if (!obj.IsActive()) return;
             if (_isTaken)
             {
                 obj.CapturePiece(piece);
-                foreach (MeshRenderer renderer in piece.gameObject.GetComponentsInChildren<MeshRenderer>())
-                {
-                    renderer.enabled = false;
-                }
+                
             }
             _isTaken = true;
             piece = obj;
@@ -32,13 +31,17 @@ namespace Chess.Board
 
         public void Activate(ChessPiece piece)
         {
+            piece.OnMove += Deactivate;
             isActiveForChessPiece = piece;
             _rend.enabled = true;
             _collider.enabled = true;
+            isActive = true;
         }
 
         public void Deactivate()
         {
+            if (isActive) isActiveForChessPiece.OnMove -= Deactivate;
+            isActive = false;
             isActiveForChessPiece = null;
             _rend.enabled = false;
             _collider.enabled = false;
@@ -52,9 +55,21 @@ namespace Chess.Board
 
         private void OnMouseDown()
         {
+            MoveMade();
+        }
+
+        private void MoveMade()
+        {
             SetPiece(isActiveForChessPiece);
-            isActiveForChessPiece.Move(transform, grid);
+            var pos = transform.position;
+            isActiveForChessPiece.Move(new Vector3(pos.x, 0, pos.z), grid);
             Deactivate();
+        }
+
+        public void OnAIMove(ChessPiece piece)
+        {
+            isActiveForChessPiece = piece;
+            MoveMade();
         }
 
         public bool IsTaken()

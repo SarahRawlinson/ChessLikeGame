@@ -1,9 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Chess.Enums;
 using Chess.Interface;
 using Chess.Board;
+using Chess.Control;
 using Chess.Movement;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -20,16 +22,56 @@ namespace Chess.Pieces
         internal BoardObject _board;
         internal string NameType = "Generic";
         internal event Action OnMove;
+        private bool isActive = true;
         public List<ChessPiece> captured = new List<ChessPiece>();
+        public Controller PieceController;
 
         private void Awake()
         {
             _board = FindObjectOfType<BoardObject>();
             _board.OnBoardSetUp += SetPosition;
+            FindObjectOfType<Director>().OnStart += GetController;
+        }
+
+        private void GetController()
+        {
+            foreach (Controller con in FindObjectsOfType<Controller>())
+            {
+                if (con.GetTeam() == team)
+                {
+                    PieceController = con;
+                    con.PiecesCallToController(this);
+                }
+            }
+        }
+
+        private void OnCaptured()
+        {
+            isActive = false;
+            if (TryGetComponent(out Renderer r))
+            {
+                r.enabled = false;
+            }
+            if (TryGetComponent(out Collider c))
+            {
+                c.enabled = false;
+            }
+            foreach (Transform obj in GetComponentsInChildren<Transform>())
+            {
+                if (obj.TryGetComponent(out Renderer or))
+                {
+                    or.enabled = false;
+                }
+                if (obj.TryGetComponent(out Collider oc))
+                {
+                    oc.enabled = false;
+                }
+            }
         }
 
         public void CapturePiece(ChessPiece piece)
         {
+            piece.OnCaptured();
             captured.Add(piece);
         }
 
@@ -40,12 +82,19 @@ namespace Chess.Pieces
         }
         
 
-        public void Move(Transform moveTransform, Vector2 nextPos)
+        public void Move(Vector3 moveTransform, Vector2 nextPos)
         {
             _board._cubes[(int) pos.x ][(int) pos.y ].MovePiece();
             OnMove?.Invoke();
-            transform.position = moveTransform.position;
+            transform.position = new Vector3(moveTransform.x, transform.position.y, moveTransform.z);
             pos = nextPos;
+            PieceController.MoveMade();
+        }
+        
+        public IEnumerator AIMove(Moves moves)
+        {
+            yield return new WaitForSeconds(1);
+            moves.MoveResultPos.OnAIMove(this);
         }
 
         public virtual void WorkOutMoves()
@@ -55,7 +104,19 @@ namespace Chess.Pieces
 
         public void OnMouseDown()
         {
+            GetPossibleMoves();
+        }
+
+        public List<Moves> GetPossibleMoves()
+        {
+            List<Moves> possibleMoves = new List<Moves>();
+            if (!IsActive())
+            {
+                Debug.Log($"{NameType} or {team.ToString()} no longer active");
+                return possibleMoves;
+            }
             WorkOutMoves();
+
             // Debug.Log(NameType);
             for (var index = 0; index < MovesGroupList.Count; index++)
             {
@@ -73,57 +134,72 @@ namespace Chess.Pieces
             for (int index = 0; index < MovesList.Count; index++)
             {
                 Moves move = MovesList[index];
-                int posX = (int) pos.x + move.Forward;
-                int posY = (int) pos.y + move.Right;
-                try
+                
+                if (!MovesGroupList[move.groupIndex].Active) continue;
+                (int posX, int posY) = GetPos(move);
+                    
+                if (posX >= _board._cubes.Count || posX < 0 || posY >= _board._cubes[posX].Count || posY < 0)
                 {
-                    if (!MovesGroupList[move.groupIndex].Active) continue;
-                    if (posX >= _board._cubes.Count || posX < 0 || posY >= _board._cubes[posX].Count || posY < 0)
+                    // Debug.Log($"Move Out Of Range {move.MoveType.ToString()} x={posX},y={posY}");
+                    if (!(move.MoveType is MoveTypes.L))
                     {
-                        // Debug.Log($"Move Out Of Range {move.MoveType.ToString()} x={posX},y={posY}");
-                        if (!(move.MoveType is MoveTypes.L))
-                        {
-                            MovesGroupList[move.groupIndex].Active = false;
-                        }
-                        continue;
-                    }
-                    Position posObj = _board._cubes[posX][posY];
-                    if (posObj.IsTaken())
-                    {
-                        if (move.Overtake == Overtake.No)
-                        {
-                            MovesGroupList[move.groupIndex].Active = false;
-                            // Debug.Log($"Blocked Can't Overtake {move.MoveType.ToString()}");
-                            continue;
-                        }
-
-                        if (posObj.piece.team == team)
-                        {
-                            if (!(move.MoveType is MoveTypes.L))
-                            {
-                                MovesGroupList[move.groupIndex].Active = false;
-                            }
-                            // Debug.Log($"Blocked by Team {move.MoveType.ToString()}");
-                            continue;
-                        }
-                        if (!(move.MoveType is MoveTypes.L))
-                        {
-                            MovesGroupList[move.groupIndex].Active = false;
-                        }
+                        MovesGroupList[move.groupIndex].Active = false;
                     }
 
-                    if (!posObj.IsTaken() && move.Overtake == Overtake.Yes) continue;
-                    // Debug.Log($"Path {move.MoveType.ToString()} ok");
-                    posObj.Activate(this);
-                }
-                catch (Exception e)
-                {
-                    Debug.Log($"Error x={posX},y={posY}:{e}");
                     continue;
                 }
+
+                Position posObj = _board._cubes[posX][posY];
+                if (posObj.IsTaken())
+                {
+                    if (move.Overtake == Overtake.No)
+                    {
+                        MovesGroupList[move.groupIndex].Active = false;
+                        // Debug.Log($"Blocked Can't Overtake {move.MoveType.ToString()}");
+                        continue;
+                    }
+
+                    if (posObj.piece.team == team)
+                    {
+                        if (!(move.MoveType is MoveTypes.L))
+                        {
+                            MovesGroupList[move.groupIndex].Active = false;
+                        }
+
+                        // Debug.Log($"Blocked by Team {move.MoveType.ToString()}");
+                        continue;
+                    }
+
+                    if (!(move.MoveType is MoveTypes.L))
+                    {
+                        MovesGroupList[move.groupIndex].Active = false;
+                    }
+                }
+
+                if (!posObj.IsTaken() && move.Overtake == Overtake.Yes) continue;
+                // Debug.Log($"Path {move.MoveType.ToString()} ok");
+                posObj.Activate(this);
+                move.MoveResultPos = posObj;
+                possibleMoves.Add(move);
             }
+
+            return possibleMoves;
         }
-        
+
+        (int x, int y) GetPos(Moves move)
+        {
+            int posX = (int) pos.x + move.Forward;
+            int posY = (int) pos.y + move.Right;
+            return (posX, posY);
+        }
+
+        public bool IsActive()
+        {
+            if (!isActive) Debug.Log($"{NameType} no longer active");
+            if (!PieceController.IsActive()) Debug.Log($"{team.ToString()} no longer active");
+            return isActive && PieceController.IsActive();
+        }
+
         internal void WorkOutMovesUnlimitedSteps()
         {
             MovesList.Clear();
@@ -156,38 +232,38 @@ namespace Chess.Pieces
                 switch (MovesGroupList[index].Type)
                 {
                     case MoveTypes.Right:
-                        movesList.Add(new Moves(-step * offset, 0, MovesGroupList[index], index));
+                        movesList.Add(new Moves(-step * offset, 0, MovesGroupList[index], index, this));
                         break;
                     case MoveTypes.Left:
-                        movesList.Add(new Moves(step * offset, 0, MovesGroupList[index], index));
+                        movesList.Add(new Moves(step * offset, 0, MovesGroupList[index], index, this));
                         break;
                     case MoveTypes.Forward:
-                        movesList.Add(new Moves(0, step * offset, MovesGroupList[index], index));
+                        movesList.Add(new Moves(0, step * offset, MovesGroupList[index], index, this));
                         break;
                     case MoveTypes.Backward:
-                        movesList.Add(new Moves(0, -step * offset, MovesGroupList[index], index));
+                        movesList.Add(new Moves(0, -step * offset, MovesGroupList[index], index, this));
                         break;
                     case MoveTypes.DiagonalDownLeft:
-                        movesList.Add(new Moves(-step * offset, -step * offset, MovesGroupList[index], index));
+                        movesList.Add(new Moves(-step * offset, -step * offset, MovesGroupList[index], index, this));
                         break;
                     case MoveTypes.DiagonalDownRight:
-                        movesList.Add(new Moves(step * offset, -step * offset, MovesGroupList[index], index));
+                        movesList.Add(new Moves(step * offset, -step * offset, MovesGroupList[index], index, this));
                         break;
                     case MoveTypes.DiagonalUpLeft:
-                        movesList.Add(new Moves(-step * offset, step * offset, MovesGroupList[index], index));
+                        movesList.Add(new Moves(-step * offset, step * offset, MovesGroupList[index], index, this));
                         break;
                     case MoveTypes.DiagonalUpRight:
-                        movesList.Add(new Moves(step * offset, step * offset, MovesGroupList[index], index));
+                        movesList.Add(new Moves(step * offset, step * offset, MovesGroupList[index], index, this));
                         break;
                     case MoveTypes.L:
-                        movesList.Add(new Moves(1, 2, MovesGroupList[index], index));
-                        movesList.Add(new Moves(-1, 2, MovesGroupList[index], index));
-                        movesList.Add(new Moves(1, -2, MovesGroupList[index], index));
-                        movesList.Add(new Moves(-1, -2, MovesGroupList[index], index));
-                        movesList.Add(new Moves(2, 1, MovesGroupList[index], index));
-                        movesList.Add(new Moves(-2, 1, MovesGroupList[index], index));
-                        movesList.Add(new Moves(2, -1, MovesGroupList[index], index));
-                        movesList.Add(new Moves(-2, -1, MovesGroupList[index], index));
+                        movesList.Add(new Moves(1, 2, MovesGroupList[index], index, this));
+                        movesList.Add(new Moves(-1, 2, MovesGroupList[index], index, this));
+                        movesList.Add(new Moves(1, -2, MovesGroupList[index], index, this));
+                        movesList.Add(new Moves(-1, -2, MovesGroupList[index], index, this));
+                        movesList.Add(new Moves(2, 1, MovesGroupList[index], index, this));
+                        movesList.Add(new Moves(-2, 1, MovesGroupList[index], index, this));
+                        movesList.Add(new Moves(2, -1, MovesGroupList[index], index, this));
+                        movesList.Add(new Moves(-2, -1, MovesGroupList[index], index, this));
                         break;
                 }
             }

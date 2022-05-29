@@ -1,5 +1,7 @@
 ﻿using System;
+using Chess.Board;
 using Chess.Enums;
+using Chess.Pieces;
 
 namespace Chess.Movement
 {
@@ -11,7 +13,9 @@ namespace Chess.Movement
         public MoveTypes MoveType;
         public bool CanJump;
         public int groupIndex;
-        public Moves(int x, int y, MoveGroup moveGroup, int index)
+        public ChessPiece Piece;
+        public Position MoveResultPos;
+        public Moves(int x, int y, MoveGroup moveGroup, int index, ChessPiece piece)
         {
             Forward = x;
             Right = y;
@@ -19,6 +23,7 @@ namespace Chess.Movement
             CanJump = moveGroup.CanJump;
             MoveType = moveGroup.Type;
             groupIndex = index;
+            Piece = piece;
         }
     }
 }

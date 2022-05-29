@@ -23,7 +23,7 @@ namespace Chess.Board
                 for (int r = 0; r < rows; r++)
                 {
                     GameObject obj = Instantiate(cubeObj, transform);
-                    obj.transform.position = (transform.position + new Vector3(0,(cubeSize.y / 2),0)) -
+                    obj.transform.position = (transform.position - new Vector3(0,(cubeSize.y / 2),0)) -
                         new Vector3((cubeSize.x * c), 0, (cubeSize.z * r));
                     objects.Add(obj.GetComponent<Position>());
                     objects[r].grid = new Vector2(c, r);
