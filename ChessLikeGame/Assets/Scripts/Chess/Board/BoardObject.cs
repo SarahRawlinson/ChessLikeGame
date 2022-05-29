@@ -13,6 +13,16 @@ namespace Chess.Board
         private Vector3 cubeSize;
         public event Action OnBoardSetUp;
 
+        public void ClearBoard()
+        {
+            foreach (List<Position> posList in _cubes)
+            {
+                foreach (Position pos in posList)
+                {
+                    pos.Deactivate();
+                }
+            }
+        }
         private void Start()
         {
             GameObject cubeObj = cube.gameObject;

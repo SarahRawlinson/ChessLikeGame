@@ -23,6 +23,7 @@ namespace Chess.Pieces
         internal string NameType = "Generic";
         internal event Action OnMove;
         private bool isActive = true;
+        [SerializeField] internal int pieceValue;
         public List<ChessPiece> captured = new List<ChessPiece>();
         public Controller PieceController;
 
@@ -89,6 +90,7 @@ namespace Chess.Pieces
             transform.position = new Vector3(moveTransform.x, transform.position.y, moveTransform.z);
             pos = nextPos;
             PieceController.MoveMade();
+            _board.ClearBoard();
         }
         
         public IEnumerator AIMove(Moves moves)
@@ -104,15 +106,18 @@ namespace Chess.Pieces
 
         public void OnMouseDown()
         {
-            GetPossibleMoves();
+            GetPossibleMoves(PieceController);
         }
 
-        public List<Moves> GetPossibleMoves()
+        public List<Moves> GetPossibleMoves(Controller con)
         {
             List<Moves> possibleMoves = new List<Moves>();
-            if (!IsActive())
+            if (!isActive)
             {
-                Debug.Log($"{NameType} or {team.ToString()} no longer active");
+                return possibleMoves;
+            }
+            if (!IsActive() && !con.TryGetComponent(out AI ai))
+            {
                 return possibleMoves;
             }
             WorkOutMoves();
@@ -123,13 +128,7 @@ namespace Chess.Pieces
                 MovesGroupList[index].Active = true;
             }
 
-            foreach (List<Position> posList in _board._cubes)
-            {
-                foreach (Position pos in posList)
-                {
-                    pos.Deactivate();
-                }
-            }
+            _board.ClearBoard();
 
             for (int index = 0; index < MovesList.Count; index++)
             {
@@ -179,6 +178,10 @@ namespace Chess.Pieces
                 if (!posObj.IsTaken() && move.Overtake == Overtake.Yes) continue;
                 // Debug.Log($"Path {move.MoveType.ToString()} ok");
                 posObj.Activate(this);
+                if (posObj.IsTaken())
+                {
+                    move.moveValue = posObj.piece.pieceValue;
+                }
                 move.MoveResultPos = posObj;
                 possibleMoves.Add(move);
             }
@@ -193,6 +196,7 @@ namespace Chess.Pieces
             return (posX, posY);
         }
 
+        
         public bool IsActive()
         {
             if (!isActive) Debug.Log($"{NameType} no longer active");

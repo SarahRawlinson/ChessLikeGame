@@ -2,6 +2,7 @@
 using Chess.Pieces;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Object = UnityEngine.Object;
 
 namespace Chess.Board
 {
@@ -16,6 +17,8 @@ namespace Chess.Board
         private bool _isTaken = false;
         private ChessPiece isActiveForChessPiece;
         private bool isActive;
+        public int GetX => (int)grid.x;
+        public int GetY => (int)grid.y;
 
         public void SetPiece(ChessPiece obj)
         {
@@ -80,6 +83,19 @@ namespace Chess.Board
         public ChessPiece GetPiece()
         {
             return piece;
+        }
+
+        public override bool Equals(object other)
+        {
+            //Check for null and compare run-time types.
+            if ((other == null) || this.GetType() != other.GetType())
+            {
+                return false;
+            }
+            else {
+                Position p = (Position) other;
+                return (GetX == p.GetX) && (GetY == p.GetY);
+            }
         }
 
         private void Awake()

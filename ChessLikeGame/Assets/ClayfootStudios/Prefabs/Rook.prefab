@@ -48,6 +48,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pos: {x: 0, y: 0}
   team: 0
+  pieceValue: 50
+  captured: []
+  PieceController: {fileID: 0}
 --- !u!136 &486545232899469032
 CapsuleCollider:
   m_ObjectHideFlags: 0

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Chess.Enums;
 using Chess.Interface;
+using Chess.Movement;
 using Chess.Pieces;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -29,7 +30,17 @@ namespace Chess.Control
         {
             _isActive = true;
             OnTurn?.Invoke();
-            Debug.Log($"Set Active {_team}");
+            // Debug.Log($"Set Active {_team}");
+        }
+        public List<Moves> AllPossibleMoves()
+        {
+            List<Moves> possibleMoves = new List<Moves>();
+            foreach (ChessPiece piece in pieces)
+            {
+                possibleMoves.AddRange(piece.GetPossibleMoves(this));
+            }
+
+            return possibleMoves;
         }
 
         public void PiecesCallToController(ChessPiece piece)
@@ -44,7 +55,7 @@ namespace Chess.Control
 
         public void MoveMade()
         {
-            Debug.Log($"Move Made for {_team}");
+            // Debug.Log($"Move Made for {_team}");
             OnMoved?.Invoke(this);
             _isActive = false;
         }
