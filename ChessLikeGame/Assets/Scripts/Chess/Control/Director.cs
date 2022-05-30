@@ -12,7 +12,30 @@ namespace Chess.Control
         private Controller _activeController;
         public Team team;
 
+        private void Update()
+        {
+            if (Input.GetKey("escape"))
+            {
+                Application.Quit();
+            }
+        }
+
+        public void Exit()
+        {
+            Application.Quit();
+        }
+
+        public void NewGame()
+        {
+            StartGame();
+        }
+
         private void Start()
+        {
+            StartGame();
+        }
+
+        private void StartGame()
         {
             player1.SetTeam(Team.Black);
             player1.OnMoved += MoveMade;
@@ -40,6 +63,8 @@ namespace Chess.Control
                 Debug.Log($"Active controller is now {player1}");
             }
             team = _activeController._team;
+            
+            
         }
     }
 }

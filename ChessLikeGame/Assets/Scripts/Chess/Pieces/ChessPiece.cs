@@ -26,6 +26,7 @@ namespace Chess.Pieces
         [SerializeField] internal int pieceValue;
         public List<ChessPiece> captured = new List<ChessPiece>();
         public Controller PieceController;
+        private Position _startPosition;
 
         private void Awake()
         {
@@ -79,6 +80,7 @@ namespace Chess.Pieces
         public void SetPosition()
         {
             Position posObj = _board._cubes[(int) pos.x ][(int) pos.y ];
+            _startPosition = posObj;
             posObj.SetPiece(this);
         }
         

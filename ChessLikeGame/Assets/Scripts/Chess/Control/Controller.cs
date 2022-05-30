@@ -45,7 +45,11 @@ namespace Chess.Control
 
         public void PiecesCallToController(ChessPiece piece)
         {
-            pieces.Add(piece);
+            if (!pieces.Contains(piece))
+            {
+                pieces.Add(piece);
+            }
+            
         }
 
         public void SetTeam(Team team)
