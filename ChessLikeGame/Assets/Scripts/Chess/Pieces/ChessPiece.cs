@@ -27,6 +27,7 @@ namespace Chess.Pieces
         public List<ChessPiece> captured = new List<ChessPiece>();
         public Controller PieceController;
         private Position _startPosition;
+        internal event Action OnTaken;
 
         private void Awake()
         {
@@ -69,6 +70,7 @@ namespace Chess.Pieces
                     oc.enabled = false;
                 }
             }
+            OnTaken?.Invoke();
         }
 
         public void CapturePiece(ChessPiece piece)

@@ -1,4 +1,6 @@
-﻿using Chess.Enums;
+﻿using System;
+using System.Net;
+using Chess.Enums;
 using Chess.Movement;
 using UnityEngine;
 
@@ -6,10 +8,17 @@ namespace Chess.Pieces
 {
     public class King: ChessPiece
     {
+        public static event Action<Team> OnEnd;
         private void Start()
         {
             NameType = "King";
             // WorkOutMoves();
+            OnTaken += End;
+        }
+
+        private void End()
+        {
+            OnEnd?.Invoke(team);
         }
 
         public override void WorkOutMoves()
