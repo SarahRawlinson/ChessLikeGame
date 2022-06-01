@@ -41,6 +41,11 @@ namespace Chess.Board
             isActive = true;
         }
 
+        public bool IsActive()
+        {
+            return isActive;
+        }
+
         public void Deactivate()
         {
             if (isActive) isActiveForChessPiece.OnMove -= Deactivate;
@@ -61,7 +66,7 @@ namespace Chess.Board
             MoveMade();
         }
 
-        private void MoveMade()
+        public void MoveMade()
         {
             SetPiece(isActiveForChessPiece);
             var pos = transform.position;

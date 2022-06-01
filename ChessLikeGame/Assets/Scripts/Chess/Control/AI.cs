@@ -12,52 +12,38 @@ namespace Chess.Control
 {
     public class AI : Controller
     {
-        private Controller otherPlayer;
-        private void Awake()
+        [SerializeField] private int trys = 50;
+
+        public override void Awake()
         {
-            foreach (Controller con in FindObjectsOfType<Controller>())
-            {
-                if (con != this)
-                {
-                    otherPlayer = con;
-                    break;
-                }
-            }
+            base.Awake();
+            
             OnTurn += StartMove;
         }
 
         private void StartMove()
         {
-            List<Moves> myPossibleMoves = AllPossibleMoves();
-            
-            Moves move = myPossibleMoves[Random.Range(0, myPossibleMoves.Count)];
-            myPossibleMoves.Sort(Comparison);
-            if (myPossibleMoves[^1].moveValue > 0)
+            List<Moves> myPossibleMoves = AllLegalMoves();
+            Moves move = HighestValueMove(myPossibleMoves);
+            List<Moves> opponentsPossibleMoves = otherPlayer.AllLegalMoves();
+            bool okToMove = false;
+            int giveUpCount = 0;
+            while (!okToMove && giveUpCount < trys)
             {
-                move = myPossibleMoves[^1];
-                
-                
-            }
-            List<Moves> opponentsPossibleMoves = otherPlayer.AllPossibleMoves();
-            foreach (Moves m in opponentsPossibleMoves)
-            {
-                if (m.MoveResultPos == myPossibleMoves[^1].MoveResultPos)
+                trys++;
+                okToMove = true;
+                foreach (Moves m in opponentsPossibleMoves)
                 {
-                    Debug.Log("Move conflict");
-                    move = myPossibleMoves[Random.Range(0, myPossibleMoves.Count)];
-                }
-                else
-                {
-                    // Debug.Log("Move OK");
+                    if (m.MoveResultPos == move.MoveResultPos)
+                    {
+                        okToMove = false;
+                        Debug.Log("Move conflict");
+                        move = myPossibleMoves[Random.Range(0, myPossibleMoves.Count)];
+                        break;
+                    }
                 }
             }
             StartCoroutine(move.Piece.AIMove(move));
-        }
-
-
-        private int Comparison(Moves x, Moves y)
-        {
-            return (int)(x.moveValue - y.moveValue);
         }
     }
 }

@@ -76,7 +76,7 @@ namespace Chess.Control
                 player2.OnMoved += MoveMade;
                 _activeController = player2;
                 player2.SetActive();
-                Debug.Log($"Active controller is now {player2}");
+                // Debug.Log($"Active controller is now {player2}");
             }
             else
             {
@@ -84,7 +84,7 @@ namespace Chess.Control
                 player1.OnMoved += MoveMade;
                 _activeController = player1;
                 player1.SetActive();
-                Debug.Log($"Active controller is now {player1}");
+                // Debug.Log($"Active controller is now {player1}");
             }
             team = _activeController._team;
             

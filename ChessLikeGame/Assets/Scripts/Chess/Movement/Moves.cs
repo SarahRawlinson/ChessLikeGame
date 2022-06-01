@@ -16,6 +16,7 @@ namespace Chess.Movement
         public ChessPiece Piece;
         public Position MoveResultPos;
         public float moveValue = 0;
+        public ChessPiece PieceTaken;
         public Moves(int x, int y, MoveGroup moveGroup, int index, ChessPiece piece)
         {
             Forward = x;

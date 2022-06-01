@@ -6,6 +6,7 @@ using Chess.Movement;
 using Chess.Pieces;
 using Unity.VisualScripting;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Chess.Control
 {
@@ -16,9 +17,24 @@ namespace Chess.Control
         public event Action<Controller> OnMoved;
         internal event Action OnTurn;
         internal List<ChessPiece> pieces = new List<ChessPiece>();
+        private bool inCheck = false;
+        internal King _king;
+        internal Controller otherPlayer;
         public Team GetTeam()
         {
             return _team;
+        }
+        
+        public virtual void Awake()
+        {
+            foreach (Controller con in FindObjectsOfType<Controller>())
+            {
+                if (con != this)
+                {
+                    otherPlayer = con;
+                    break;
+                }
+            }
         }
 
         public bool IsActive()
@@ -32,7 +48,27 @@ namespace Chess.Control
             OnTurn?.Invoke();
             // Debug.Log($"Set Active {_team}");
         }
-        public List<Moves> AllPossibleMoves()
+        public List<Moves> AllLegalMoves()
+        {
+            return PossibleMoves();
+        }
+
+        public List<Moves> LegalMovesList(List<Moves> movesList)
+        {
+            if (inCheck)
+            {
+                MoveStopsCheck(ref movesList);
+            }
+            return movesList;
+        }
+
+        //todo work this out
+        private void MoveStopsCheck(ref List<Moves> movesList)
+        {
+            
+        }
+
+        private List<Moves> PossibleMoves()
         {
             List<Moves> possibleMoves = new List<Moves>();
             foreach (ChessPiece piece in pieces)
@@ -43,10 +79,33 @@ namespace Chess.Control
             return possibleMoves;
         }
 
+        public static List<Moves> PossibleMovesOrderedByValue(ref List<Moves> myPossibleMoves)
+        {
+            myPossibleMoves.Sort(Comparison);
+            return myPossibleMoves;
+        }
+        
+        public static int Comparison(Moves x, Moves y)
+        {
+            return (int)(x.moveValue - y.moveValue);
+        }
+        
+        public static Moves HighestValueMove(List<Moves> myPossibleMoves)
+        {
+            PossibleMovesOrderedByValue(ref myPossibleMoves);
+            Moves move = myPossibleMoves[Random.Range(0, myPossibleMoves.Count)];
+            if (myPossibleMoves[^1].moveValue > 0)
+            {
+                move = myPossibleMoves[^1];
+            }
+            return move;
+        }
+
         public void PiecesCallToController(ChessPiece piece)
         {
             if (!pieces.Contains(piece))
             {
+                piece.TryGetComponent(out _king);
                 pieces.Add(piece);
             }
             
@@ -63,5 +122,7 @@ namespace Chess.Control
             OnMoved?.Invoke(this);
             _isActive = false;
         }
+
+        
     }
 }

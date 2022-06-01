@@ -77,19 +77,26 @@ namespace Chess.Pieces
         {
             piece.OnCaptured();
             captured.Add(piece);
+            Debug.Log($"{team.ToString()} {this.NameType} takes {piece.team.ToString()} {piece.NameType}");
         }
 
         public void SetPosition()
         {
-            Position posObj = _board._cubes[(int) pos.x ][(int) pos.y ];
+            var posObj = GetPosition();
             _startPosition = posObj;
             posObj.SetPiece(this);
         }
-        
+
+        public Position GetPosition()
+        {
+            Position posObj = _board._cubes[(int) pos.x][(int) pos.y];
+            return posObj;
+        }
+
 
         public void Move(Vector3 moveTransform, Vector2 nextPos)
         {
-            _board._cubes[(int) pos.x ][(int) pos.y ].MovePiece();
+            GetPosition().MovePiece();
             OnMove?.Invoke();
             transform.position = new Vector3(moveTransform.x, transform.position.y, moveTransform.z);
             pos = nextPos;
@@ -110,28 +117,27 @@ namespace Chess.Pieces
 
         public void OnMouseDown()
         {
-            GetPossibleMoves(PieceController);
+            if (IsActive())
+            {
+                PieceController.LegalMovesList(GetPossibleMoves(PieceController));
+            }
+            else
+            {
+                Position position = GetPosition();
+                if (position.IsActive()) position.MoveMade();
+            }
+            
         }
 
         public List<Moves> GetPossibleMoves(Controller con)
         {
             List<Moves> possibleMoves = new List<Moves>();
-            if (!isActive)
-            {
-                return possibleMoves;
-            }
-            if (!IsActive() && !con.TryGetComponent(out AI ai))
-            {
-                return possibleMoves;
-            }
+            if (!isActive) return possibleMoves;
             WorkOutMoves();
-
-            // Debug.Log(NameType);
-            for (var index = 0; index < MovesGroupList.Count; index++)
+            foreach (MoveGroup m in MovesGroupList)
             {
-                MovesGroupList[index].Active = true;
+                m.Active = true;
             }
-
             _board.ClearBoard();
 
             for (int index = 0; index < MovesList.Count; index++)
@@ -184,12 +190,12 @@ namespace Chess.Pieces
                 posObj.Activate(this);
                 if (posObj.IsTaken())
                 {
+                    move.PieceTaken = posObj.piece;
                     move.moveValue = posObj.piece.pieceValue;
                 }
                 move.MoveResultPos = posObj;
                 possibleMoves.Add(move);
             }
-
             return possibleMoves;
         }
 
