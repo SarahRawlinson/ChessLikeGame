@@ -1,4 +1,5 @@
 ﻿using System;
+using Chess.Board;
 using Chess.Enums;
 using Chess.Pieces;
 using TMPro;
@@ -12,6 +13,9 @@ namespace Chess.Control
         [SerializeField] private Controller player1;
         [SerializeField] private Controller player2;
         [SerializeField] private TMP_Text endText;
+        [SerializeField] private Material teamBlackColour;
+        [SerializeField] private Material teamWhiteColour;
+        private BoardObject _boardObject;
         public event Action OnStart;
         private Controller _activeController;
         private bool _gameOver = false;
@@ -23,6 +27,16 @@ namespace Chess.Control
             {
                 Application.Quit();
             }
+        }
+
+        public Material GetTeamMaterial(Team team)
+        {
+            if (team == Team.Black)
+            {
+                return teamBlackColour;
+            }
+
+            return teamWhiteColour;
         }
 
         public void Exit()
@@ -37,6 +51,7 @@ namespace Chess.Control
 
         private void Start()
         {
+            _boardObject = FindObjectOfType<BoardObject>();
             StartGame();
             King.OnEnd += End;
         }
@@ -65,6 +80,7 @@ namespace Chess.Control
 
         private void MoveMade(Controller controller)
         {
+            _boardObject.ClearBoard();
             if (_gameOver)
             {
                 Debug.Log("Game Over");

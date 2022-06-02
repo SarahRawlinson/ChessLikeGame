@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a735de0d6d854b8c9ecfb6870fe97d59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pieceObject: {fileID: 6418892965872695931}
   pos: {x: 0, y: 0}
   team: 0
   pieceValue: 200

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Chess.Enums;
 using Chess.Interface;
@@ -21,29 +22,18 @@ namespace Chess.Control
             OnTurn += StartMove;
         }
 
+        IEnumerator Move()
+        {
+            yield return new WaitForSeconds(2);
+            List<Moves> myPossibleMoves = AllLegalMoves(this);
+            List<Moves> opponentsPossibleMovesList = otherPlayer.AllLegalMoves(this);
+            Moves move = HighestValueMove(myPossibleMoves, opponentsPossibleMovesList);
+            StartCoroutine(move.Piece.AIMove(move));
+        }
+
         private void StartMove()
         {
-            List<Moves> myPossibleMoves = AllLegalMoves();
-            Moves move = HighestValueMove(myPossibleMoves);
-            List<Moves> opponentsPossibleMoves = otherPlayer.AllLegalMoves();
-            bool okToMove = false;
-            int giveUpCount = 0;
-            while (!okToMove && giveUpCount < trys)
-            {
-                trys++;
-                okToMove = true;
-                foreach (Moves m in opponentsPossibleMoves)
-                {
-                    if (m.MoveResultPos == move.MoveResultPos)
-                    {
-                        okToMove = false;
-                        Debug.Log("Move conflict");
-                        move = myPossibleMoves[Random.Range(0, myPossibleMoves.Count)];
-                        break;
-                    }
-                }
-            }
-            StartCoroutine(move.Piece.AIMove(move));
+            StartCoroutine(Move());
         }
     }
 }

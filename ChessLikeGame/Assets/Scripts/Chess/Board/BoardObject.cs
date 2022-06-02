@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -51,8 +52,10 @@ namespace Chess.Board
                     GameObject obj = Instantiate(cubeObj, transform);
                     obj.transform.position = (transform.position - new Vector3(0,(_cubeSize.y / 2),0)) -
                         new Vector3((_cubeSize.x * c), 0, (_cubeSize.z * r));
-                    objects.Add(obj.GetComponent<PositionGameObject>().GetPosition());
+                    PositionGameObject posObj = obj.GetComponent<PositionGameObject>();
+                    objects.Add(posObj.GetPosition());
                     objects[r].grid = new Vector2(c, r);
+                    posObj.SetText();
                 }
                 Cubes.Add(objects);
             }

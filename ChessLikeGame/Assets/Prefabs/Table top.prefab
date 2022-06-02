@@ -297,6 +297,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4740109550905006489}
     m_Modifications:
+    - target: {fileID: 8797578823937192920, guid: 78c09e4bc69874a4e968422e0b0da7c8, type: 3}
+      propertyPath: cube
+      value: 
+      objectReference: {fileID: 779374608134734112, guid: db945a424797f2a4eb8c6a63b738c1ad, type: 3}
     - target: {fileID: 8797578824179071926, guid: 78c09e4bc69874a4e968422e0b0da7c8, type: 3}
       propertyPath: m_Name
       value: Chess Board

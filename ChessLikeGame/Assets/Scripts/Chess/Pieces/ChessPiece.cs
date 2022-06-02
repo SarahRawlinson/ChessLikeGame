@@ -15,6 +15,7 @@ namespace Chess.Pieces
 {
     public class ChessPiece: MonoBehaviour, ICondition
     {
+        [SerializeField] private GameObject pieceObject;
         internal List<MoveGroup> MovesGroupList = new List<MoveGroup>();
         internal List<Moves> MovesList = new List<Moves>();
         public Vector2 pos;
@@ -103,13 +104,13 @@ namespace Chess.Pieces
             pos = nextPos;
             PieceController.MoveMade();
             _board.ClearBoard();
-            Debug.Log($"{NameType} moves from {positionFrom.GetCoordinates()} to {position.GetCoordinates()}");
+            Debug.Log($"{team.ToString()} {NameType} moves from {positionFrom.GetCoordinates()} to {position.GetCoordinates()}");
         }
         
         public IEnumerator AIMove(Moves moves)
         {
             yield return new WaitForSeconds(1);
-            moves.MoveResultPos.OnAIMove(this);
+            moves.MoveResultPos.MoveSelected(this);
         }
 
         public virtual void WorkOutMoves()
@@ -126,7 +127,7 @@ namespace Chess.Pieces
             else
             {
                 Position position = GetPosition();
-                if (position.IsActive()) position.MoveMade();
+                if (position.IsActive()) position.MoveSelected();
             }
             
         }
@@ -189,7 +190,7 @@ namespace Chess.Pieces
 
                 if (!posObj.IsTaken() && move.Overtake == Overtake.Yes) continue;
                 // Debug.Log($"Path {move.MoveType.ToString()} ok");
-                posObj.Activate(this);
+                posObj.Activate(this, con);
                 if (posObj.IsTaken())
                 {
                     move.MoveValue = posObj.piece.pieceValue;

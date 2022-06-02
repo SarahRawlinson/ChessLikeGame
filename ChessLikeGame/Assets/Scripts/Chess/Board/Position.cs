@@ -1,4 +1,5 @@
 ﻿using System;
+using Chess.Control;
 using Chess.Pieces;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -47,12 +48,17 @@ namespace Chess.Board
             piece = obj;
         }
 
-        public void Activate(ChessPiece piece)
+        public void Activate(ChessPiece piece, Controller con)
         {
+            bool aiCon = con.TryGetComponent(out AI ai);
             piece.OnMove += Deactivate;
             isActiveForChessPiece = piece;
-            if (!_hypothetical) _positionObject._rend.enabled = true;
-            if (!_hypothetical) _positionObject._collider.enabled = true;
+            if (!_hypothetical && !aiCon)
+            {
+                _positionObject._rend.enabled = true;
+                _positionObject._collider.enabled = true;
+                Debug.Log($"{GetCoordinates()} Activated by {piece.team.ToString()} {piece.NameType}");
+            }
             isActive = true;
         }
 
@@ -66,8 +72,8 @@ namespace Chess.Board
             if (isActive) isActiveForChessPiece.OnMove -= Deactivate;
             isActive = false;
             isActiveForChessPiece = null;
-            if (!_hypothetical) _positionObject._rend.enabled = false;
-            if (!_hypothetical) _positionObject._collider.enabled = false;
+            _positionObject._rend.enabled = false;
+            _positionObject._collider.enabled = false;
         }
 
         public void MovePiece()
@@ -76,7 +82,7 @@ namespace Chess.Board
             _isTaken = false;
         }
 
-        public void MoveMade()
+        public void MoveSelected()
         {
             SetPiece(isActiveForChessPiece);
             if (!_hypothetical)
@@ -87,10 +93,18 @@ namespace Chess.Board
             Deactivate();
         }
 
-        public void OnAIMove(ChessPiece piece)
+        public void MoveSelected(ChessPiece piece)
         {
-            isActiveForChessPiece = piece;
-            MoveMade();
+            try
+            {
+                isActiveForChessPiece = piece;
+                MoveSelected();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+            
         }
 
         public bool IsTaken()

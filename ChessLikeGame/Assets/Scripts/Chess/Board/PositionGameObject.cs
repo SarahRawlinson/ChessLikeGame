@@ -1,4 +1,4 @@
-﻿using UnityEditorInternal;
+﻿using TMPro;
 using UnityEngine;
 
 namespace Chess.Board
@@ -10,10 +10,12 @@ namespace Chess.Board
         public MeshRenderer _rend;
         public Collider _collider;
         private Position _position;
+        [SerializeField] public TMP_Text _text;
 
         public PositionGameObject()
         {
             _position = new Position(this);
+            
         }
 
         public Position GetPosition()
@@ -26,9 +28,15 @@ namespace Chess.Board
             _rend = GetComponent<MeshRenderer>();
             _collider = GetComponent<Collider>();
         }
+
+        public void SetText()
+        {
+            _text.text = _position.GetCoordinates();
+        }
+
         private void OnMouseDown()
         {
-            _position.MoveMade();
+            _position.MoveSelected();
         }
     }
 }

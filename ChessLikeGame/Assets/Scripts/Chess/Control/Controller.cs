@@ -20,13 +20,20 @@ namespace Chess.Control
         internal List<ChessPiece> pieces = new List<ChessPiece>();
         internal King _king;
         internal Controller otherPlayer;
+        internal BoardObject _boardObject;
         public Team GetTeam()
         {
             return _team;
         }
+
+        public void ChessPieceTaken(ChessPiece piece)
+        {
+            pieces.Remove(piece);
+        }
         
         public virtual void Awake()
         {
+            _boardObject = FindObjectOfType<BoardObject>();
             foreach (Controller con in FindObjectsOfType<Controller>())
             {
                 if (con != this)
@@ -40,7 +47,7 @@ namespace Chess.Control
         bool IsCheck()
         {
             if (_king.IsUnityNull()) return false;
-            foreach (Moves move in otherPlayer.PossibleMoves())
+            foreach (Moves move in otherPlayer.PossibleMoves(this))
             {
                 if (move.MoveResultPos.GetCoordinates() == _king.GetPosition().GetCoordinates())
                 {
@@ -61,9 +68,9 @@ namespace Chess.Control
             OnTurn?.Invoke();
             // Debug.Log($"Set Active {_team}");
         }
-        public List<Moves> AllLegalMoves()
+        public List<Moves> AllLegalMoves(Controller con)
         {
-            return PossibleMoves();
+            return PossibleMoves(con);
         }
 
         public List<Moves> LegalMovesList(List<Moves> movesList)
@@ -81,12 +88,12 @@ namespace Chess.Control
             
         }
 
-        private List<Moves> PossibleMoves()
+        private List<Moves> PossibleMoves(Controller con)
         {
             List<Moves> possibleMoves = new List<Moves>();
             foreach (ChessPiece piece in pieces)
             {
-                possibleMoves.AddRange(piece.GetPossibleMoves(this));
+                possibleMoves.AddRange(piece.GetPossibleMoves(con));
             }
 
             return possibleMoves;
@@ -103,14 +110,25 @@ namespace Chess.Control
             return (int)(x.MoveValue - y.MoveValue);
         }
         
-        public static Moves HighestValueMove(List<Moves> myPossibleMoves)
+        public static Moves HighestValueMove(List<Moves> myPossibleMoves, List<Moves> opponentsPossibleMovesList)
         {
-            PossibleMovesOrderedByValue(ref myPossibleMoves);
-            Moves move = myPossibleMoves[Random.Range(0, myPossibleMoves.Count)];
-            if (myPossibleMoves[^1].MoveValue > 0)
+            foreach (Moves mm in myPossibleMoves)
             {
-                move = myPossibleMoves[^1];
+                string mc = mm.MoveResultPos.GetCoordinates();
+                foreach (Moves om in opponentsPossibleMovesList)
+                {
+                    if (om.MoveResultPos.GetCoordinates() == mc)
+                    {
+                        mm.MoveValue -= mm.Piece.pieceValue;
+                        // Debug.LogAssertion($"move value changed to {mm.MoveValue}");
+                    }
+                }
             }
+            PossibleMovesOrderedByValue(ref myPossibleMoves);
+            Moves move = myPossibleMoves[^1];
+            List<Moves> movesList = myPossibleMoves.FindAll(m => m.MoveValue >= move.MoveValue);
+            move = movesList[Random.Range(0, movesList.Count)];
+            Debug.Log($"low Val = {myPossibleMoves[0].MoveValue}, High Val = {myPossibleMoves[^1].MoveValue}, Act Val = {move.MoveValue}");
             return move;
         }
 

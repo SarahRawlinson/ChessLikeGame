@@ -15,6 +15,7 @@ namespace Chess.Movement
             Overtake = overtake;
             CanJump = canJump;
         }
+        
         public MoveGroup(MoveTypes moveTypes, Overtake overtake, bool canJump, bool active)
         {
             Type = moveTypes;
