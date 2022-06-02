@@ -37,12 +37,12 @@ namespace Chess.Board
             _positionObject = position._positionObject;
         }
         
-        public void SetPiece(ChessPiece obj, Position pos)
+        public void SetPiece(ChessPiece obj)
         {
             // if (!obj.IsActive()) return;
             if (_isTaken)
             {
-                obj.CapturePiece(piece, pos);
+                obj.CapturePiece(piece);
             }
             _isTaken = true;
             piece = obj;
@@ -84,7 +84,7 @@ namespace Chess.Board
 
         public void MoveSelected()
         {
-            SetPiece(isActiveForChessPiece, isActiveForChessPiece.GetPosition());
+            SetPiece(isActiveForChessPiece);
             if (!_hypothetical)
             {
                 var pos = _positionObject.transform.position;
