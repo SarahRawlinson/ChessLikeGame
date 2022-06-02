@@ -29,12 +29,14 @@ namespace Chess.Pieces
         public Controller PieceController;
         private Position _startPosition;
         internal event Action OnTaken;
+        private Director _director;
 
         private void Awake()
         {
             _board = FindObjectOfType<BoardObject>();
             _board.OnBoardSetUp += SetPosition;
             FindObjectOfType<Director>().OnStart += GetController;
+            _director = FindObjectOfType<Director>();
         }
 
         private void GetController()
@@ -49,34 +51,42 @@ namespace Chess.Pieces
             }
         }
 
-        private void OnCaptured()
+        private void OnCaptured(Position pos)
+        {
+            SwitchTeams(pos);
+            OnTaken?.Invoke();
+        }
+
+        private void DeactivatePiece()
         {
             isActive = false;
             if (TryGetComponent(out Renderer r))
             {
                 r.enabled = false;
             }
+
             if (TryGetComponent(out Collider c))
             {
                 c.enabled = false;
             }
+
             foreach (Transform obj in GetComponentsInChildren<Transform>())
             {
                 if (obj.TryGetComponent(out Renderer or))
                 {
                     or.enabled = false;
                 }
+
                 if (obj.TryGetComponent(out Collider oc))
                 {
                     oc.enabled = false;
                 }
             }
-            OnTaken?.Invoke();
         }
 
-        public void CapturePiece(ChessPiece piece)
+        public void CapturePiece(ChessPiece piece, Position pos)
         {
-            piece.OnCaptured();
+            piece.OnCaptured(pos);
             captured.Add(piece);
             Debug.Log($"{team.ToString()} {this.NameType} takes {piece.team.ToString()} {piece.NameType}");
         }
@@ -85,7 +95,7 @@ namespace Chess.Pieces
         {
             var posObj = GetPosition();
             _startPosition = posObj;
-            posObj.SetPiece(this);
+            posObj.SetPiece(this, posObj);
         }
 
         public Position GetPosition()
@@ -109,13 +119,23 @@ namespace Chess.Pieces
         
         public IEnumerator AIMove(Moves moves)
         {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(.5f);
             moves.MoveResultPos.MoveSelected(this);
         }
 
         public virtual void WorkOutMoves()
         {
             
+        }
+
+        public void SwitchTeams(Position pos)
+        {
+            PieceController.ChessPieceTaken(this);
+            PieceController = PieceController.otherPlayer;
+            PieceController.PiecesCallToController(this);
+            team = PieceController._team;
+            pieceObject.GetComponent<MeshRenderer>().material = _director.GetTeamMaterial(team);
+            pos.MoveSelected(this);
         }
 
         public void OnMouseDown()
