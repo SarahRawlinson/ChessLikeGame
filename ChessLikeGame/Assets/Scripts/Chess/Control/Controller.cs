@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Chess.Board;
 using Chess.Enums;
 using Chess.Interface;
 using Chess.Movement;
@@ -17,7 +18,6 @@ namespace Chess.Control
         public event Action<Controller> OnMoved;
         internal event Action OnTurn;
         internal List<ChessPiece> pieces = new List<ChessPiece>();
-        private bool inCheck = false;
         internal King _king;
         internal Controller otherPlayer;
         public Team GetTeam()
@@ -35,6 +35,19 @@ namespace Chess.Control
                     break;
                 }
             }
+        }
+
+        bool IsCheck()
+        {
+            if (_king.IsUnityNull()) return false;
+            foreach (Moves move in otherPlayer.PossibleMoves())
+            {
+                if (move.MoveResultPos.GetCoordinates() == _king.GetPosition().GetCoordinates())
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public bool IsActive()
@@ -55,7 +68,7 @@ namespace Chess.Control
 
         public List<Moves> LegalMovesList(List<Moves> movesList)
         {
-            if (inCheck)
+            if (IsCheck())
             {
                 MoveStopsCheck(ref movesList);
             }
@@ -87,14 +100,14 @@ namespace Chess.Control
         
         public static int Comparison(Moves x, Moves y)
         {
-            return (int)(x.moveValue - y.moveValue);
+            return (int)(x.MoveValue - y.MoveValue);
         }
         
         public static Moves HighestValueMove(List<Moves> myPossibleMoves)
         {
             PossibleMovesOrderedByValue(ref myPossibleMoves);
             Moves move = myPossibleMoves[Random.Range(0, myPossibleMoves.Count)];
-            if (myPossibleMoves[^1].moveValue > 0)
+            if (myPossibleMoves[^1].MoveValue > 0)
             {
                 move = myPossibleMoves[^1];
             }

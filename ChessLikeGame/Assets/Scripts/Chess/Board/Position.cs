@@ -6,27 +6,42 @@ using Object = UnityEngine.Object;
 
 namespace Chess.Board
 {
-    [RequireComponent(typeof(MeshRenderer))]
-    [RequireComponent(typeof(Collider))]
-    public class Position : MonoBehaviour
+    
+    public class Position 
     {
         public ChessPiece piece = null;
         public Vector2 grid;
-        private MeshRenderer _rend;
-        private Collider _collider;
         private bool _isTaken = false;
         private ChessPiece isActiveForChessPiece;
         private bool isActive;
-        public int GetX => (int)grid.x;
-        public int GetY => (int)grid.y;
+        private int GetX => (int)grid.x;
+        private int GetY => (int)grid.y;
+        private readonly PositionGameObject _positionObject;
+        private readonly bool _hypothetical;
 
+        public Position(PositionGameObject positionGameObject)
+        {
+            _hypothetical = false;
+            _positionObject = positionGameObject;
+        }
+
+        public Position(Position position)
+        {
+            _hypothetical = true;
+            piece = position.piece;
+            grid = position.grid;
+            _isTaken = position._isTaken;
+            isActiveForChessPiece = position.isActiveForChessPiece;
+            isActive = position.isActive;
+            _positionObject = position._positionObject;
+        }
+        
         public void SetPiece(ChessPiece obj)
         {
             // if (!obj.IsActive()) return;
             if (_isTaken)
             {
                 obj.CapturePiece(piece);
-                
             }
             _isTaken = true;
             piece = obj;
@@ -36,8 +51,8 @@ namespace Chess.Board
         {
             piece.OnMove += Deactivate;
             isActiveForChessPiece = piece;
-            _rend.enabled = true;
-            _collider.enabled = true;
+            if (!_hypothetical) _positionObject._rend.enabled = true;
+            if (!_hypothetical) _positionObject._collider.enabled = true;
             isActive = true;
         }
 
@@ -51,8 +66,8 @@ namespace Chess.Board
             if (isActive) isActiveForChessPiece.OnMove -= Deactivate;
             isActive = false;
             isActiveForChessPiece = null;
-            _rend.enabled = false;
-            _collider.enabled = false;
+            if (!_hypothetical) _positionObject._rend.enabled = false;
+            if (!_hypothetical) _positionObject._collider.enabled = false;
         }
 
         public void MovePiece()
@@ -61,16 +76,14 @@ namespace Chess.Board
             _isTaken = false;
         }
 
-        private void OnMouseDown()
-        {
-            MoveMade();
-        }
-
         public void MoveMade()
         {
             SetPiece(isActiveForChessPiece);
-            var pos = transform.position;
-            isActiveForChessPiece.Move(new Vector3(pos.x, 0, pos.z), grid);
+            if (!_hypothetical)
+            {
+                var pos = _positionObject.transform.position;
+                isActiveForChessPiece.Move(new Vector3(pos.x, 0, pos.z), grid, this);
+            }
             Deactivate();
         }
 
@@ -90,6 +103,11 @@ namespace Chess.Board
             return piece;
         }
 
+        public string GetCoordinates()
+        {
+            return $"{GetAlphabets((int) grid.x)}{(int)(grid.y + 1)}";
+        }
+
         public override bool Equals(object other)
         {
             //Check for null and compare run-time types.
@@ -103,10 +121,33 @@ namespace Chess.Board
             }
         }
 
-        private void Awake()
+        public string GetAlphabets(int num)
+        { 
+            string strAlpha = "";
+            int alp = 26;
+            int letters = (num / alp);
+            int remainder = (num % alp);
+            strAlpha = Number2String(remainder);
+
+            while (letters / (alp) > 0)
+            {
+                letters = (letters / (alp));
+                int l = (letters % (alp));
+                strAlpha = $"{Number2String(l)}{strAlpha}";
+            }
+            return strAlpha;
+        }
+        
+        private String Number2String(int number)
+
         {
-            _rend = GetComponent<MeshRenderer>();
-            _collider = GetComponent<Collider>();
+            string[] columns = new[]
+            {
+                "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
+                "V", "W", "X", "Y", "Z"
+            };
+            return columns[number];
+
         }
     }
 }

@@ -89,19 +89,21 @@ namespace Chess.Pieces
 
         public Position GetPosition()
         {
-            Position posObj = _board._cubes[(int) pos.x][(int) pos.y];
+            Position posObj = _board.Cubes[(int) pos.x][(int) pos.y];
             return posObj;
         }
 
 
-        public void Move(Vector3 moveTransform, Vector2 nextPos)
+        public void Move(Vector3 moveTransform, Vector2 nextPos, Position position)
         {
-            GetPosition().MovePiece();
+            Position positionFrom = GetPosition();
+            positionFrom.MovePiece();
             OnMove?.Invoke();
             transform.position = new Vector3(moveTransform.x, transform.position.y, moveTransform.z);
             pos = nextPos;
             PieceController.MoveMade();
             _board.ClearBoard();
+            Debug.Log($"{NameType} moves from {positionFrom.GetCoordinates()} to {position.GetCoordinates()}");
         }
         
         public IEnumerator AIMove(Moves moves)
@@ -144,26 +146,26 @@ namespace Chess.Pieces
             {
                 Moves move = MovesList[index];
                 
-                if (!MovesGroupList[move.groupIndex].Active) continue;
+                if (!MovesGroupList[move.GroupIndex].Active) continue;
                 (int posX, int posY) = GetPos(move);
                     
-                if (posX >= _board._cubes.Count || posX < 0 || posY >= _board._cubes[posX].Count || posY < 0)
+                if (posX >= _board.Cubes.Count || posX < 0 || posY >= _board.Cubes[posX].Count || posY < 0)
                 {
                     // Debug.Log($"Move Out Of Range {move.MoveType.ToString()} x={posX},y={posY}");
                     if (!(move.MoveType is MoveTypes.L))
                     {
-                        MovesGroupList[move.groupIndex].Active = false;
+                        MovesGroupList[move.GroupIndex].Active = false;
                     }
 
                     continue;
                 }
 
-                Position posObj = _board._cubes[posX][posY];
+                Position posObj = _board.Cubes[posX][posY];
                 if (posObj.IsTaken())
                 {
                     if (move.Overtake == Overtake.No)
                     {
-                        MovesGroupList[move.groupIndex].Active = false;
+                        MovesGroupList[move.GroupIndex].Active = false;
                         // Debug.Log($"Blocked Can't Overtake {move.MoveType.ToString()}");
                         continue;
                     }
@@ -172,7 +174,7 @@ namespace Chess.Pieces
                     {
                         if (!(move.MoveType is MoveTypes.L))
                         {
-                            MovesGroupList[move.groupIndex].Active = false;
+                            MovesGroupList[move.GroupIndex].Active = false;
                         }
 
                         // Debug.Log($"Blocked by Team {move.MoveType.ToString()}");
@@ -181,7 +183,7 @@ namespace Chess.Pieces
 
                     if (!(move.MoveType is MoveTypes.L))
                     {
-                        MovesGroupList[move.groupIndex].Active = false;
+                        MovesGroupList[move.GroupIndex].Active = false;
                     }
                 }
 
@@ -190,8 +192,7 @@ namespace Chess.Pieces
                 posObj.Activate(this);
                 if (posObj.IsTaken())
                 {
-                    move.PieceTaken = posObj.piece;
-                    move.moveValue = posObj.piece.pieceValue;
+                    move.MoveValue = posObj.piece.pieceValue;
                 }
                 move.MoveResultPos = posObj;
                 possibleMoves.Add(move);
