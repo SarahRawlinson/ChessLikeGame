@@ -1,5 +1,6 @@
 ﻿using System;
 using Chess.Control;
+using Chess.Enums;
 using Chess.Pieces;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -17,7 +18,7 @@ namespace Chess.Board
         private bool isActive;
         private int GetX => (int)grid.x;
         private int GetY => (int)grid.y;
-        private readonly PositionGameObject _positionObject;
+        public readonly PositionGameObject _positionObject;
         private readonly bool _hypothetical;
 
         public Position(PositionGameObject positionGameObject)
@@ -162,6 +163,26 @@ namespace Chess.Board
             };
             return columns[number];
 
+        }
+
+        public (int x, int y) GetPos()
+        {
+            return (GetX, GetY);
+        }
+
+        public Team Team()
+        {
+            throw new NotImplementedException();
+        }
+
+        public float PieceValue()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemovePiece()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -94,6 +94,11 @@ namespace Chess.Pieces
             return posObj;
         }
 
+        public void Move()
+        {
+            OnMove?.Invoke();
+        }
+
 
         public void Move(Vector3 moveTransform, Vector2 nextPos, Position position)
         {
@@ -110,7 +115,7 @@ namespace Chess.Pieces
         public IEnumerator AIMove(Moves moves)
         {
             yield return new WaitForSeconds(1);
-            moves.MoveResultPos.MoveSelected(this);
+            _board.GetPosition(moves.MoveResultPos).MoveSelected(this);
         }
 
         public virtual void WorkOutMoves()
@@ -161,8 +166,8 @@ namespace Chess.Pieces
                     continue;
                 }
 
-                Position posObj = _board.Cubes[posX][posY];
-                if (posObj.IsTaken())
+                (int x, int y) posObj = (posX, posY);
+                if (_board.IsTaken(posObj))
                 {
                     if (move.Overtake == Overtake.No)
                     {
@@ -171,7 +176,7 @@ namespace Chess.Pieces
                         continue;
                     }
 
-                    if (posObj.piece.team == team)
+                    if (_board.GetPosition(posObj).piece.team == team)
                     {
                         if (!(move.MoveType is MoveTypes.L))
                         {
@@ -188,14 +193,14 @@ namespace Chess.Pieces
                     }
                 }
 
-                if (!posObj.IsTaken() && move.Overtake == Overtake.Yes) continue;
+                if (!_board.IsTaken(posObj) && move.Overtake == Overtake.Yes) continue;
                 // Debug.Log($"Path {move.MoveType.ToString()} ok");
-                posObj.Activate(this, con);
-                if (posObj.IsTaken())
+                _board.GetPosition(posObj).Activate(this, con);
+                if (_board.IsTaken(posObj))
                 {
-                    move.MoveValue = posObj.piece.pieceValue;
+                    move.MoveValue = _board.GetPosition(posObj).piece.pieceValue;
                 }
-                move.MoveResultPos = posObj;
+                move.MoveResultPos =  posObj;
                 possibleMoves.Add(move);
             }
             return possibleMoves;
@@ -292,6 +297,10 @@ namespace Chess.Pieces
             Debug.Log("Generic");
             return true;
         }
-        
+
+        public (int x, int y) GetPositionXY()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

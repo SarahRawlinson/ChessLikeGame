@@ -37,7 +37,7 @@ namespace Chess.Board
                 List<Position> newList = new List<Position>();
                 foreach (Position p in pList)
                 {
-                    newList.Add(new Position(p, this));
+                    newList.Add(new Position(p));
                 }
                 posList.Add(newList);
             }
@@ -46,7 +46,7 @@ namespace Chess.Board
         
         public void Move(Vector3 moveTransform, Vector2 nextPos, (int x, int y) position, ChessPiece piece)
         {
-            (int x, int y)  positionFrom = piece.GetPosition();
+            (int x, int y)  positionFrom = piece.GetPositionXY();
             RemovePiece(positionFrom);
             piece.Move();
             piece.transform.position = new Vector3(moveTransform.x, transform.position.y, moveTransform.z);
@@ -177,6 +177,11 @@ namespace Chess.Board
                 if (con.IsCheck()) return true;
             }
             return false;
+        }
+
+        public Position GetPosition((int x, int y) movesMoveResultPos)
+        {
+            return Cubes[movesMoveResultPos.x][movesMoveResultPos.y];
         }
     }
 }

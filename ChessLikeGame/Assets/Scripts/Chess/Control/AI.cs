@@ -27,7 +27,7 @@ namespace Chess.Control
             yield return new WaitForSeconds(2);
             List<Moves> myPossibleMoves = AllLegalMoves(this);
             List<Moves> opponentsPossibleMovesList = otherPlayer.AllLegalMoves(this);
-            Moves move = HighestValueMove(myPossibleMoves, opponentsPossibleMovesList);
+            Moves move = HighestValueMove(myPossibleMoves, opponentsPossibleMovesList, _boardObject);
             StartCoroutine(move.Piece.AIMove(move));
         }
 

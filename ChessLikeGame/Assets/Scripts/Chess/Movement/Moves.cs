@@ -12,7 +12,7 @@ namespace Chess.Movement
         public readonly MoveTypes MoveType;
         public readonly int GroupIndex;
         public readonly ChessPiece Piece;
-        public Position MoveResultPos;
+        public (int x, int y) MoveResultPos;
         public float MoveValue = 0;
         public Moves(int x, int y, MoveGroup moveGroup, int index, ChessPiece piece)
         {

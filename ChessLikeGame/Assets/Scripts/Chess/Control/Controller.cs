@@ -44,12 +44,12 @@ namespace Chess.Control
             }
         }
 
-        bool IsCheck()
+        public bool IsCheck()
         {
             if (_king.IsUnityNull()) return false;
             foreach (Moves move in otherPlayer.PossibleMoves(this))
             {
-                if (move.MoveResultPos.GetCoordinates() == _king.GetPosition().GetCoordinates())
+                if (_boardObject.GetCoordinates(move.MoveResultPos) == _king.GetPosition().GetCoordinates())
                 {
                     return true;
                 }
@@ -110,14 +110,14 @@ namespace Chess.Control
             return (int)(x.MoveValue - y.MoveValue);
         }
         
-        public static Moves HighestValueMove(List<Moves> myPossibleMoves, List<Moves> opponentsPossibleMovesList)
+        public static Moves HighestValueMove(List<Moves> myPossibleMoves, List<Moves> opponentsPossibleMovesList, BoardObject boardObject)
         {
             foreach (Moves mm in myPossibleMoves)
             {
-                string mc = mm.MoveResultPos.GetCoordinates();
+                string mc = boardObject.GetCoordinates(mm.MoveResultPos);
                 foreach (Moves om in opponentsPossibleMovesList)
                 {
-                    if (om.MoveResultPos.GetCoordinates() == mc)
+                    if (boardObject.GetCoordinates(om.MoveResultPos) == mc)
                     {
                         mm.MoveValue -= mm.Piece.pieceValue;
                         // Debug.LogAssertion($"move value changed to {mm.MoveValue}");
