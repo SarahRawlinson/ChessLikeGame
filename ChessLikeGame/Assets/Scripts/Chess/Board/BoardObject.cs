@@ -54,7 +54,7 @@ namespace Chess.Board
         private void OnGridSelect((int x, int y) obj, PositionGameObject posObj)
         {
             (int x, int y) p = posObj.GetPos();
-            if (GetPosition(obj).IsActive()) Move(posObj.transform.position, new Vector2(p.x, p.y),p,activeChessPiece);
+            if (GetPosition(obj).IsActive()) Move(posObj.transform.position, new Vector2(p.x, p.y),p,activeChessPiece, false);
         }
 
         private void OnSelectedPiece(ChessPiece obj, bool on, Controller con)
@@ -95,14 +95,19 @@ namespace Chess.Board
             return posList;
         }
         
-        public void Move(Vector3 moveTransform, Vector2 nextPos, (int x, int y) position, ChessPiece piece)
+        public void Move(Vector3 moveTransform, Vector2 nextPos, (int x, int y) position, ChessPiece piece, bool callTaken)
         {
+            (int x, int y) lastPos = piece.GetPositionXY();
+            bool taken = false;
+            ChessPiece takenPiece = null;
             if (Cubes[position.x][position.y].IsTaken())
             {
-                piece.CapturePiece(Cubes[position.x][position.y].piece);
+                taken = true;
+                takenPiece = Cubes[position.x][position.y].piece;
+                piece.CapturePiece(takenPiece);
             }
             (int x, int y)  positionFrom = piece.GetPositionXY();
-            RemovePiece(positionFrom);
+            if (!callTaken) RemovePiece(positionFrom);
             piece.Move();
             piece.transform.position = new Vector3(moveTransform.x, transform.position.y, moveTransform.z);
             piece.pos = nextPos;
@@ -111,12 +116,17 @@ namespace Chess.Board
             Debug.Log($"{piece.team.ToString()} {piece.NameType} moves from {GetCoordinates(positionFrom)} to {GetCoordinates(position)}");
             SetPosition(piece,position);
             StoreAction(piece,position.x, position.y, positionFrom.x, positionFrom.y);
+            if (taken && takenPiece != null)
+            {
+                Debug.Log($"{takenPiece.NameType} taken moving to {GetCoordinates((lastPos.x,lastPos.y))}");
+                Move(Cubes[lastPos.x][lastPos.y]._positionObject.transform.position,new Vector2(lastPos.x, lastPos.y) ,Cubes[lastPos.x][lastPos.y].GetPos(), takenPiece, true);
+            }
         }
 
         public void Move(Moves move)
         {
             Move(GetPositionVector(move.MoveResultPos), new Vector2(move.MoveResultPos.x, move.MoveResultPos.y),
-                move.MoveResultPos, move.Piece);
+                move.MoveResultPos, move.Piece, false);
         }
 
         Vector3 GetPositionVector((int x, int y) pos)
@@ -164,8 +174,9 @@ namespace Chess.Board
 
         public void SetPosition(ChessPiece chessPiece, (int x, int y) getPosition)
         {
-            // Debug.Log("SetPosition");
-            Cubes[getPosition.x][getPosition.y].SetPiece(chessPiece);
+            Debug.Log("SetPosition");
+            Cubes[getPosition.x][getPosition.y].piece = (chessPiece);
+            Cubes[getPosition.x][getPosition.y]._isTaken = true;
         }
 
         public void RemovePiece((int x, int y) move)

@@ -8,12 +8,12 @@ using Object = UnityEngine.Object;
 
 namespace Chess.Board
 {
-    
+    [Serializable]
     public class Position 
     {
         public ChessPiece piece = null;
         public Vector2 grid;
-        private bool _isTaken = false;
+        public bool _isTaken = false;
         private ChessPiece isActiveForChessPiece;
         private bool isActive;
         private int GetX => (int)grid.x;
@@ -38,16 +38,16 @@ namespace Chess.Board
             _positionObject = position._positionObject;
         }
         
-        public void SetPiece(ChessPiece obj)
-        {
-            // if (!obj.IsActive()) return;
-            if (_isTaken)
-            {
-                // obj.CapturePiece(piece);
-            }
-            _isTaken = true;
-            piece = obj;
-        }
+        // public void SetPiece(ChessPiece obj)
+        // {
+        //     // if (!obj.IsActive()) return;
+        //     if (_isTaken)
+        //     {
+        //         // obj.CapturePiece(piece);
+        //     }
+        //     _isTaken = true;
+        //     piece = obj;
+        // }
 
         public void Activate(ChessPiece piece, Controller con)
         {
@@ -58,7 +58,7 @@ namespace Chess.Board
             {
                 _positionObject._rend.enabled = true;
                 _positionObject._collider.enabled = true;
-                Debug.Log($"{GetCoordinates()} Activated by {piece.team.ToString()} {piece.NameType}");
+                // Debug.Log($"{GetCoordinates()} Activated by {piece.team.ToString()} {piece.NameType}");
             }
             isActive = true;
         }

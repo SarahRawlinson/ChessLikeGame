@@ -31,6 +31,21 @@ namespace Chess.Pieces
         internal event Action OnTaken;
         public static event Action<ChessPiece, bool, Controller> OnSelectedChessPiece;
         public static event Action<ChessPiece> OnChosenChessPiece;
+        public static event Action<GameObject, Team> TeamSwitch;
+
+        public void SwitchTeams()
+        {
+            PieceController.ChessPieceTaken(this);
+            PieceController = PieceController.otherPlayer;
+            team = PieceController._team;
+            PieceController.PiecesCallToController(this);
+            TeamColour();
+        }
+
+        private void TeamColour()
+        {
+            TeamSwitch?.Invoke(pieceObject, team);
+        }
 
         private void Awake()
         {
@@ -53,27 +68,35 @@ namespace Chess.Pieces
 
         private void OnCaptured()
         {
+            SwitchTeams();
+            OnTaken?.Invoke();
+        }
+
+        private void DeactivateGameObject()
+        {
             isActive = false;
             if (TryGetComponent(out Renderer r))
             {
                 r.enabled = false;
             }
+
             if (TryGetComponent(out Collider c))
             {
                 c.enabled = false;
             }
+
             foreach (Transform obj in GetComponentsInChildren<Transform>())
             {
                 if (obj.TryGetComponent(out Renderer or))
                 {
                     or.enabled = false;
                 }
+
                 if (obj.TryGetComponent(out Collider oc))
                 {
                     oc.enabled = false;
                 }
             }
-            OnTaken?.Invoke();
         }
 
         public void CapturePiece(ChessPiece piece)
@@ -87,7 +110,8 @@ namespace Chess.Pieces
         {
             var posObj = GetPosition();
             _startPosition = posObj;
-            posObj.SetPiece(this);
+            // posObj.SetPiece(this);
+            _board.SetPosition(this, GetPositionXY());
         }
 
         public Position GetPosition()

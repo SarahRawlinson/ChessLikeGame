@@ -10,7 +10,7 @@ namespace Chess.Board
     {
         public MeshRenderer _rend;
         public Collider _collider;
-        private Position _position;
+        [SerializeField] private Position _position;
         [SerializeField] public TMP_Text _text;
 
         public static event Action<(int x, int y), PositionGameObject> OnSelected;
@@ -36,7 +36,6 @@ namespace Chess.Board
 
         private void Awake()
         {
-            
             _rend = GetComponent<MeshRenderer>();
             _collider = GetComponent<Collider>();
         }
@@ -44,6 +43,7 @@ namespace Chess.Board
         public void SetText()
         {
             _text.text = _position.GetCoordinates();
+            gameObject.name = _position.GetCoordinates();
         }
 
         private void OnMouseDown()

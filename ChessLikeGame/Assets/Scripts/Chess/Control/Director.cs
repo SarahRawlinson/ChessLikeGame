@@ -54,7 +54,14 @@ namespace Chess.Control
             _boardObject = FindObjectOfType<BoardObject>();
             StartGame();
             King.OnEnd += End;
+            ChessPiece.TeamSwitch += SetColours;
         }
+
+        private void SetColours(GameObject arg1, Team arg2)
+        {
+            arg1.GetComponent<MeshRenderer>().material = GetTeamMaterial(arg2);
+        }
+
 
         private void End(Team obj)
         {
