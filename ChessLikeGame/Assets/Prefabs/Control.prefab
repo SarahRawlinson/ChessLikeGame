@@ -46,6 +46,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player1: {fileID: 5363260824369075283}
   player2: {fileID: 1770025044467282548}
+  endText: {fileID: 0}
+  teamBlackColour: {fileID: 2100000, guid: 8f0172e64ad18ad999ad47913faedd7c, type: 2}
+  teamWhiteColour: {fileID: 2100000, guid: c4309d4054978f93fb08657b9b52c8db, type: 2}
+  team: 0
 --- !u!1 &7060227813545681562
 GameObject:
   m_ObjectHideFlags: 0
@@ -124,7 +128,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33ff4d3cd6a64bec8d229727916dd08a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsActive: 0
+  _isActive: 0
+  trys: 50
 --- !u!1 &8028034709573698384
 GameObject:
   m_ObjectHideFlags: 0
@@ -169,4 +174,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11642a80891846bba5ebf6460486a37d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsActive: 0
+  _isActive: 0
