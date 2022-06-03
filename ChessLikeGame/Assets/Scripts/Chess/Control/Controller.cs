@@ -115,8 +115,14 @@ namespace Chess.Control
             foreach (Moves mm in myPossibleMoves)
             {
                 string mc = boardObject.GetCoordinates(mm.MoveResultPos);
+                string noMove = boardObject.GetCoordinates(mm.Piece.GetPositionXY());
                 foreach (Moves om in opponentsPossibleMovesList)
                 {
+                    if (boardObject.GetCoordinates(om.MoveResultPos) == noMove)
+                    {
+                        mm.MoveValue += mm.Piece.pieceValue;
+                        // Debug.LogAssertion($"move value changed to {mm.MoveValue}");
+                    }
                     if (boardObject.GetCoordinates(om.MoveResultPos) == mc)
                     {
                         mm.MoveValue -= mm.Piece.pieceValue;
@@ -128,7 +134,7 @@ namespace Chess.Control
             Moves move = myPossibleMoves[^1];
             List<Moves> movesList = myPossibleMoves.FindAll(m => m.MoveValue >= move.MoveValue);
             move = movesList[Random.Range(0, movesList.Count)];
-            Debug.Log($"low Val = {myPossibleMoves[0].MoveValue}, High Val = {myPossibleMoves[^1].MoveValue}, Act Val = {move.MoveValue}");
+            // Debug.Log($"low Val = {myPossibleMoves[0].MoveValue}, High Val = {myPossibleMoves[^1].MoveValue}, Act Val = {move.MoveValue}");
             return move;
         }
 
