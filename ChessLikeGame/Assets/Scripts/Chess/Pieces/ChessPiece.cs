@@ -68,7 +68,7 @@ namespace Chess.Pieces
 
         private void OnCaptured()
         {
-            SwitchTeams();
+            DeactivateGameObject();
             OnTaken?.Invoke();
         }
 

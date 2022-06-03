@@ -116,11 +116,11 @@ namespace Chess.Board
             Debug.Log($"{piece.team.ToString()} {piece.NameType} moves from {GetCoordinates(positionFrom)} to {GetCoordinates(position)}");
             SetPosition(piece,position);
             StoreAction(piece,position.x, position.y, positionFrom.x, positionFrom.y);
-            if (taken && takenPiece != null)
-            {
-                Debug.Log($"{takenPiece.NameType} taken moving to {GetCoordinates((lastPos.x,lastPos.y))}");
-                Move(Cubes[lastPos.x][lastPos.y]._positionObject.transform.position,new Vector2(lastPos.x, lastPos.y) ,Cubes[lastPos.x][lastPos.y].GetPos(), takenPiece, true);
-            }
+            // if (taken && takenPiece != null)
+            // {
+            //     Debug.Log($"{takenPiece.NameType} taken moving to {GetCoordinates((lastPos.x,lastPos.y))}");
+            //     Move(Cubes[lastPos.x][lastPos.y]._positionObject.transform.position,new Vector2(lastPos.x, lastPos.y) ,Cubes[lastPos.x][lastPos.y].GetPos(), takenPiece, true);
+            // }
         }
 
         public void Move(Moves move)
@@ -174,14 +174,14 @@ namespace Chess.Board
 
         public void SetPosition(ChessPiece chessPiece, (int x, int y) getPosition)
         {
-            Debug.Log("SetPosition");
+            // Debug.Log("SetPosition");
             Cubes[getPosition.x][getPosition.y].piece = (chessPiece);
             Cubes[getPosition.x][getPosition.y]._isTaken = true;
         }
 
         public void RemovePiece((int x, int y) move)
         {
-            Debug.Log("RemovePiece");
+            // Debug.Log("RemovePiece");
             Cubes[move.x][move.y].RemovePiece();
         }
 
