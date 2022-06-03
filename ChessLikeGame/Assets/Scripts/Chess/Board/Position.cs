@@ -43,7 +43,7 @@ namespace Chess.Board
             // if (!obj.IsActive()) return;
             if (_isTaken)
             {
-                obj.CapturePiece(piece);
+                // obj.CapturePiece(piece);
             }
             _isTaken = true;
             piece = obj;
@@ -77,45 +77,9 @@ namespace Chess.Board
             _positionObject._collider.enabled = false;
         }
 
-        public void MovePiece()
-        {
-            piece = null;
-            _isTaken = false;
-        }
-
-        public void MoveSelected()
-        {
-            SetPiece(isActiveForChessPiece);
-            if (!_hypothetical)
-            {
-                var pos = _positionObject.transform.position;
-                isActiveForChessPiece.Move(new Vector3(pos.x, 0, pos.z), grid, this);
-            }
-            Deactivate();
-        }
-
-        public void MoveSelected(ChessPiece piece)
-        {
-            try
-            {
-                isActiveForChessPiece = piece;
-                MoveSelected();
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-            
-        }
-
         public bool IsTaken()
         {
             return _isTaken;
-        }
-
-        public ChessPiece GetPiece()
-        {
-            return piece;
         }
 
         public string GetCoordinates()
@@ -172,17 +136,20 @@ namespace Chess.Board
 
         public Team Team()
         {
-            throw new NotImplementedException();
+            if (!_isTaken) return Enums.Team.Null;
+            return piece.team;
         }
 
         public float PieceValue()
         {
-            throw new NotImplementedException();
+            if (!_isTaken) return 0;
+            return piece.pieceValue;
         }
 
         public void RemovePiece()
         {
-            throw new NotImplementedException();
+            piece = null;
+            _isTaken = false;
         }
     }
 }

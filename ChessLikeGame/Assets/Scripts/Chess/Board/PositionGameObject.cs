@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 
 namespace Chess.Board
@@ -12,10 +13,20 @@ namespace Chess.Board
         private Position _position;
         [SerializeField] public TMP_Text _text;
 
+        public static event Action<(int x, int y), PositionGameObject> OnSelected;
+
         public PositionGameObject()
         {
             _position = new Position(this);
             
+        }
+        public void MoveSelected()
+        {
+            OnSelected?.Invoke(_position.GetPos(), this);
+        }
+        public (int x, int y) GetPos()
+        {
+            return (_position.GetPos());
         }
 
         public Position GetPosition()
@@ -25,6 +36,7 @@ namespace Chess.Board
 
         private void Awake()
         {
+            
             _rend = GetComponent<MeshRenderer>();
             _collider = GetComponent<Collider>();
         }
@@ -36,7 +48,7 @@ namespace Chess.Board
 
         private void OnMouseDown()
         {
-            _position.MoveSelected();
+            MoveSelected();
         }
     }
 }

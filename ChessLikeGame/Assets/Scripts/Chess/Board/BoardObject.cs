@@ -13,6 +13,24 @@ namespace Chess.Board
 {
     public class BoardObject : MonoBehaviour
     {
+        public class Actions
+        {
+            public ChessPiece piece;
+            public int xNewPosIndex;
+            public int yNewPosIndex;
+            public int xOldPosIndex;
+            public int yOldPosIndex;
+
+            public Actions(ChessPiece p, int nx, int ny, int ox, int oy)
+            {
+                piece = p;
+                xNewPosIndex = nx;
+                yNewPosIndex = ny;
+                xOldPosIndex = ox;
+                yOldPosIndex = oy;
+            }
+        }
+        
         public readonly List<List<Position>> Cubes = new List<List<Position>>();
         public int rows = 10;
         public int columns = 10;
@@ -21,12 +39,45 @@ namespace Chess.Board
         public event Action OnBoardSetUp;
         private King[] _kings;
         private Controller[] _controllers;
-        private List<(ChessPiece piece, int xNewPosIndex, int yNewPosIndex, int xOldPosIndex, int yOldPosIndex)> moves;
+        private List<Actions> moves = new List<Actions>();
+        private ChessPiece activeChessPiece;
 
         private void Awake()
         {
             _kings = FindObjectsOfType<King>();
             _controllers = FindObjectsOfType<Controller>();
+            ChessPiece.OnChosenChessPiece += OnChosenMove;
+            ChessPiece.OnSelectedChessPiece += OnSelectedPiece;
+            PositionGameObject.OnSelected += OnGridSelect;
+        }
+
+        private void OnGridSelect((int x, int y) obj, PositionGameObject posObj)
+        {
+            (int x, int y) p = posObj.GetPos();
+            if (GetPosition(obj).IsActive()) Move(posObj.transform.position, new Vector2(p.x, p.y),p,activeChessPiece);
+        }
+
+        private void OnSelectedPiece(ChessPiece obj, bool on, Controller con)
+        {
+            if (on) ActivatePositions(obj, con);
+            else
+            {
+                (int x, int y) pos = obj.GetPositionXY();
+                Position p = GetPosition(pos);
+                OnGridSelect(pos, p._positionObject);
+            };
+        }
+
+        private void ActivatePositions(ChessPiece obj, Controller con)
+        {
+            activeChessPiece = obj;
+            obj.GetPossibleMoves(con);
+        }
+
+        private void OnChosenMove(ChessPiece obj)
+        {
+            Position p = GetPosition(obj.GetPositionXY());
+            OnGridSelect(p.GetPos(),p._positionObject);
         }
 
         public List<List<Position>> GetHypotheticalBoard()
@@ -46,6 +97,10 @@ namespace Chess.Board
         
         public void Move(Vector3 moveTransform, Vector2 nextPos, (int x, int y) position, ChessPiece piece)
         {
+            if (Cubes[position.x][position.y].IsTaken())
+            {
+                piece.CapturePiece(Cubes[position.x][position.y].piece);
+            }
             (int x, int y)  positionFrom = piece.GetPositionXY();
             RemovePiece(positionFrom);
             piece.Move();
@@ -54,6 +109,8 @@ namespace Chess.Board
             piece.PieceController.MoveMade();
             ClearBoard();
             Debug.Log($"{piece.team.ToString()} {piece.NameType} moves from {GetCoordinates(positionFrom)} to {GetCoordinates(position)}");
+            SetPosition(piece,position);
+            StoreAction(piece,position.x, position.y, positionFrom.x, positionFrom.y);
         }
 
         public void Move(Moves move)
@@ -100,15 +157,15 @@ namespace Chess.Board
             OnBoardSetUp?.Invoke();
         }
 
-        private void StoreAction((int x, int y) pos, (int x, int y) oldPos)
+        private void StoreAction(ChessPiece piece, int nx, int ny, int ox, int oy)
         {
-            moves.Add((Cubes[pos.x][pos.y].piece, pos.x, pos.y,oldPos.x, oldPos.y ));
+            moves.Add(new Actions(piece, nx, ny, ox, oy ));
         }
 
         public void SetPosition(ChessPiece chessPiece, (int x, int y) getPosition)
         {
             // Debug.Log("SetPosition");
-            Cubes[getPosition.x][getPosition.y].piece = chessPiece;
+            Cubes[getPosition.x][getPosition.y].SetPiece(chessPiece);
         }
 
         public void RemovePiece((int x, int y) move)
@@ -126,13 +183,6 @@ namespace Chess.Board
         {
             Debug.Log("IsActive");
             return Cubes[position.x][position.y].IsActive();
-        }
-
-        public void MoveSelected((int x, int y) position)
-        {
-            Debug.Log("MoveSelected");
-            Cubes[position.x][position.y].MoveSelected();
-            // throw new NotImplementedException();
         }
 
         public bool IsTaken((int x, int y) posObj)
@@ -184,4 +234,5 @@ namespace Chess.Board
             return Cubes[movesMoveResultPos.x][movesMoveResultPos.y];
         }
     }
+    
 }

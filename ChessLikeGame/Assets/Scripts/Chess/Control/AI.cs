@@ -28,7 +28,8 @@ namespace Chess.Control
             List<Moves> myPossibleMoves = AllLegalMoves(this);
             List<Moves> opponentsPossibleMovesList = otherPlayer.AllLegalMoves(this);
             Moves move = HighestValueMove(myPossibleMoves, opponentsPossibleMovesList, _boardObject);
-            StartCoroutine(move.Piece.AIMove(move));
+            // StartCoroutine(move.Piece.AIMove(move));
+            _boardObject.Move(move);
         }
 
         private void StartMove()

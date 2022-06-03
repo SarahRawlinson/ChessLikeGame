@@ -29,6 +29,8 @@ namespace Chess.Pieces
         public Controller PieceController;
         private Position _startPosition;
         internal event Action OnTaken;
+        public static event Action<ChessPiece, bool, Controller> OnSelectedChessPiece;
+        public static event Action<ChessPiece> OnChosenChessPiece;
 
         private void Awake()
         {
@@ -90,32 +92,12 @@ namespace Chess.Pieces
 
         public Position GetPosition()
         {
-            Position posObj = _board.Cubes[(int) pos.x][(int) pos.y];
-            return posObj;
+            return _board.Cubes[(int) pos.x][(int) pos.y];
         }
 
         public void Move()
         {
             OnMove?.Invoke();
-        }
-
-
-        public void Move(Vector3 moveTransform, Vector2 nextPos, Position position)
-        {
-            Position positionFrom = GetPosition();
-            positionFrom.MovePiece();
-            OnMove?.Invoke();
-            transform.position = new Vector3(moveTransform.x, transform.position.y, moveTransform.z);
-            pos = nextPos;
-            PieceController.MoveMade();
-            _board.ClearBoard();
-            Debug.Log($"{team.ToString()} {NameType} moves from {positionFrom.GetCoordinates()} to {position.GetCoordinates()}");
-        }
-        
-        public IEnumerator AIMove(Moves moves)
-        {
-            yield return new WaitForSeconds(1);
-            _board.GetPosition(moves.MoveResultPos).MoveSelected(this);
         }
 
         public virtual void WorkOutMoves()
@@ -125,16 +107,7 @@ namespace Chess.Pieces
 
         public void OnMouseDown()
         {
-            if (IsActive())
-            {
-                PieceController.LegalMovesList(GetPossibleMoves(PieceController));
-            }
-            else
-            {
-                Position position = GetPosition();
-                if (position.IsActive()) position.MoveSelected();
-            }
-            
+            OnSelectedChessPiece?.Invoke(this, IsActive(), PieceController);
         }
 
         public List<Moves> GetPossibleMoves(Controller con)
@@ -300,7 +273,7 @@ namespace Chess.Pieces
 
         public (int x, int y) GetPositionXY()
         {
-            throw new NotImplementedException();
+            return ((int)pos.x,(int) pos.y);
         }
     }
 }
