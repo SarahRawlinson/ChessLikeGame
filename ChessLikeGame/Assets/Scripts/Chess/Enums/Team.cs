@@ -3,6 +3,7 @@
     public enum Team
     {
         White,
-        Black
+        Black,
+        Null
     }
 }
