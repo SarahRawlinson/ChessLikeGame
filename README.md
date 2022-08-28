@@ -1,6 +1,6 @@
 <h1 id="header" align ="centre">Chess Like Game</h1>
 <body>
- <p>This project was made to for my first game jam, not very origional but the whole game was implemented within 7 days.</p>
+ <p>This project was made to for my first game jam, not very original but the whole game was implemented within 7 days.</p>
  <p>Not all rules of chess apply and the AI is limited but I am still happy with the results.</p>
  <p>
   <br>
