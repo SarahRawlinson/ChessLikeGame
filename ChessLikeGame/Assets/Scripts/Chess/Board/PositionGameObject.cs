@@ -12,6 +12,7 @@ namespace Chess.Board
         public Collider _collider;
         [SerializeField] private Position _position;
         [SerializeField] public TMP_Text _text;
+        [SerializeField] GameObject piecePosition;
 
         public static event Action<(int x, int y), PositionGameObject> OnSelected;
 
@@ -44,6 +45,12 @@ namespace Chess.Board
         {
             _text.text = _position.GetCoordinates();
             gameObject.name = _position.GetCoordinates();
+        }
+
+        public GameObject SpawnGameObject(GameObject obj)
+        {
+            Vector3 pos = new Vector3(piecePosition.transform.position.x, piecePosition.transform.position.y, piecePosition.transform.position.z);
+            return Instantiate(obj, pos, Quaternion.identity);
         }
 
         private void OnMouseDown()

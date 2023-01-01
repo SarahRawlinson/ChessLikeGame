@@ -10,6 +10,7 @@ namespace Chess.Pieces
     public class Pawn : ChessPiece
     {
         private bool firstMove = true;
+        private int endY;
         private void Start()
         {
             OnMove += WhenMove;
@@ -31,6 +32,30 @@ namespace Chess.Pieces
             firstMove = false;
             OnMove -= WhenMove;
         }
+
+        public override void SetPosition()
+        {
+            base.SetPosition();
+            if (_startPosition.y == 0)
+            {
+                endY = _board.rows;
+            }
+            if (_startPosition.y == _board.rows)
+            {
+                endY = 0;
+            }
+        }
+
+        public override void SpecialActions(int x, int y)
+        {
+            base.SpecialActions(x, y);
+            if (y == endY)
+            {
+                SwapPiece(this, ReturnNewPiece());
+            }
+        }
+
+        
 
         public override bool GetConditionsMet(MoveTypes move, int step, Overtake overtake, bool jump)
         {

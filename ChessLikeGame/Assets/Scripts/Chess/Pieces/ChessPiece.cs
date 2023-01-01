@@ -27,11 +27,39 @@ namespace Chess.Pieces
         [SerializeField] internal int pieceValue;
         public List<ChessPiece> captured = new List<ChessPiece>();
         public Controller PieceController;
-        private Position _startPosition;
+        internal (int x, int y) _startPosition;
         internal event Action OnTaken;
         public static event Action<ChessPiece, bool, Controller> OnSelectedChessPiece;
         public static event Action<ChessPiece> OnChosenChessPiece;
         public static event Action<GameObject, Team> TeamSwitch;
+        public static event Action<ChessPiece, int> OnSwap;
+        private bool SpecialMoveUsed = false;
+        private bool copy = false;
+        [SerializeField] public MeshRenderer MeshRender;
+
+        public void SetUpCopy(ChessPiece chessPiece)
+        {
+            transform.position = chessPiece.transform.position;
+            team = chessPiece.team;
+            pos = chessPiece.pos;
+            captured = chessPiece.captured;
+            PieceController = chessPiece.PieceController;
+            _startPosition = chessPiece._startPosition;
+            _board = chessPiece._board;
+            copy = true;
+            TeamColour();
+            SetPosition();
+        }
+        
+        public virtual int ReturnNewPiece()
+        {
+            return 0;
+        }
+        
+        internal void SwapPiece(ChessPiece oldPiece, int newPiece)
+        {
+            OnSwap?.Invoke(oldPiece, newPiece);
+        }
 
         public void SwitchTeams()
         {
@@ -40,6 +68,11 @@ namespace Chess.Pieces
             team = PieceController._team;
             PieceController.PiecesCallToController(this);
             TeamColour();
+        }
+
+        public virtual void SpecialActions(int x, int y)
+        {
+            
         }
 
         private void TeamColour()
@@ -72,8 +105,9 @@ namespace Chess.Pieces
             OnTaken?.Invoke();
         }
 
-        private void DeactivateGameObject()
+        public void DeactivateGameObject()
         {
+            PieceController.ChessPieceTaken(this);
             isActive = false;
             if (TryGetComponent(out Renderer r))
             {
@@ -106,10 +140,10 @@ namespace Chess.Pieces
             Debug.Log($"{team.ToString()} {this.NameType} takes {piece.team.ToString()} {piece.NameType}");
         }
 
-        public void SetPosition()
+        public virtual void SetPosition()
         {
             var posObj = GetPosition();
-            _startPosition = posObj;
+            _startPosition = posObj.GetPos();
             // posObj.SetPiece(this);
             _board.SetPosition(this, GetPositionXY());
         }
@@ -119,9 +153,10 @@ namespace Chess.Pieces
             return _board.Cubes[(int) pos.x][(int) pos.y];
         }
 
-        public void Move()
+        public void Move(int x, int y)
         {
             OnMove?.Invoke();
+            SpecialActions(x, y);
         }
 
         public virtual void WorkOutMoves()
@@ -299,5 +334,7 @@ namespace Chess.Pieces
         {
             return ((int)pos.x,(int) pos.y);
         }
+
+        
     }
 }

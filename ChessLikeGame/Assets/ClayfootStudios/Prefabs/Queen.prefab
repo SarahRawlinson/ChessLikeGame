@@ -52,6 +52,7 @@ MonoBehaviour:
   pieceValue: 200
   captured: []
   PieceController: {fileID: 0}
+  MeshRender: {fileID: 4761572908054600622}
 --- !u!136 &3048909287193112029
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -123,6 +124,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9f37fba6c332586799fc622fe7dce477, type: 3}
+--- !u!23 &4761572908054600622 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 9f37fba6c332586799fc622fe7dce477, type: 3}
+  m_PrefabInstance: {fileID: 6184872706535933738}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5935653634877956289 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9f37fba6c332586799fc622fe7dce477, type: 3}

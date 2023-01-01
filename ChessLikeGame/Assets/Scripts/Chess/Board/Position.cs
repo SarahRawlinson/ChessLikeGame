@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Chess.Control;
 using Chess.Enums;
 using Chess.Pieces;
@@ -20,6 +21,11 @@ namespace Chess.Board
         private int GetY => (int)grid.y;
         public readonly PositionGameObject _positionObject;
         private readonly bool _hypothetical;
+        public static string[] columns = new[]
+        {
+            "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", 
+            "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+        };
 
         public Position(PositionGameObject positionGameObject)
         {
@@ -37,6 +43,11 @@ namespace Chess.Board
             isActive = position.isActive;
             _positionObject = position._positionObject;
         }
+
+        public GameObject SpawnPiece(GameObject obj)
+        {
+            return _positionObject.SpawnGameObject(obj);
+        }
         
         // public void SetPiece(ChessPiece obj)
         // {
@@ -52,7 +63,7 @@ namespace Chess.Board
         public void Activate(ChessPiece piece, Controller con)
         {
             bool aiCon = con.TryGetComponent(out AI ai);
-            piece.OnMove += Deactivate;
+            // piece.OnMove += Deactivate;
             isActiveForChessPiece = piece;
             if (!_hypothetical && !aiCon)
             {
@@ -70,7 +81,7 @@ namespace Chess.Board
 
         public void Deactivate()
         {
-            if (isActive) isActiveForChessPiece.OnMove -= Deactivate;
+            // if (isActive) isActiveForChessPiece.OnMove -= Deactivate;
             isActive = false;
             isActiveForChessPiece = null;
             _positionObject._rend.enabled = false;
@@ -117,16 +128,14 @@ namespace Chess.Board
             return strAlpha;
         }
         
-        private String Number2String(int number)
-
+        public static String Number2String(int number)
         {
-            string[] columns = new[]
-            {
-                "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
-                "V", "W", "X", "Y", "Z"
-            };
             return columns[number];
-
+        }
+        
+        public static int String2Number(string number)
+        {
+            return Array.IndexOf(columns,number);
         }
 
         public (int x, int y) GetPos()

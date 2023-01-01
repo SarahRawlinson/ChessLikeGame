@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Chess.Control;
 using Chess.Enums;
 using Chess.Interface;
@@ -49,7 +50,10 @@ namespace Chess.Board
             ChessPiece.OnChosenChessPiece += OnChosenMove;
             ChessPiece.OnSelectedChessPiece += OnSelectedPiece;
             PositionGameObject.OnSelected += OnGridSelect;
+            
         }
+
+        
 
         private void OnGridSelect((int x, int y) obj, PositionGameObject posObj)
         {
@@ -108,7 +112,6 @@ namespace Chess.Board
             }
             (int x, int y)  positionFrom = piece.GetPositionXY();
             if (!callTaken) RemovePiece(positionFrom);
-            piece.Move();
             piece.transform.position = new Vector3(moveTransform.x, transform.position.y, moveTransform.z);
             piece.pos = nextPos;
             piece.PieceController.MoveMade();
@@ -121,6 +124,7 @@ namespace Chess.Board
             //     Debug.Log($"{takenPiece.NameType} taken moving to {GetCoordinates((lastPos.x,lastPos.y))}");
             //     Move(Cubes[lastPos.x][lastPos.y]._positionObject.transform.position,new Vector2(lastPos.x, lastPos.y) ,Cubes[lastPos.x][lastPos.y].GetPos(), takenPiece, true);
             // }
+            piece.Move(position.x, position.y);
         }
 
         public void Move(Moves move)
@@ -144,6 +148,11 @@ namespace Chess.Board
                 }
             }
         }
+
+        public void SetReady()
+        {
+            OnBoardSetUp?.Invoke();
+        }
         private void Start()
         {
             GameObject cubeObj = cube.gameObject;
@@ -164,7 +173,7 @@ namespace Chess.Board
                 Cubes.Add(objects);
             }
 
-            OnBoardSetUp?.Invoke();
+            // OnBoardSetUp?.Invoke();
         }
 
         private void StoreAction(ChessPiece piece, int nx, int ny, int ox, int oy)
@@ -243,6 +252,11 @@ namespace Chess.Board
         public Position GetPosition((int x, int y) movesMoveResultPos)
         {
             return Cubes[movesMoveResultPos.x][movesMoveResultPos.y];
+        }
+        public Position GetPosition(string pos)
+        {
+
+            return Cubes[Position.String2Number(pos[0].ToString().ToUpper())][int.Parse(pos.Substring(1,pos.Length-1))-1];
         }
     }
     
