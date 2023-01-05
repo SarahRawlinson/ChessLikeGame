@@ -9,11 +9,12 @@ using Chess.Control;
 using Chess.Movement;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 namespace Chess.Pieces
 {
-    public class ChessPiece: MonoBehaviour, ICondition
+    public class ChessPiece: ControlItem, ICondition, IComparable
     {
         [SerializeField] private GameObject pieceObject;
         internal List<MoveGroup> MovesGroupList = new List<MoveGroup>();
@@ -36,6 +37,12 @@ namespace Chess.Pieces
         private bool SpecialMoveUsed = false;
         private bool copy = false;
         [SerializeField] public MeshRenderer MeshRender;
+        [SerializeField] private UnityEvent onSelected = null;
+        [SerializeField] private UnityEvent onDeselected = null;
+        public static event Action<ChessPiece> ServerOnUnitSpawned;
+        public static event Action<ChessPiece> ServerOnUnitDespawned;
+        public static event Action<ChessPiece> AuthorityOnUnitSpawned;
+        public static event Action<ChessPiece> AuthorityOnUnitDespawned;
 
         public void SetUpCopy(ChessPiece chessPiece)
         {
@@ -335,6 +342,10 @@ namespace Chess.Pieces
             return ((int)pos.x,(int) pos.y);
         }
 
-        
+
+        public int CompareTo(object obj)
+        {
+            return team.CompareTo(obj);
+        }
     }
 }

@@ -120,10 +120,10 @@ namespace Chess.Control
 
         private void Update()
         {
-            if (Input.GetKey("escape"))
-            {
-                Application.Quit();
-            }
+            // if (Input.GetKey("escape"))
+            // {
+            //     Application.Quit();
+            // }
         }
 
         private void Awake()
