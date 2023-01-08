@@ -27,8 +27,6 @@ Y
 )Assets/Scripts/Chess/Pieces/ChessPiece.cs,0\4\0455da0916ec5428e2999bd0d12dd3e8737803df
 e
 5Assets/Scripts/Chess/Networking/NetworkPlayerChess.cs,b\1\b175ff811f788d99c0ca35d836f61f19ae41407f
-T
-$Assets/Mirror/Core/NetworkManager.cs,9\9\9945fda09bb13e3b2e115f1cad9c6a5c5841204d
 X
 (Assets/Scripts/EndGame/EndGameHandler.cs,f\5\f5c503bf86caaa4abce0ff98e18508525e9592fe
 T

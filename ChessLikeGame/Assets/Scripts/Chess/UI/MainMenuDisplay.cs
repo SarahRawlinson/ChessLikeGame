@@ -19,10 +19,10 @@ namespace Chess.UI
 
         private void Start()
         {
-            useSteamToggle.isOn = useSteam;
-            if (useSteam && (!steamNetworker.activeSelf || mirrorNetworker.activeSelf)) Debug.Log("Error in Networking Set up");
-            if (!useSteam && (steamNetworker.activeSelf || !mirrorNetworker.activeSelf)) Debug.Log("Error in Networking Set up");
-            if (!useSteam) return;
+            // useSteamToggle.isOn = useSteam;
+            // if (useSteam && (!steamNetworker.activeSelf || mirrorNetworker.activeSelf)) Debug.Log("Error in Networking Set up");
+            // if (!useSteam && (steamNetworker.activeSelf || !mirrorNetworker.activeSelf)) Debug.Log("Error in Networking Set up");
+            // if (!useSteam) return;
             lobbyCreated = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
             gameLobbyJoinedRequested = Callback<GameLobbyJoinRequested_t>.Create(OnLobbyJoinedRequested);
             lobbyEntered = Callback<LobbyEnter_t>.Create(OnlobbyEntered);
