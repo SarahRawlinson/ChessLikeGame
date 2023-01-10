@@ -70,7 +70,7 @@ MonoBehaviour:
   timeInterpolationGui: 0
   startOfSceneName: Chess_Board
   startScene: Chess_Board
-  unitBasePrefab: {fileID: 0}
+  unitBasePrefab: {fileID: 1337016230325609427, guid: 89708febf5cf656489fc2a6e01bf8fdf, type: 3}
   endGameHandlerPrefab: {fileID: 3632761897668306124, guid: 700c0231268091c4baa8c771a91ea220, type: 3}
 --- !u!114 &1558923491950465084
 MonoBehaviour:

@@ -1,8 +1,6 @@
 
 S
 #Assets/Scripts/Chess/Pieces/Pawn.cs,3\5\355a2b4fc6aa06180ee3f05bf35acf89e4a54af8
-U
-%Assets/Scripts/Chess/Pieces/Bishop.cs,f\9\f9b2d862a57ca13dfcb146cb4f31a8debdfc52dd
 ]
 -Assets/Scripts/Chess/Interface/IController.cs,e\e\ee21837cb4f2d305ec80f13cf52f846e79d7ac82
 \
@@ -23,8 +21,6 @@ Z
 *Assets/Scripts/Chess/Control/Controller.cs,c\d\cde9ca29673d76e1c92dcae919e6e09f568af164
 Y
 )Assets/Scripts/Chess/Board/BoardObject.cs,8\5\85649264578fdc99d8f43ad85fdf461b4182032d
-Y
-)Assets/Scripts/Chess/Pieces/ChessPiece.cs,0\4\0455da0916ec5428e2999bd0d12dd3e8737803df
 e
 5Assets/Scripts/Chess/Networking/NetworkPlayerChess.cs,b\1\b175ff811f788d99c0ca35d836f61f19ae41407f
 X

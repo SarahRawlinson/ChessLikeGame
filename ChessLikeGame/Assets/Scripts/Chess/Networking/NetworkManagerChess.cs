@@ -45,6 +45,7 @@ namespace Chess.Networking
 
         private void SpawnStartObjects(NetworkPlayerChess player)
         {
+            if (player == null) return;
             Transform startPosition = GetStartPosition();
             GameObject unitSpawnerInstance = Instantiate(unitBasePrefab, startPosition.position, Quaternion.identity);
             NetworkServer.Spawn(unitSpawnerInstance, player.connectionToClient);

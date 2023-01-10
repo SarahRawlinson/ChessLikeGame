@@ -163,7 +163,7 @@ namespace Chess.Control
         private void Start()
         {
             _boardObject = FindObjectOfType<BoardObject>();
-            BuildDictionarySetUp();
+            // BuildDictionarySetUp();
             StartGame();
             King.OnEnd += End;
             ChessPiece.TeamSwitch += SetColours;
