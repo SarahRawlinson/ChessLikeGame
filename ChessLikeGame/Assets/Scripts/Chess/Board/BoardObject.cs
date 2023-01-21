@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Chess.Control;
 using Chess.Enums;
@@ -257,6 +258,16 @@ namespace Chess.Board
         {
 
             return Cubes[Position.String2Number(pos[0].ToString().ToUpper())][int.Parse(pos.Substring(1,pos.Length-1))-1];
+        }
+
+        public List<Position> GetPositions()
+        {
+            List<Position> list = new List<Position>();
+            foreach (var positions in Cubes)
+            {
+                list.AddRange(positions);
+            }
+            return list;
         }
     }
     

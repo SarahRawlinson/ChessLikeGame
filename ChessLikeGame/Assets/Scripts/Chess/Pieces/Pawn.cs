@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using Chess.Board;
+using Chess.Control;
 using Chess.Enums;
 using Chess.Movement;
 using Unity.VisualScripting;
@@ -11,10 +13,12 @@ namespace Chess.Pieces
     {
         private bool firstMove = true;
         private int endY;
+        
         private void Start()
         {
             OnMove += WhenMove;
             NameType = "Pawn";
+            Key = "P";
             // WorkOutMoves();
         }
 
@@ -27,10 +31,32 @@ namespace Chess.Pieces
             MovesList.AddRange(GetMoves(2));
         }
 
-        void WhenMove()
+        void WhenMove(((int x, int y) from, (int x, int y) to) valueTuple)
         {
+            OnMoveStatic?.Invoke();
+            var fromY = valueTuple.from.y;
+            var toY = valueTuple.to.y;
+            if (firstMove && Mathf.Abs(fromY - toY) == 2)
+            {
+                ActivateEnPassant(valueTuple, fromY, toY);
+                PieceController.OnMoved += DeactivateEnPassant;
+            }
             firstMove = false;
             OnMove -= WhenMove;
+        }
+
+        private void ActivateEnPassant(((int x, int y) from, (int x, int y) to) valueTuple, int fromY, int toY)
+        {
+            enPassant = true;
+            // not sure if this is the correct way around need to test
+            EnPassantString =
+                $"{Position.Number2String(valueTuple.from.x).ToLower()}{fromY + 1 + (fromY - toY > 0 ? 1 : -1)}";
+        }
+
+        private void DeactivateEnPassant(Controller obj)
+        {
+            enPassant = false;
+            EnPassantString = "";
         }
 
         public override void SetPosition()
@@ -77,6 +103,8 @@ namespace Chess.Pieces
             }
             return false;
         }
+
+        public static event Action OnMoveStatic;
     } 
 }
 

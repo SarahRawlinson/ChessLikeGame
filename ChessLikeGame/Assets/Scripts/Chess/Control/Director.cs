@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using Chess.Board;
 using Chess.Enums;
+using Chess.Fen;
 using Chess.Pieces;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -24,6 +26,8 @@ namespace Chess.Control
         [SerializeField] ChessPiece[] chessPieces;
         private Dictionary<string, string> boardSetUpWhite = new Dictionary<string, string>();
         private Dictionary<string, string> boardSetUpBlack = new Dictionary<string, string>();
+        public int HalfmoveClock { get; set; }
+        public int TurnNumber { get; set; }
 
         private void BuildDictionarySetUp()
         {
@@ -129,6 +133,13 @@ namespace Chess.Control
         private void Awake()
         {
             ChessPiece.OnSwap += SwapPiece;
+            ChessPiece.OnTakenStatic += ResetHalfMoveClock;
+            Pawn.OnMoveStatic += ResetHalfMoveClock;
+        }
+
+        private void ResetHalfMoveClock()
+        {
+            HalfmoveClock = 0;
         }
 
         private void SwapPiece(ChessPiece arg1, int arg2)
@@ -200,6 +211,10 @@ namespace Chess.Control
 
         private void MoveMade(Controller controller)
         {
+            TurnNumber++;
+            BoardToFenMapper mapper = new BoardToFenMapper(_boardObject.GetPositions(), controller, this);
+            Debug.Log(mapper.GetMap());
+            HalfmoveClock++;
             _boardObject.ClearBoard();
             if (_gameOver)
             {
@@ -223,8 +238,8 @@ namespace Chess.Control
                 // Debug.Log($"Active controller is now {player1}");
             }
             team = _activeController._team;
-            
-            
+
+
         }
     }
 }

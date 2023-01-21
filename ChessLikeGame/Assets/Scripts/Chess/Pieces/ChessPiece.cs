@@ -18,11 +18,14 @@ namespace Chess.Pieces
         [SerializeField] private GameObject pieceObject;
         internal List<MoveGroup> MovesGroupList = new List<MoveGroup>();
         internal List<Moves> MovesList = new List<Moves>();
+        protected bool enPassant = false;
         public Vector2 pos;
         public Team team;
         internal BoardObject _board;
         internal string NameType = "Generic";
-        internal event Action OnMove;
+        internal string Key = "G";
+        protected internal string EnPassantString = "";
+        internal event Action<((int x, int y) from, (int x, int y) to)>  OnMove;
         private bool isActive = true;
         [SerializeField] internal int pieceValue;
         public List<ChessPiece> captured = new List<ChessPiece>();
@@ -34,8 +37,9 @@ namespace Chess.Pieces
         public static event Action<GameObject, Team> TeamSwitch;
         public static event Action<ChessPiece, int> OnSwap;
         private bool SpecialMoveUsed = false;
-        private bool copy = false;
+        private bool _copy = false;
         [SerializeField] public MeshRenderer MeshRender;
+        public bool HasMoved { get; set; }
 
         public void SetUpCopy(ChessPiece chessPiece)
         {
@@ -46,7 +50,7 @@ namespace Chess.Pieces
             PieceController = chessPiece.PieceController;
             _startPosition = chessPiece._startPosition;
             _board = chessPiece._board;
-            copy = true;
+            _copy = true;
             TeamColour();
             SetPosition();
         }
@@ -82,6 +86,7 @@ namespace Chess.Pieces
 
         private void Awake()
         {
+            HasMoved = false;
             _board = FindObjectOfType<BoardObject>();
             _board.OnBoardSetUp += SetPosition;
             FindObjectOfType<Director>().OnStart += GetController;
@@ -103,6 +108,7 @@ namespace Chess.Pieces
         {
             DeactivateGameObject();
             OnTaken?.Invoke();
+            OnTakenStatic?.Invoke();
         }
 
         public void DeactivateGameObject()
@@ -155,7 +161,8 @@ namespace Chess.Pieces
 
         public void Move(int x, int y)
         {
-            OnMove?.Invoke();
+            HasMoved = true;
+            OnMove?.Invoke((((int) pos.x, (int) pos.y),(x,y)));
             SpecialActions(x, y);
         }
 
@@ -335,6 +342,12 @@ namespace Chess.Pieces
             return ((int)pos.x,(int) pos.y);
         }
 
-        
+
+        public bool IsEnPassant()
+        {
+            return enPassant;
+        }
+
+        public static event Action OnTakenStatic;
     }
 }
