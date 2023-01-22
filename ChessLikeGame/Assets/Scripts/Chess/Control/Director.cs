@@ -26,8 +26,10 @@ namespace Chess.Control
         [SerializeField] ChessPiece[] chessPieces;
         private Dictionary<string, string> boardSetUpWhite = new Dictionary<string, string>();
         private Dictionary<string, string> boardSetUpBlack = new Dictionary<string, string>();
+        public int FullMove {get => (TurnNumber -1)/2;}
         public int HalfmoveClock { get; set; }
         public int TurnNumber { get; set; }
+        public static event Action OnMoveMade;
 
         private void BuildDictionarySetUp()
         {
@@ -238,8 +240,7 @@ namespace Chess.Control
                 // Debug.Log($"Active controller is now {player1}");
             }
             team = _activeController._team;
-
-
+            OnMoveMade?.Invoke();
         }
     }
 }

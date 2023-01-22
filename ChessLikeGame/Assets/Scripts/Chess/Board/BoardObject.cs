@@ -125,7 +125,7 @@ namespace Chess.Board
             //     Debug.Log($"{takenPiece.NameType} taken moving to {GetCoordinates((lastPos.x,lastPos.y))}");
             //     Move(Cubes[lastPos.x][lastPos.y]._positionObject.transform.position,new Vector2(lastPos.x, lastPos.y) ,Cubes[lastPos.x][lastPos.y].GetPos(), takenPiece, true);
             // }
-            piece.Move(position.x, position.y);
+            piece.Move(lastPos, ((int)nextPos.x, (int)nextPos.y));
         }
 
         public void Move(Moves move)

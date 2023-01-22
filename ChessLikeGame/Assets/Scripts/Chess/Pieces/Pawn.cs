@@ -36,13 +36,21 @@ namespace Chess.Pieces
             OnMoveStatic?.Invoke();
             var fromY = valueTuple.from.y;
             var toY = valueTuple.to.y;
+            Debug.Log(fromY - toY);
             if (firstMove && Mathf.Abs(fromY - toY) == 2)
             {
                 ActivateEnPassant(valueTuple, fromY, toY);
-                PieceController.OnMoved += DeactivateEnPassant;
+                Director.OnMoveMade += DeactivateEnPassant;
             }
             firstMove = false;
             OnMove -= WhenMove;
+        }
+
+        private void DeactivateEnPassant()
+        {
+            Debug.Log($"En Passant Deactivated {EnPassantString}");
+            enPassant = false;
+            EnPassantString = "";
         }
 
         private void ActivateEnPassant(((int x, int y) from, (int x, int y) to) valueTuple, int fromY, int toY)
@@ -50,13 +58,8 @@ namespace Chess.Pieces
             enPassant = true;
             // not sure if this is the correct way around need to test
             EnPassantString =
-                $"{Position.Number2String(valueTuple.from.x).ToLower()}{fromY + 1 + (fromY - toY > 0 ? 1 : -1)}";
-        }
-
-        private void DeactivateEnPassant(Controller obj)
-        {
-            enPassant = false;
-            EnPassantString = "";
+                $"{Position.Number2String(valueTuple.from.x).ToLower()}{fromY + 1 + (fromY - toY > 0 ? -1 : 1)}";
+            Debug.Log($"En Passant Active {EnPassantString}");
         }
 
         public override void SetPosition()
@@ -81,8 +84,6 @@ namespace Chess.Pieces
             }
         }
 
-        
-
         public override bool GetConditionsMet(MoveTypes move, int step, Overtake overtake, bool jump)
         {
             // Debug.Log("Pawn");
@@ -103,7 +104,6 @@ namespace Chess.Pieces
             }
             return false;
         }
-
         public static event Action OnMoveStatic;
     } 
 }

@@ -159,11 +159,11 @@ namespace Chess.Pieces
             return _board.Cubes[(int) pos.x][(int) pos.y];
         }
 
-        public void Move(int x, int y)
+        public void Move((int x, int y) from, (int x, int y) to)
         {
             HasMoved = true;
-            OnMove?.Invoke((((int) pos.x, (int) pos.y),(x,y)));
-            SpecialActions(x, y);
+            OnMove?.Invoke((from, to));
+            SpecialActions(to.x, to.y);
         }
 
         public virtual void WorkOutMoves()

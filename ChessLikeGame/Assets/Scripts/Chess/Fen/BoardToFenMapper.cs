@@ -29,7 +29,7 @@ namespace Chess.Fen
             WorkOutCastle(ref mapStringBuilder);
             mapStringBuilder.Append(" ");
             WorkOutEnPassant(ref mapStringBuilder);
-            mapStringBuilder.Append($" {director.HalfmoveClock} {director.TurnNumber}");
+            mapStringBuilder.Append($" {director.HalfmoveClock} {director.FullMove}");
             _map = mapStringBuilder.ToString();
         }
 
