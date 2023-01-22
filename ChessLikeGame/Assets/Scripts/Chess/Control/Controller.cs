@@ -160,6 +160,10 @@ namespace Chess.Control
             _isActive = false;
         }
 
-        
+
+        public string GetKey()
+        {
+            return _team.ToString().ToLower().Substring(0, 1);
+        }
     }
 }

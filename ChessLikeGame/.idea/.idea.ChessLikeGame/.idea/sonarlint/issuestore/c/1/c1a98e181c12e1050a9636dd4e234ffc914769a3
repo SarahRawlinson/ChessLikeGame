@@ -1,0 +1,7 @@
+
+9csharpsquid:S2933#"Make '_hasMoved' 'readonly'.(οθα„
+csharpsquid:S3887
+"bUse an immutable collection or reduce the accessibility of the non-private readonly field 'Moves'.(‰„ΔΡ
+xcsharpsquid:S2386
+"[Use an immutable collection or reduce the accessibility of the public static field 'Moves'.(‰„ΔΡ
+pcsharpsquid:S4487#"SRemove this unread private field '_hasMoved' or refactor the code to use its value.(οθα„

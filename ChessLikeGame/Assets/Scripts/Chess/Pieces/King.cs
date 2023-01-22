@@ -12,6 +12,7 @@ namespace Chess.Pieces
         private void Start()
         {
             NameType = "King";
+            Key = "K";
             // WorkOutMoves();
             OnTaken += End;
         }

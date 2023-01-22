@@ -9,6 +9,7 @@ namespace Chess.Pieces
         private void Start()
         {
             NameType = "Knight";
+            Key = "N";
             // WorkOutMoves();
         }
 

@@ -160,5 +160,23 @@ namespace Chess.Board
             piece = null;
             _isTaken = false;
         }
+
+        public bool IsEnPassant()
+        {
+            if (_isTaken)
+            {
+                return piece.IsEnPassant();
+            }
+            return false;
+        }
+
+        public string GetEnPassantString()
+        {
+            if (_isTaken)
+            {
+                return piece.EnPassantString;
+            }
+            return "";
+        }
     }
 }
