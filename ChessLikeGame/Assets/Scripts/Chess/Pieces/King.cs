@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using Chess.Board;
 using Chess.Enums;
 using Chess.Movement;
 using UnityEngine;
@@ -9,8 +10,19 @@ namespace Chess.Pieces
     public class King: ChessPiece
     {
         public static event Action<Team> OnEnd;
-        private void Start()
+        public bool canCastleKing;
+        public bool canCastleQueen;
+        public bool CanCastleKing { get => canCastleKing; set => CanCastle(ref canCastleKing, value); }
+        public bool CanCastleQueen { get => canCastleQueen; set => CanCastle(ref canCastleQueen, value); }
+
+        private void CanCastle(ref bool castle, bool value)
         {
+            castle = value;
+            // Debug.Log($"can castle called {value}");
+        }
+        protected override void Awake()
+        {
+            base.Awake();
             NameType = "King";
             Key = "K";
             // WorkOutMoves();
@@ -32,6 +44,28 @@ namespace Chess.Pieces
             MovesGroupList.Add(new MoveGroup(MoveTypes.DiagonalUpRight, Overtake.Both, false));
             MovesGroupList.Add(new MoveGroup(MoveTypes.DiagonalDownLeft, Overtake.Both, false));
             MovesGroupList.Add(new MoveGroup(MoveTypes.DiagonalDownRight, Overtake.Both, false));
+            if (CanCastleKing)
+            {
+                // Debug.Log($"{team.ToString()} can king castle");
+                MovesGroupList.Add(
+                    new MoveGroup(
+                        team==Team.Black ? MoveTypes.CastleKingSideBlack : MoveTypes.CastleKingSideWhite, 
+                        Overtake.Both, 
+                        true
+                    )
+                    );
+            }
+            if (CanCastleQueen)
+            {
+                // Debug.Log($"{team.ToString()} can queen castle");
+                MovesGroupList.Add(
+                    new MoveGroup(
+                        team==Team.Black ? MoveTypes.CastleQueenSideBlack : MoveTypes.CastleQueenSideWhite, 
+                        Overtake.Both, 
+                        true
+                    )
+                );
+            }
             MovesList = GetMoves(1);
         }
 
@@ -47,11 +81,47 @@ namespace Chess.Pieces
                 or MoveTypes.DiagonalDownRight 
                 or MoveTypes.DiagonalUpLeft 
                 or MoveTypes.DiagonalUpRight
-                && step == 1)
+                && step == 1 ||
+                move is MoveTypes.CastleKingSideBlack
+                or MoveTypes.CastleKingSideWhite
+                or MoveTypes.CastleQueenSideBlack
+                or MoveTypes.CastleQueenSideWhite)
             {
                 return true;
             }
             return false;
+        }
+        
+        public override void WorkoutIfMoved()
+        {
+            if (pos.x != 4)
+            {
+                HasMoved = true;
+            }
+            else if (team == Team.Black)
+            {
+                HasMoved = pos.y != 7;
+            }
+            else if (team == Team.White)
+            {
+                HasMoved = pos.y != 0;
+            }
+
+            if (HasMoved)
+            {
+                Debug.Log("King Has Moved");
+            }
+        }
+        
+        public override void SpecialActions(int x, int y, Position positionFrom, Position positionTo)
+        {
+            base.SpecialActions(x, y, positionFrom, positionTo);
+            // if (positionFrom.hasReplacementPiece)
+            // {
+            //     ChessPiece piece = positionFrom.replacementPiece;
+            //     piece.SetActive();
+            //     piece.Move(positionFrom);
+            // }
         }
     }
 }

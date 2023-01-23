@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using Chess.Board;
 using Chess.Enums;
 using Chess.Fen;
@@ -18,6 +19,7 @@ namespace Chess.Control
         [SerializeField] private TMP_Text endText;
         [SerializeField] private Material teamBlackColour;
         [SerializeField] private Material teamWhiteColour;
+        [SerializeField] private string fenStartString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         private BoardObject _boardObject;
         public event Action OnStart;
         private Controller _activeController;
@@ -26,10 +28,14 @@ namespace Chess.Control
         [SerializeField] ChessPiece[] chessPieces;
         private Dictionary<string, string> boardSetUpWhite = new Dictionary<string, string>();
         private Dictionary<string, string> boardSetUpBlack = new Dictionary<string, string>();
-        public int FullMove {get => (TurnNumber -1)/2;}
+        public int FullMove {get => (TurnNumber)/2;}
         public int HalfmoveClock { get; set; }
         public int TurnNumber { get; set; }
         public static event Action OnMoveMade;
+        private King blackKing;
+        private King whiteKing;
+        private FenParser fenParser;
+        private bool BoardSetUp = false;
 
         private void BuildDictionarySetUp()
         {
@@ -69,29 +75,45 @@ namespace Chess.Control
 
             foreach (var piece in boardSetUpWhite)
             {
-                var obj = ChessPieceType(piece);
-
-                var position = _boardObject.GetPosition(piece.Key);
-                var gObj = position.SpawnPiece(obj.gameObject);
-                ChessPiece chessPiece = gObj.GetComponent<ChessPiece>();
-                chessPiece.team = Team.White;
-                chessPiece.MeshRender.material = teamWhiteColour;
-                var pos = position.GetPos();
-                chessPiece.pos = new Vector2(pos.x, pos.y);
+                CreatePiece(piece, Team.White);
             }
             foreach (var piece in boardSetUpBlack)
             {
-                var obj = ChessPieceType(piece);
-
-                var position = _boardObject.GetPosition(piece.Key);
-                var gObj = position.SpawnPiece(obj.gameObject);
-                ChessPiece chessPiece = gObj.GetComponent<ChessPiece>();
-                chessPiece.team = Team.Black;
-                chessPiece.MeshRender.material = teamBlackColour;
-                var pos = position.GetPos();
-                chessPiece.pos = new Vector2(pos.x, pos.y);
+                CreatePiece(piece, Team.Black);
             }
             
+        }
+
+        public GameObject CreatePiece(KeyValuePair<string, string> piece, Team chessPieceTeam)
+        {
+            if (BoardSetUp)
+            {
+                Debug.Log("needs implementing");
+                throw CheckoutException.Canceled;
+            }
+
+            
+            var obj = ChessPieceType(piece);
+
+            var position = _boardObject.GetPosition(piece.Key);
+            var gObj = position.SpawnPiece(obj.gameObject);
+            ChessPiece chessPiece = gObj.GetComponent<ChessPiece>();
+            chessPiece.team = chessPieceTeam;
+            chessPiece.MeshRender.material = chessPieceTeam==Team.Black?teamBlackColour:teamWhiteColour;
+            var pos = position.GetPos();
+            chessPiece.pos = new Vector2(pos.x, pos.y);
+            if (chessPiece.TryGetComponent(out King king))
+            {
+                if (chessPieceTeam == Team.Black)
+                {
+                    blackKing = king;
+                }
+                else
+                {
+                    whiteKing = king;
+                }
+            }
+            return gObj;
         }
 
         private ChessPiece ChessPieceType(KeyValuePair<string, string> piece)
@@ -170,17 +192,21 @@ namespace Chess.Control
 
         public void NewGame()
         {
-            StartGame();
+            CreateBoardFromFen boardMaker = new CreateBoardFromFen(this);
+            StartGame(boardMaker.fenParser.BoardStateData);
         }
 
         private void Start()
         {
             _boardObject = FindObjectOfType<BoardObject>();
-            BuildDictionarySetUp();
-            StartGame();
+            // BuildDictionarySetUp();
+            CreateBoardFromFen boardMaker = new CreateBoardFromFen(this);
+            boardMaker.SetUpBoardFromFen(fenStartString);
+            StartGame(boardMaker.fenParser.BoardStateData);
             King.OnEnd += End;
             ChessPiece.TeamSwitch += SetColours;
             _boardObject.SetReady();
+            BoardSetUp = true;
         }
 
         private void SetColours(GameObject arg1, Team arg2)
@@ -202,21 +228,21 @@ namespace Chess.Control
             if (on) endText.text = $"Game Over Team {s} Won";
         }
 
-        private void StartGame()
+        private void StartGame(BoardStateData boardState)
         {
             player1.SetTeam(Team.Black);
-            player1.OnMoved += MoveMade;
             player2.SetTeam(Team.White);
-            OnStart?.Invoke();
-            player1.SetActive();
-        }
 
+            Controller player = boardState.ActivePlayerColor == "White" ? player2 : player1;
+            player.OnMoved += MoveMade;
+            OnStart?.Invoke();
+            player.SetActive();
+        }
+        
         private void MoveMade(Controller controller)
         {
             TurnNumber++;
-            BoardToFenMapper mapper = new BoardToFenMapper(_boardObject.GetPositions(), controller, this);
-            Debug.Log(mapper.GetMap());
-            HalfmoveClock++;
+            
             _boardObject.ClearBoard();
             if (_gameOver)
             {
@@ -239,8 +265,22 @@ namespace Chess.Control
                 player1.SetActive();
                 // Debug.Log($"Active controller is now {player1}");
             }
+            
             team = _activeController._team;
+            ReMapFen(_activeController);
+            HalfmoveClock++;
             OnMoveMade?.Invoke();
+        }
+
+        private void ReMapFen(Controller controller)
+        {
+            BoardToFenMapper mapper = new BoardToFenMapper(_boardObject.GetPositions(), controller, this);
+            fenParser = new FenParser(mapper.GetMap());
+            blackKing.CanCastleKing = fenParser.BoardStateData.BlackCanKingsideCastle;
+            whiteKing.CanCastleKing = fenParser.BoardStateData.WhiteCanKingsideCastle;
+            blackKing.CanCastleQueen = fenParser.BoardStateData.BlackCanQueensideCastle;
+            whiteKing.CanCastleQueen = fenParser.BoardStateData.WhiteCanQueensideCastle;
+            Debug.Log(mapper.GetMap());
         }
     }
 }

@@ -10,6 +10,10 @@
         DiagonalUpLeft,
         DiagonalDownRight,
         DiagonalDownLeft,
-        L
+        L,
+        CastleQueenSideWhite,
+        CastleQueenSideBlack,
+        CastleKingSideWhite,
+        CastleKingSideBlack
     }
 }

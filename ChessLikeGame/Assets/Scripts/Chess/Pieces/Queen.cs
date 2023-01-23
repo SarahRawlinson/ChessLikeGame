@@ -7,8 +7,9 @@ namespace Chess.Pieces
 {
     public class Queen: ChessPiece
     {
-        private void Start()
+        protected override void Awake()
         {
+            base.Awake();
             NameType = "Queen";
             Key = "Q";
             // WorkOutMoves();
@@ -43,6 +44,27 @@ namespace Chess.Pieces
                 return true;
             }
             return false;
+        }
+        
+        public override void WorkoutIfMoved()
+        {
+            if (pos.x != 3)
+            {
+                HasMoved = true;
+            }
+            else if (team == Team.Black)
+            {
+                HasMoved = pos.y != 7;
+            }
+            else if (team == Team.White)
+            {
+                HasMoved = pos.y != 0;
+            }
+
+            if (HasMoved)
+            {
+                Debug.Log("Queen Has Moved");
+            }
         }
     }
 }

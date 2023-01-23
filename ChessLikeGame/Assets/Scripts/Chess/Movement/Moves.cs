@@ -12,6 +12,7 @@ namespace Chess.Movement
         public readonly MoveTypes MoveType;
         public readonly int GroupIndex;
         public readonly ChessPiece Piece;
+        public readonly ChessPiece SwapPiece;
         public (int x, int y) MoveResultPos;
         public float MoveValue = 0;
         public Moves(int x, int y, MoveGroup moveGroup, int index, ChessPiece piece)
@@ -23,5 +24,18 @@ namespace Chess.Movement
             GroupIndex = index;
             Piece = piece;
         }
+        public Moves(int x, int y, MoveGroup moveGroup, int index, ChessPiece piece, ChessPiece swapPiece)
+        {
+            Forward = x;
+            Right = y;
+            Overtake = moveGroup.Overtake;
+            MoveType = moveGroup.Type;
+            GroupIndex = index;
+            Piece = piece;
+            SwapPiece = swapPiece;
+            IsCastle = swapPiece!=null;
+        }
+
+        public bool IsCastle { get; }
     }
 }

@@ -25,6 +25,7 @@ namespace Chess.Fen
         {
             StringBuilder mapStringBuilder = new StringBuilder();
             CreateBoardMap(board, ref mapStringBuilder);
+            Debug.Log(mapStringBuilder.ToString());
             mapStringBuilder.Append($" {nextPlayer.GetKey()} ");
             WorkOutCastle(ref mapStringBuilder);
             mapStringBuilder.Append(" ");
@@ -79,7 +80,7 @@ namespace Chess.Fen
                     ChessPiece piece = position.piece;
                     if (piece.Key == "R" && !piece.HasMoved)
                     {
-                        mapStringBuilder.Append(row == 1 ? "k": "K");
+                        mapStringBuilder.Append(row == 1 ? "K": "k");
                         canCastle = true;
                     }
                 }
@@ -90,7 +91,7 @@ namespace Chess.Fen
                     ChessPiece piece = position.piece;
                     if (piece.Key == "R" && !piece.HasMoved)
                     {
-                        mapStringBuilder.Append(row == 1 ? "q": "Q");
+                        mapStringBuilder.Append(row == 1 ? "Q": "q");
                         canCastle = true;
                     }
                 }
@@ -115,7 +116,7 @@ namespace Chess.Fen
             BoardToFenMapper boardObj = this;
             int freeSpaces = 0;
 
-            for (int i = 1; i <= 8; i++)
+            for (int i = 8; i > 0; i--)
             {
                 for (int j = 0; j < 8; j++)
                 {
@@ -141,11 +142,11 @@ namespace Chess.Fen
                         }
                         if (piece.team == Team.Black)
                         {
-                            mapStringBuilder.Append(piece.Key);
+                            mapStringBuilder.Append(piece.Key.ToLower());
                         }
                         else if (piece.team == Team.White)
                         {
-                            mapStringBuilder.Append(piece.Key.ToLower());
+                            mapStringBuilder.Append(piece.Key);
                         }
                         else
                         {
@@ -161,7 +162,7 @@ namespace Chess.Fen
                     freeSpaces = 0;
                 }
 
-                if (i < 8)
+                if (i > 1)
                 {
                     mapStringBuilder.Append("/");
                 }

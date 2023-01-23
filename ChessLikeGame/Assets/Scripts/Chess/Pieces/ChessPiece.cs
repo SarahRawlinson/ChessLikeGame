@@ -74,7 +74,7 @@ namespace Chess.Pieces
             TeamColour();
         }
 
-        public virtual void SpecialActions(int x, int y)
+        public virtual void SpecialActions(int x, int y, Position positionFrom, Position positionTo)
         {
             
         }
@@ -84,7 +84,7 @@ namespace Chess.Pieces
             TeamSwitch?.Invoke(pieceObject, team);
         }
 
-        private void Awake()
+        protected virtual void Awake()
         {
             HasMoved = false;
             _board = FindObjectOfType<BoardObject>();
@@ -161,11 +161,24 @@ namespace Chess.Pieces
 
         public void Move((int x, int y) from, (int x, int y) to)
         {
+            Position positionFrom = _board.GetPosition(from);
+            Position positionTo = _board.GetPosition(from);
             HasMoved = true;
             OnMove?.Invoke((from, to));
-            SpecialActions(to.x, to.y);
+            SpecialActions(to.x, to.y, positionFrom, positionTo);
         }
 
+        public void Move(Position position)
+        {
+            HasMoved = true;
+        }
+
+        public void SetActive()
+        {
+            
+        }
+        
+        
         public virtual void WorkOutMoves()
         {
             
@@ -180,6 +193,7 @@ namespace Chess.Pieces
         {
             List<Moves> possibleMoves = new List<Moves>();
             if (!isActive) return possibleMoves;
+            MovesGroupList = new List<MoveGroup>();
             WorkOutMoves();
             foreach (MoveGroup m in MovesGroupList)
             {
@@ -193,7 +207,14 @@ namespace Chess.Pieces
                 
                 if (!MovesGroupList[move.GroupIndex].Active) continue;
                 (int posX, int posY) = GetPos(move);
-                    
+                if (move.IsCastle)
+                {
+                    // Debug.Log("castle move added");
+                    move.MoveResultPos =  (posX, posY);
+                    possibleMoves.Add(move);
+                    _board.GetPosition((posX, posY)).Activate(this, con, move);
+                    continue;
+                }
                 if (posX >= _board.Cubes.Count || posX < 0 || posY >= _board.Cubes[posX].Count || posY < 0)
                 {
                     // Debug.Log($"Move Out Of Range {move.MoveType.ToString()} x={posX},y={posY}");
@@ -234,7 +255,7 @@ namespace Chess.Pieces
 
                 if (!_board.IsTaken(posObj) && move.Overtake == Overtake.Yes) continue;
                 // Debug.Log($"Path {move.MoveType.ToString()} ok");
-                _board.GetPosition(posObj).Activate(this, con);
+                _board.GetPosition(posObj).Activate(this, con, move);
                 if (_board.IsTaken(posObj))
                 {
                     move.MoveValue = _board.GetPosition(posObj).piece.pieceValue;
@@ -255,8 +276,8 @@ namespace Chess.Pieces
         
         public bool IsActive()
         {
-            if (!isActive) Debug.Log($"{NameType} no longer active");
-            if (!PieceController.IsActive()) Debug.Log($"{team.ToString()} no longer active");
+            // if (!isActive) Debug.Log($"{NameType} no longer active");
+            // if (!PieceController.IsActive()) Debug.Log($"{team.ToString()} no longer active");
             return isActive && PieceController.IsActive();
         }
 
@@ -325,6 +346,22 @@ namespace Chess.Pieces
                         movesList.Add(new Moves(2, -1, MovesGroupList[index], index, this));
                         movesList.Add(new Moves(-2, -1, MovesGroupList[index], index, this));
                         break;
+                    case MoveTypes.CastleKingSideBlack:
+                        // Debug.Log("CastleKingSideBlack added");
+                        movesList.Add(new Moves(3, 0, MovesGroupList[index], index, this, _board.GetPosition("H8").piece));
+                        break;
+                    case MoveTypes.CastleKingSideWhite:
+                        // Debug.Log("CastleKingSideWhite added");
+                        movesList.Add(new Moves(3, 0, MovesGroupList[index], index, this, _board.GetPosition("H1").piece));
+                        break;
+                    case MoveTypes.CastleQueenSideBlack:
+                        // Debug.Log("CastleQueenSideBlack added");
+                        movesList.Add(new Moves(-4, 0, MovesGroupList[index], index, this, _board.GetPosition("A8").piece));
+                        break;
+                    case MoveTypes.CastleQueenSideWhite:
+                        // Debug.Log("CastleQueenSideWhite added");
+                        movesList.Add(new Moves(-4, 0, MovesGroupList[index], index, this, _board.GetPosition("A1").piece));
+                        break;
                 }
             }
 
@@ -333,7 +370,7 @@ namespace Chess.Pieces
 
         public virtual bool GetConditionsMet(MoveTypes move, int step, Overtake overtake, bool jump)
         {
-            Debug.Log("Generic");
+            Debug.Log($"Generic conditions met {NameType}");
             return true;
         }
 
@@ -349,5 +386,10 @@ namespace Chess.Pieces
         }
 
         public static event Action OnTakenStatic;
+
+        public virtual void WorkoutIfMoved()
+        {
+            Debug.Log($"Generic workout if moved {NameType}");
+        }
     }
 }

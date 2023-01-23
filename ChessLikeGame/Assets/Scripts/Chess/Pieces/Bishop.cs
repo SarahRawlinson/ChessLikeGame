@@ -6,8 +6,9 @@ namespace Chess.Pieces
 {
     public class Bishop: ChessPiece
     {
-        private void Start()
+        protected override void Awake()
         {
+            base.Awake();
             NameType = "Bishop";
             Key = "B";
             // WorkOutMoves();
@@ -34,6 +35,26 @@ namespace Chess.Pieces
                 return true;
             }
             return false;
+        }
+        public override void WorkoutIfMoved()
+        {
+            if (pos.x != 2 && pos.x != 5)
+            {
+                HasMoved = true;
+            }
+            else if (team == Team.Black)
+            {
+                HasMoved = pos.y != 7;
+            }
+            else if (team == Team.White)
+            {
+                HasMoved = pos.y != 0;
+            }
+
+            if (HasMoved)
+            {
+                Debug.Log("Bishop Has Moved");
+            }
         }
     }
 }

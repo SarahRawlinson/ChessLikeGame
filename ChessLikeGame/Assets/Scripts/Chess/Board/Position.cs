@@ -2,6 +2,7 @@
 using System.Linq;
 using Chess.Control;
 using Chess.Enums;
+using Chess.Movement;
 using Chess.Pieces;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -20,6 +21,7 @@ namespace Chess.Board
         private int GetX => (int)grid.x;
         private int GetY => (int)grid.y;
         public readonly PositionGameObject _positionObject;
+        public Moves PossibleMove = null;
         private readonly bool _hypothetical;
         public static string[] columns = new[]
         {
@@ -60,8 +62,9 @@ namespace Chess.Board
         //     piece = obj;
         // }
 
-        public void Activate(ChessPiece piece, Controller con)
+        public void Activate(ChessPiece piece, Controller con, Moves possibleMove)
         {
+            PossibleMove = possibleMove;
             bool aiCon = con.TryGetComponent(out AI ai);
             // piece.OnMove += Deactivate;
             isActiveForChessPiece = piece;
@@ -81,6 +84,7 @@ namespace Chess.Board
 
         public void Deactivate()
         {
+            PossibleMove = null;
             // if (isActive) isActiveForChessPiece.OnMove -= Deactivate;
             isActive = false;
             isActiveForChessPiece = null;
@@ -177,6 +181,13 @@ namespace Chess.Board
                 return piece.EnPassantString;
             }
             return "";
+        }
+
+        public void PlacePiece(ChessPiece newPositionPiece)
+        {
+            Debug.Log("place piece");
+            piece = newPositionPiece;
+            _positionObject.SetPiece(newPositionPiece);
         }
     }
 }
