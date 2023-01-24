@@ -25,7 +25,7 @@ namespace Chess.Fen
         {
             StringBuilder mapStringBuilder = new StringBuilder();
             CreateBoardMap(board, ref mapStringBuilder);
-            Debug.Log(mapStringBuilder.ToString());
+            // Debug.Log(mapStringBuilder.ToString());
             mapStringBuilder.Append($" {nextPlayer.GetKey()} ");
             WorkOutCastle(ref mapStringBuilder);
             mapStringBuilder.Append(" ");

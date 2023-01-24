@@ -46,7 +46,7 @@ namespace Chess.Pieces
 
             if (HasMoved)
             {
-                Debug.Log("Knight Has Moved");
+                // Debug.Log("Knight Has Moved");
             }
         }
     }

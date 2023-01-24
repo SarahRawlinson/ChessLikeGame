@@ -1,18 +1,20 @@
-﻿using Chess.Board;
+﻿using System;
+using Chess.Board;
 using Chess.Enums;
 using Chess.Pieces;
 
 namespace Chess.Movement
 {
+    [Serializable]
     public class Moves
     {
-        public readonly int Forward;
-        public readonly int Right;
-        public readonly Overtake Overtake;
-        public readonly MoveTypes MoveType;
-        public readonly int GroupIndex;
-        public readonly ChessPiece Piece;
-        public readonly ChessPiece SwapPiece;
+        public int Forward;
+        public int Right;
+        public Overtake Overtake;
+        public MoveTypes MoveType;
+        public int GroupIndex;
+        public ChessPiece Piece;
+        public ChessPiece SwapPiece;
         public (int x, int y) MoveResultPos;
         public float MoveValue = 0;
         public Moves(int x, int y, MoveGroup moveGroup, int index, ChessPiece piece)

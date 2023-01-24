@@ -45,7 +45,7 @@ namespace Chess.Pieces
 
             if (HasMoved)
             {
-                Debug.Log("Pawn Has Moved");
+                // Debug.Log("Pawn Has Moved");
             }
         }
 

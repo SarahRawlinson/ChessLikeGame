@@ -60,10 +60,7 @@ namespace Chess.Fen
         #endregion
 
         #region Constructors
-        public FenParser()
-        {
-            BoardStateData = new BoardStateData();
-        }
+
 
         public FenParser(string fen)
         {

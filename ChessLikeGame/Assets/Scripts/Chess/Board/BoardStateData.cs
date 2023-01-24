@@ -53,6 +53,8 @@ namespace Chess.Board
         /// The game's move number.
         /// </summary>
         public int FullMoveNumber { get; set; }
+        
+        public string Fen { get; set; }
 
         #endregion
 
@@ -219,7 +221,7 @@ namespace Chess.Board
         #endregion
 
         #region Construtors
-        public BoardStateData() { }
+        // public BoardStateData() { }
 
         public BoardStateData(string piecePlacementString, string activeColorString, string castlingAvailabilityString,
                 string enPassantSquareString, string halfmoveClockString, string fullmoveNumberString)
@@ -230,6 +232,19 @@ namespace Chess.Board
             ParseEnPassantSquare(enPassantSquareString);
             ParseHalfMoveCounter(halfmoveClockString);
             ParseFullmoveNumber(fullmoveNumberString);
+            Fen = $"{piecePlacementString} {activeColorString} {castlingAvailabilityString} {enPassantSquareString} {halfmoveClockString} {fullmoveNumberString}";
+        }
+        
+        public BoardStateData(string fen)
+        {
+            Fen = fen;
+            var fenSplit = fen.Split(" ");
+            ParseRanks(fenSplit[0]);
+            ParseActiveColor(fenSplit[1]);
+            ParseCastlingAvailability(fenSplit[2]);
+            ParseEnPassantSquare(fenSplit[3]);
+            ParseHalfMoveCounter(fenSplit[4]);
+            ParseFullmoveNumber(fenSplit[5]);
         }
 
         #endregion

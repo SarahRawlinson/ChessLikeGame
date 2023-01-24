@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Chess.Control;
 using Chess.Enums;
+using Chess.Fen;
 using Chess.Interface;
 using Chess.Movement;
 using Chess.Pieces;
@@ -32,7 +33,8 @@ namespace Chess.Board
                 yOldPosIndex = oy;
             }
         }
-        
+
+        private BoardStateData CurrentBoardStateData;
         public readonly List<List<Position>> Cubes = new List<List<Position>>();
         public int rows = 10;
         public int columns = 10;
@@ -43,6 +45,7 @@ namespace Chess.Board
         private Controller[] _controllers;
         private List<Actions> moves = new List<Actions>();
         private ChessPiece activeChessPiece;
+        private FenParser fenParser;
 
         private void Awake()
         {
@@ -85,20 +88,20 @@ namespace Chess.Board
             OnGridSelect(p.GetPos(),p._positionObject);
         }
 
-        public List<List<Position>> GetHypotheticalBoard()
-        {
-            List<List<Position>> posList = new List<List<Position>>();
-            foreach (List<Position> pList in Cubes)
-            {
-                List<Position> newList = new List<Position>();
-                foreach (Position p in pList)
-                {
-                    newList.Add(new Position(p));
-                }
-                posList.Add(newList);
-            }
-            return posList;
-        }
+        // public List<List<Position>> GetHypotheticalBoard()
+        // {
+        //     List<List<Position>> posList = new List<List<Position>>();
+        //     foreach (List<Position> pList in Cubes)
+        //     {
+        //         List<Position> newList = new List<Position>();
+        //         foreach (Position p in pList)
+        //         {
+        //             newList.Add(new Position(p));
+        //         }
+        //         posList.Add(newList);
+        //     }
+        //     return posList;
+        // }
         
         public void Move(Vector3 moveTransform, Vector2 nextPos, (int x, int y) position, ChessPiece piece, bool callTaken, bool isCastle)
         {
@@ -291,6 +294,24 @@ namespace Chess.Board
                 list.AddRange(positions);
             }
             return list;
+        }
+
+        public bool IsEnPassant(string s)
+        {
+            return CurrentBoardStateData.EnPassantSquare.ToLower() == s.ToLower();
+        }
+
+        public BoardStateData GetBoardStateData(Controller controller, Director director)
+        {
+            BoardToFenMapper mapper = new BoardToFenMapper(GetPositions(), controller, director);
+            fenParser = new FenParser(mapper.GetMap());
+            CurrentBoardStateData = fenParser.BoardStateData;
+            return CurrentBoardStateData;
+        }
+
+        public void SetBoardStateData(BoardStateData fenParserBoardStateData)
+        {
+            CurrentBoardStateData = fenParserBoardStateData;
         }
     }
     

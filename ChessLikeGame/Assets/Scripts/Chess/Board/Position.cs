@@ -16,12 +16,12 @@ namespace Chess.Board
         public ChessPiece piece = null;
         public Vector2 grid;
         public bool _isTaken = false;
+        public Moves PossibleMove = null;
+        public readonly PositionGameObject _positionObject;
         private ChessPiece isActiveForChessPiece;
         private bool isActive;
         private int GetX => (int)grid.x;
         private int GetY => (int)grid.y;
-        public readonly PositionGameObject _positionObject;
-        public Moves PossibleMove = null;
         private readonly bool _hypothetical;
         public static string[] columns = new[]
         {
@@ -65,6 +65,7 @@ namespace Chess.Board
         public void Activate(ChessPiece piece, Controller con, Moves possibleMove)
         {
             PossibleMove = possibleMove;
+            // Debug.Log($"move set {GetCoordinates()} {piece.NameType}");
             bool aiCon = con.TryGetComponent(out AI ai);
             // piece.OnMove += Deactivate;
             isActiveForChessPiece = piece;
@@ -84,6 +85,7 @@ namespace Chess.Board
 
         public void Deactivate()
         {
+            // Debug.Log($"move removed {GetCoordinates()}");
             PossibleMove = null;
             // if (isActive) isActiveForChessPiece.OnMove -= Deactivate;
             isActive = false;

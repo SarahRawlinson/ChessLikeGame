@@ -53,7 +53,7 @@ namespace Chess.Pieces
 
             if (HasMoved)
             {
-                Debug.Log("Rook Has Moved");
+                // Debug.Log("Rook Has Moved");
             }
         }
     }

@@ -26,73 +26,26 @@ namespace Chess.Control
         private bool _gameOver = false;
         public Team team;
         [SerializeField] ChessPiece[] chessPieces;
-        private Dictionary<string, string> boardSetUpWhite = new Dictionary<string, string>();
-        private Dictionary<string, string> boardSetUpBlack = new Dictionary<string, string>();
+        private CreateBoardFromFen boardMaker;
         public int FullMove {get => (TurnNumber)/2;}
         public int HalfmoveClock { get; set; }
         public int TurnNumber { get; set; }
         public static event Action OnMoveMade;
         private King blackKing;
         private King whiteKing;
-        private FenParser fenParser;
+        
         private bool BoardSetUp = false;
 
-        private void BuildDictionarySetUp()
-        {
-            boardSetUpWhite.Add("a1","rook");
-            boardSetUpWhite.Add("b1","knight");
-            boardSetUpWhite.Add("c1","bishop");
-            boardSetUpWhite.Add("d1","queen");
-            boardSetUpWhite.Add("e1","king");
-            boardSetUpWhite.Add("f1","bishop");
-            boardSetUpWhite.Add("g1","knight");
-            boardSetUpWhite.Add("h1","rook");
-            boardSetUpWhite.Add("a2","pawn");
-            boardSetUpWhite.Add("b2","pawn");
-            boardSetUpWhite.Add("c2","pawn");
-            boardSetUpWhite.Add("d2","pawn");
-            boardSetUpWhite.Add("e2","pawn");
-            boardSetUpWhite.Add("f2","pawn");
-            boardSetUpWhite.Add("g2","pawn");
-            boardSetUpWhite.Add("h2","pawn");
-            
-            boardSetUpBlack.Add("a8","rook");
-            boardSetUpBlack.Add("b8","knight");
-            boardSetUpBlack.Add("c8","bishop");
-            boardSetUpBlack.Add("d8","queen");
-            boardSetUpBlack.Add("e8","king");
-            boardSetUpBlack.Add("f8","bishop");
-            boardSetUpBlack.Add("g8","knight");
-            boardSetUpBlack.Add("h8","rook");
-            boardSetUpBlack.Add("a7","pawn");
-            boardSetUpBlack.Add("b7","pawn");
-            boardSetUpBlack.Add("c7","pawn");
-            boardSetUpBlack.Add("d7","pawn");
-            boardSetUpBlack.Add("e7","pawn");
-            boardSetUpBlack.Add("f7","pawn");
-            boardSetUpBlack.Add("g7","pawn");
-            boardSetUpBlack.Add("h7","pawn");
-
-            foreach (var piece in boardSetUpWhite)
-            {
-                CreatePiece(piece, Team.White);
-            }
-            foreach (var piece in boardSetUpBlack)
-            {
-                CreatePiece(piece, Team.Black);
-            }
-            
-        }
 
         public GameObject CreatePiece(KeyValuePair<string, string> piece, Team chessPieceTeam)
         {
+            //TODO
             if (BoardSetUp)
             {
                 Debug.Log("needs implementing");
                 throw CheckoutException.Canceled;
             }
 
-            
             var obj = ChessPieceType(piece);
 
             var position = _boardObject.GetPosition(piece.Key);
@@ -192,7 +145,7 @@ namespace Chess.Control
 
         public void NewGame()
         {
-            CreateBoardFromFen boardMaker = new CreateBoardFromFen(this);
+            boardMaker = new CreateBoardFromFen(this);
             StartGame(boardMaker.fenParser.BoardStateData);
         }
 
@@ -200,9 +153,11 @@ namespace Chess.Control
         {
             _boardObject = FindObjectOfType<BoardObject>();
             // BuildDictionarySetUp();
-            CreateBoardFromFen boardMaker = new CreateBoardFromFen(this);
+            boardMaker = new CreateBoardFromFen(this);
             boardMaker.SetUpBoardFromFen(fenStartString);
+            _boardObject.SetBoardStateData(boardMaker.fenParser.BoardStateData);
             StartGame(boardMaker.fenParser.BoardStateData);
+            
             King.OnEnd += End;
             ChessPiece.TeamSwitch += SetColours;
             _boardObject.SetReady();
@@ -274,13 +229,13 @@ namespace Chess.Control
 
         private void ReMapFen(Controller controller)
         {
-            BoardToFenMapper mapper = new BoardToFenMapper(_boardObject.GetPositions(), controller, this);
-            fenParser = new FenParser(mapper.GetMap());
-            blackKing.CanCastleKing = fenParser.BoardStateData.BlackCanKingsideCastle;
-            whiteKing.CanCastleKing = fenParser.BoardStateData.WhiteCanKingsideCastle;
-            blackKing.CanCastleQueen = fenParser.BoardStateData.BlackCanQueensideCastle;
-            whiteKing.CanCastleQueen = fenParser.BoardStateData.WhiteCanQueensideCastle;
-            Debug.Log(mapper.GetMap());
+            
+            BoardStateData data = _boardObject.GetBoardStateData(controller,this);
+            blackKing.CanCastleKing = data.BlackCanKingsideCastle;
+            whiteKing.CanCastleKing = data.WhiteCanKingsideCastle;
+            blackKing.CanCastleQueen = data.BlackCanQueensideCastle;
+            whiteKing.CanCastleQueen = data.WhiteCanQueensideCastle;
+            Debug.Log(data.Fen);
         }
     }
 }

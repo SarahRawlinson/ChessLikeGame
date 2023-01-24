@@ -225,9 +225,10 @@ namespace Chess.Pieces
 
                     continue;
                 }
-
+                
                 (int x, int y) posObj = (posX, posY);
-                if (_board.IsTaken(posObj))
+                bool isTaken = _board.IsTaken(posObj);
+                if (isTaken || _board.IsEnPassant($"{Position.Number2String(posX)}{posY-1}"))
                 {
                     if (move.Overtake == Overtake.No)
                     {
@@ -253,10 +254,10 @@ namespace Chess.Pieces
                     }
                 }
 
-                if (!_board.IsTaken(posObj) && move.Overtake == Overtake.Yes) continue;
+                if (!isTaken && move.Overtake == Overtake.Yes) continue;
                 // Debug.Log($"Path {move.MoveType.ToString()} ok");
                 _board.GetPosition(posObj).Activate(this, con, move);
-                if (_board.IsTaken(posObj))
+                if (isTaken)
                 {
                     move.MoveValue = _board.GetPosition(posObj).piece.pieceValue;
                 }
