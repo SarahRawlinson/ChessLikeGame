@@ -1,15 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Chess.Enums;
 using Chess.Interface;
 using Chess.Board;
 using Chess.Control;
 using Chess.Movement;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace Chess.Pieces
 {
@@ -237,7 +233,7 @@ namespace Chess.Pieces
                         continue;
                     }
 
-                    if (_board.GetPosition(posObj).piece.team == team)
+                    if (_board.GetPosition(posObj).GetPiece().team == team)
                     {
                         if (!(move.MoveType is MoveTypes.L))
                         {
@@ -259,7 +255,7 @@ namespace Chess.Pieces
                 _board.GetPosition(posObj).Activate(this, con, move);
                 if (isTaken)
                 {
-                    move.MoveValue = _board.GetPosition(posObj).piece.pieceValue;
+                    move.MoveValue = _board.GetPosition(posObj).GetPiece().pieceValue;
                 }
                 move.MoveResultPos =  posObj;
                 possibleMoves.Add(move);
@@ -349,19 +345,19 @@ namespace Chess.Pieces
                         break;
                     case MoveTypes.CastleKingSideBlack:
                         // Debug.Log("CastleKingSideBlack added");
-                        movesList.Add(new Moves(3, 0, MovesGroupList[index], index, this, _board.GetPosition("H8").piece));
+                        movesList.Add(new Moves(3, 0, MovesGroupList[index], index, this, _board.GetPosition("H8").GetPiece()));
                         break;
                     case MoveTypes.CastleKingSideWhite:
                         // Debug.Log("CastleKingSideWhite added");
-                        movesList.Add(new Moves(3, 0, MovesGroupList[index], index, this, _board.GetPosition("H1").piece));
+                        movesList.Add(new Moves(3, 0, MovesGroupList[index], index, this, _board.GetPosition("H1").GetPiece()));
                         break;
                     case MoveTypes.CastleQueenSideBlack:
                         // Debug.Log("CastleQueenSideBlack added");
-                        movesList.Add(new Moves(-4, 0, MovesGroupList[index], index, this, _board.GetPosition("A8").piece));
+                        movesList.Add(new Moves(-4, 0, MovesGroupList[index], index, this, _board.GetPosition("A8").GetPiece()));
                         break;
                     case MoveTypes.CastleQueenSideWhite:
                         // Debug.Log("CastleQueenSideWhite added");
-                        movesList.Add(new Moves(-4, 0, MovesGroupList[index], index, this, _board.GetPosition("A1").piece));
+                        movesList.Add(new Moves(-4, 0, MovesGroupList[index], index, this, _board.GetPosition("A1").GetPiece()));
                         break;
                 }
             }
@@ -378,12 +374,6 @@ namespace Chess.Pieces
         public (int x, int y) GetPositionXY()
         {
             return ((int)pos.x,(int) pos.y);
-        }
-
-
-        public bool IsEnPassant()
-        {
-            return enPassant;
         }
 
         public static event Action OnTakenStatic;

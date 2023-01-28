@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using Chess.Control;
 using Chess.Enums;
+using Chess.Fen;
 using Chess.Movement;
 using Chess.Pieces;
 using UnityEngine;
@@ -13,21 +15,26 @@ namespace Chess.Board
     [Serializable]
     public class Position 
     {
-        public ChessPiece piece = null;
+        private ChessPiece piece = null;
         public Vector2 grid;
         public bool _isTaken = false;
         public Moves PossibleMove = null;
         public readonly PositionGameObject _positionObject;
         private ChessPiece isActiveForChessPiece;
         private bool isActive;
+        public bool enPassant = false;
         private int GetX => (int)grid.x;
         private int GetY => (int)grid.y;
         private readonly bool _hypothetical;
         public static string[] columns = new[]
         {
-            "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", 
-            "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+            "A", "B", "C", "D", "E", "F", "G", "H"
         };
+
+        public ChessPiece GetPiece()
+        {
+            return piece;
+        }
 
         public Position(PositionGameObject positionGameObject)
         {
@@ -167,13 +174,14 @@ namespace Chess.Board
             _isTaken = false;
         }
 
+        public void SetEnPassant(bool on)
+        {
+            enPassant = on;
+        }
+
         public bool IsEnPassant()
         {
-            if (_isTaken)
-            {
-                return piece.IsEnPassant();
-            }
-            return false;
+            return enPassant;
         }
 
         public string GetEnPassantString()
@@ -191,5 +199,12 @@ namespace Chess.Board
             piece = newPositionPiece;
             _positionObject.SetPiece(newPositionPiece);
         }
+
+        public void SetPiece(ChessPiece chessPiece)
+        {
+            piece = chessPiece;
+            _isTaken = true;
+        }
+
     }
 }

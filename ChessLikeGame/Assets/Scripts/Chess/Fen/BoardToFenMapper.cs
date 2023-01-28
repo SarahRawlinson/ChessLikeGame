@@ -63,9 +63,9 @@ namespace Chess.Fen
             bool canCastle = false;
             Position position = _board[$"E{row}"];
             bool kingNoteMoved = false;
-            if (position._isTaken)
+            if (position.IsTaken())
             {
-                ChessPiece piece = position.piece;
+                ChessPiece piece = position.GetPiece();
                 if (piece.Key == "K" && !piece.HasMoved)
                 {
                     kingNoteMoved = true;
@@ -75,9 +75,9 @@ namespace Chess.Fen
             if (kingNoteMoved)
             {
                 position = _board[$"H{row}"];
-                if (position._isTaken)
+                if (position.IsTaken())
                 {
-                    ChessPiece piece = position.piece;
+                    ChessPiece piece = position.GetPiece();
                     if (piece.Key == "R" && !piece.HasMoved)
                     {
                         mapStringBuilder.Append(row == 1 ? "K": "k");
@@ -86,9 +86,9 @@ namespace Chess.Fen
                 }
                 
                 position = _board[$"A{row}"];
-                if (position._isTaken)
+                if (position.IsTaken())
                 {
-                    ChessPiece piece = position.piece;
+                    ChessPiece piece = position.GetPiece();
                     if (piece.Key == "R" && !piece.HasMoved)
                     {
                         mapStringBuilder.Append(row == 1 ? "Q": "q");
@@ -128,13 +128,13 @@ namespace Chess.Fen
                     }
 
                     Position pos = _board[key];
-                    if (!pos._isTaken)
+                    if (!pos.IsTaken())
                     {
                         freeSpaces++;
                     }
                     else
                     {
-                        ChessPiece piece = pos.piece;
+                        ChessPiece piece = pos.GetPiece();
                         if (freeSpaces > 0)
                         {
                             mapStringBuilder.Append(freeSpaces.ToString());

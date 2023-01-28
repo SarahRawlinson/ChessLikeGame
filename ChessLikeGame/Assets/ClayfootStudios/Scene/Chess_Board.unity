@@ -2443,8 +2443,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 447186409}
     - target: {fileID: 5637443610228527872, guid: b800da3a54db7564c8401314207afc38, type: 3}
+      propertyPath: textToDisplay
+      value: A checkmate involving a queen and a rook trapping the opponent's king
+        on the edge of the board.
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637443610228527872, guid: b800da3a54db7564c8401314207afc38, type: 3}
+      propertyPath: fenDescription
+      value: jbjk
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637443610228527872, guid: b800da3a54db7564c8401314207afc38, type: 3}
       propertyPath: fenStartString
-      value: rnb1kbn1/ppp2ppr/8/3p2q1/8/6P1/PPPPP3/RNBQKBN1 w Qq - 0 4
+      value: r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637443610228527872, guid: b800da3a54db7564c8401314207afc38, type: 3}
+      propertyPath: fenStringEnumEnum
+      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 5637443610228527872, guid: b800da3a54db7564c8401314207afc38, type: 3}
       propertyPath: chessPieces.Array.size

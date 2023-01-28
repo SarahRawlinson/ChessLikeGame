@@ -6,20 +6,22 @@ using Chess.Enums;
 using Chess.Fen;
 using Chess.Pieces;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
+using static Chess.Fen.FenExamples;
 
 namespace Chess.Control
 {
     public class Director: MonoBehaviour
     {
-        [SerializeField] private Controller player1;
-        [SerializeField] private Controller player2;
+        [FormerlySerializedAs("player1")] [SerializeField] private Controller blackPlayer;
+        [FormerlySerializedAs("player2")] [SerializeField] private Controller whitePlayer;
         [SerializeField] private TMP_Text endText;
         [SerializeField] private Material teamBlackColour;
         [SerializeField] private Material teamWhiteColour;
         [SerializeField] private string fenStartString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        private bool useFenStringEnum = true;
+        [SerializeField] public FenStringsEnum fenStringEnumEnum = FenStringsEnum.StartPosition;
         private BoardObject _boardObject;
         public event Action OnStart;
         private Controller _activeController;
@@ -154,6 +156,10 @@ namespace Chess.Control
             _boardObject = FindObjectOfType<BoardObject>();
             // BuildDictionarySetUp();
             boardMaker = new CreateBoardFromFen(this);
+            if (useFenStringEnum)
+            {
+                fenStartString = GetFenByName(fenStringEnumEnum);
+            }
             boardMaker.SetUpBoardFromFen(fenStartString);
             _boardObject.SetBoardStateData(boardMaker.fenParser.BoardStateData);
             StartGame(boardMaker.fenParser.BoardStateData);
@@ -185,10 +191,10 @@ namespace Chess.Control
 
         private void StartGame(BoardStateData boardState)
         {
-            player1.SetTeam(Team.Black);
-            player2.SetTeam(Team.White);
+            blackPlayer.SetTeam(Team.Black);
+            whitePlayer.SetTeam(Team.White);
 
-            Controller player = boardState.ActivePlayerColor == "White" ? player2 : player1;
+            Controller player = boardState.ActivePlayerColor == "White" ? whitePlayer : blackPlayer;
             player.OnMoved += MoveMade;
             OnStart?.Invoke();
             player.SetActive();
@@ -204,20 +210,20 @@ namespace Chess.Control
                 Debug.Log("Game Over");
                 return;
             }
-            if (player1._team == controller._team)
+            if (blackPlayer._team == controller._team)
             {
-                player1.OnMoved -= MoveMade;
-                player2.OnMoved += MoveMade;
-                _activeController = player2;
-                player2.SetActive();
+                blackPlayer.OnMoved -= MoveMade;
+                whitePlayer.OnMoved += MoveMade;
+                _activeController = whitePlayer;
+                whitePlayer.SetActive();
                 // Debug.Log($"Active controller is now {player2}");
             }
             else
             {
-                player2.OnMoved -= MoveMade;
-                player1.OnMoved += MoveMade;
-                _activeController = player1;
-                player1.SetActive();
+                whitePlayer.OnMoved -= MoveMade;
+                blackPlayer.OnMoved += MoveMade;
+                _activeController = blackPlayer;
+                blackPlayer.SetActive();
                 // Debug.Log($"Active controller is now {player1}");
             }
             

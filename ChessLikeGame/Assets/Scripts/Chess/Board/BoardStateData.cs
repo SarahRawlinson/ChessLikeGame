@@ -17,7 +17,7 @@ namespace Chess.Board
         /// <summary>
         /// The square which is currently available for "en passant" capture ('-' if a square is not available).  
         /// </summary>
-        public string EnPassantSquare { get; set; }
+        public string EnPassantSquare { get; set; } = "";
 
         /// <summary>
         /// A list of ranks (reversed; from rank #8 to rank #1)

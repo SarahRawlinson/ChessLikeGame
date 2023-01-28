@@ -111,7 +111,7 @@ namespace Chess.Board
             Position newPosition = GetPosition(position);
             if(isCastle)
             {
-                lastPosition.PlacePiece(newPosition.piece);
+                lastPosition.PlacePiece(newPosition.GetPiece());
                 var king = piece.GetComponent<King>();
                 king.CanCastleKing = false;
                 king.CanCastleQueen = false;
@@ -123,8 +123,18 @@ namespace Chess.Board
                     ChessPiece takenPiece = null;
                     bool taken = false;
                     taken = true;
-                    takenPiece = Cubes[position.x][position.y].piece;
+                    takenPiece = Cubes[position.x][position.y].GetPiece();
                     piece.CapturePiece(takenPiece);
+                }
+                if (Cubes[position.x][position.y].IsEnPassant())
+                {
+                    ChessPiece takenPiece = null;
+                    //3w 6b
+                    Position position2 = Cubes[position.x][position.y==2?3:5];
+                    Debug.Log(position2.GetCoordinates());
+                    takenPiece = position2.GetPiece();
+                    piece.CapturePiece(takenPiece);
+                    RemovePiece(position2.GetPos());
                 }
                 if (!callTaken) RemovePiece(lastPos);
             }
@@ -200,14 +210,11 @@ namespace Chess.Board
 
         public void SetPosition(ChessPiece chessPiece, (int x, int y) getPosition)
         {
-            // Debug.Log("SetPosition");
-            Cubes[getPosition.x][getPosition.y].piece = (chessPiece);
-            Cubes[getPosition.x][getPosition.y]._isTaken = true;
+            Cubes[getPosition.x][getPosition.y].SetPiece(chessPiece);
         }
 
         public void RemovePiece((int x, int y) move)
         {
-            // Debug.Log("RemovePiece");
             Cubes[move.x][move.y].RemovePiece();
         }
 
@@ -305,13 +312,25 @@ namespace Chess.Board
         {
             BoardToFenMapper mapper = new BoardToFenMapper(GetPositions(), controller, director);
             fenParser = new FenParser(mapper.GetMap());
-            CurrentBoardStateData = fenParser.BoardStateData;
+            SetBoardStateData(fenParser.BoardStateData);
             return CurrentBoardStateData;
         }
 
         public void SetBoardStateData(BoardStateData fenParserBoardStateData)
         {
+            foreach (List<Position> posList in Cubes)
+            {
+                foreach (Position pos in posList)
+                {
+                    pos.SetEnPassant(false);
+                }
+            }
             CurrentBoardStateData = fenParserBoardStateData;
+            if (CurrentBoardStateData.EnPassantSquare.Length > 0)
+            {
+                var enPassant = GetPosition(CurrentBoardStateData.EnPassantSquare);
+                enPassant.SetEnPassant(true);
+            }
         }
     }
     
