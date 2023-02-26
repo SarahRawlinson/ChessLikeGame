@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using Chess.Board;
+using Chess.Control;
 using Chess.Enums;
 using Chess.Movement;
 using UnityEngine;
@@ -14,6 +16,8 @@ namespace Chess.Pieces
         public bool canCastleQueen;
         public bool CanCastleKing { get => canCastleKing; set => CanCastle(ref canCastleKing, value); }
         public bool CanCastleQueen { get => canCastleQueen; set => CanCastle(ref canCastleQueen, value); }
+        private bool inCheck = false;
+        private Director _director;
 
         private void CanCastle(ref bool castle, bool value)
         {
@@ -27,6 +31,7 @@ namespace Chess.Pieces
             Key = "K";
             // WorkOutMoves();
             OnTaken += End;
+            _director = FindObjectOfType<Director>();
         }
 
         private void End()
@@ -67,6 +72,20 @@ namespace Chess.Pieces
                 );
             }
             MovesList = GetMoves(1);
+        }
+
+        internal override List<Moves> GetPossibleMoves(Controller controller)
+        {
+            List<Moves> possibleMoves = base.GetPossibleMoves(controller);
+            List<Moves> actualMoves = new List<Moves>();
+            foreach (Moves move in possibleMoves)
+            {
+                if (!_director.IsCheck(team, move.MoveResultPos))
+                {
+                    actualMoves.Add(move);
+                }
+            }
+            return actualMoves;
         }
 
 
@@ -122,6 +141,11 @@ namespace Chess.Pieces
             //     piece.SetActive();
             //     piece.Move(positionFrom);
             // }
+        }
+
+        public void SetInCheck(bool on)
+        {
+            inCheck = on;
         }
     }
 }

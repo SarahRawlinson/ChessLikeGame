@@ -1,7 +1,9 @@
-﻿using Chess.Enums;
+﻿using System;
+using Chess.Enums;
 
 namespace Chess.Movement
 {
+    [Serializable]
     public class MoveGroup
     {
         public MoveTypes Type;

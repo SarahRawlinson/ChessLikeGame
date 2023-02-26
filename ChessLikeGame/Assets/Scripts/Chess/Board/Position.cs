@@ -15,7 +15,7 @@ namespace Chess.Board
     [Serializable]
     public class Position 
     {
-        private ChessPiece piece = null;
+        public ChessPiece piece = null;
         public Vector2 grid;
         public bool _isTaken = false;
         public Moves PossibleMove = null;
@@ -202,6 +202,7 @@ namespace Chess.Board
 
         public void SetPiece(ChessPiece chessPiece)
         {
+            Debug.Log("set piece");
             piece = chessPiece;
             _isTaken = true;
         }

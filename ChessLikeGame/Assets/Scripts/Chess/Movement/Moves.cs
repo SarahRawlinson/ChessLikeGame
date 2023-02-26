@@ -2,14 +2,15 @@
 using Chess.Board;
 using Chess.Enums;
 using Chess.Pieces;
+using UnityEngine.Serialization;
 
 namespace Chess.Movement
 {
     [Serializable]
     public class Moves
     {
-        public int Forward;
         public int Right;
+        public int Forward;
         public Overtake Overtake;
         public MoveTypes MoveType;
         public int GroupIndex;
@@ -19,8 +20,8 @@ namespace Chess.Movement
         public float MoveValue = 0;
         public Moves(int x, int y, MoveGroup moveGroup, int index, ChessPiece piece)
         {
-            Forward = x;
-            Right = y;
+            Right = x;
+            Forward = y;
             Overtake = moveGroup.Overtake;
             MoveType = moveGroup.Type;
             GroupIndex = index;
@@ -28,8 +29,8 @@ namespace Chess.Movement
         }
         public Moves(int x, int y, MoveGroup moveGroup, int index, ChessPiece piece, ChessPiece swapPiece)
         {
-            Forward = x;
-            Right = y;
+            Right = x;
+            Forward = y;
             Overtake = moveGroup.Overtake;
             MoveType = moveGroup.Type;
             GroupIndex = index;

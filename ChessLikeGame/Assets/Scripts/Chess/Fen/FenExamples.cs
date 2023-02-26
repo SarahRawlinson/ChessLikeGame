@@ -30,7 +30,9 @@ namespace Chess.Fen
             PetrovDefense,
             KasparovDeepBlue,
             FourRooks,
-            EnPassantExample
+            EnPassantExample1,
+            CheckExample1,
+            CheckExample2
         }
         private static Dictionary<FenStringsEnum, string> positions = new Dictionary<FenStringsEnum, string>()
         {
@@ -56,7 +58,9 @@ namespace Chess.Fen
             { FenStringsEnum.PetrovDefense, "r1bqkbnr/pp1ppppp/2n5/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"},
             { FenStringsEnum.KasparovDeepBlue, "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"},
             { FenStringsEnum.FourRooks, "4rrk1/ppp2ppp/8/8/8/8/PPP2PPP/4RRK1 w - - 0 1"},
-            { FenStringsEnum.EnPassantExample, "rnb1kbn1/ppp2ppr/8/3p4/3P4/4q1P1/PPP1P3/RNBQKBN1 b Qq d3 0 4"}
+            { FenStringsEnum.EnPassantExample1, "rnb1kbn1/ppp2ppr/8/3p4/3P4/4q1P1/PPP1P3/RNBQKBN1 b Qq d3 0 4"},
+            { FenStringsEnum.CheckExample1, "r1b1k1n1/2p2pp1/8/1nbq4/8/2K1P3/1P1B4/1N5r w q - 2 12"},
+            { FenStringsEnum.CheckExample2, "r1b1k1n1/n1p2pp1/8/2bq4/8/2K1P3/1P1B4/1N5r b q - 1 12"}
         };
         
         private static Dictionary<FenStringsEnum, string> summaries = new Dictionary<FenStringsEnum, string>()
@@ -83,7 +87,9 @@ namespace Chess.Fen
             { FenStringsEnum.PetrovDefense, "The Petrov Defense is a chess opening starting with the moves e4 e5, Nf3 Nf6."},
             { FenStringsEnum.KasparovDeepBlue, "This position is known as the 'Kasparov-Deep Blue' position. It is the position from the famous game between Garry Kasparov and the IBM supercomputer Deep Blue in 1997, where Kasparov resigned after making a mistake."},
             { FenStringsEnum.FourRooks, "This is the 'Four rooks' position where all the rooks are on the same file"},
-            { FenStringsEnum.EnPassantExample, "for testing 'En Passant'"}
+            { FenStringsEnum.EnPassantExample1, "for testing 'En Passant'"},
+            { FenStringsEnum.CheckExample1, "check test 1"},
+            { FenStringsEnum.CheckExample2, "check test 2"}
         };
 
         public static string GetFenByName(FenStringsEnum name)
