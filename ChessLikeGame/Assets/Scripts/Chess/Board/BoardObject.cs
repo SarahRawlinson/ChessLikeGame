@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Chess.Control;
 using Chess.Enums;
+using Chess.Fen;
 using Chess.Interface;
 using Chess.Movement;
 using Chess.Pieces;
@@ -32,7 +33,8 @@ namespace Chess.Board
                 yOldPosIndex = oy;
             }
         }
-        
+
+        private BoardStateData CurrentBoardStateData;
         public readonly List<List<Position>> Cubes = new List<List<Position>>();
         public int rows = 10;
         public int columns = 10;
@@ -43,6 +45,7 @@ namespace Chess.Board
         private Controller[] _controllers;
         private List<Actions> moves = new List<Actions>();
         private ChessPiece activeChessPiece;
+        private FenParser fenParser;
 
         private void Awake()
         {
@@ -59,7 +62,7 @@ namespace Chess.Board
         private void OnGridSelect((int x, int y) obj, PositionGameObject posObj)
         {
             (int x, int y) p = posObj.GetPos();
-            if (GetPosition(obj).IsActive()) Move(posObj.transform.position, new Vector2(p.x, p.y),p,activeChessPiece, false);
+            if (GetPosition(obj).IsActive()) Move(posObj.transform.position, new Vector2(p.x, p.y),p,activeChessPiece, false, GetPosition(p).PossibleMove.IsCastle);
         }
 
         private void OnSelectedPiece(ChessPiece obj, bool on, Controller con)
@@ -85,53 +88,76 @@ namespace Chess.Board
             OnGridSelect(p.GetPos(),p._positionObject);
         }
 
-        public List<List<Position>> GetHypotheticalBoard()
-        {
-            List<List<Position>> posList = new List<List<Position>>();
-            foreach (List<Position> pList in Cubes)
-            {
-                List<Position> newList = new List<Position>();
-                foreach (Position p in pList)
-                {
-                    newList.Add(new Position(p));
-                }
-                posList.Add(newList);
-            }
-            return posList;
-        }
+        // public List<List<Position>> GetHypotheticalBoard()
+        // {
+        //     List<List<Position>> posList = new List<List<Position>>();
+        //     foreach (List<Position> pList in Cubes)
+        //     {
+        //         List<Position> newList = new List<Position>();
+        //         foreach (Position p in pList)
+        //         {
+        //             newList.Add(new Position(p));
+        //         }
+        //         posList.Add(newList);
+        //     }
+        //     return posList;
+        // }
         
-        public void Move(Vector3 moveTransform, Vector2 nextPos, (int x, int y) position, ChessPiece piece, bool callTaken)
+        public void Move(Vector3 moveTransform, Vector2 nextPos, (int x, int y) position, ChessPiece piece, bool callTaken, bool isCastle)
         {
+            //TODO look at castle move here instead?
             (int x, int y) lastPos = piece.GetPositionXY();
-            bool taken = false;
-            ChessPiece takenPiece = null;
-            if (Cubes[position.x][position.y].IsTaken())
+            Position lastPosition = GetPosition(lastPos);
+            Position newPosition = GetPosition(position);
+            if(isCastle)
             {
-                taken = true;
-                takenPiece = Cubes[position.x][position.y].piece;
-                piece.CapturePiece(takenPiece);
+                lastPosition.PlacePiece(newPosition.GetPiece());
+                var king = piece.GetComponent<King>();
+                king.CanCastleKing = false;
+                king.CanCastleQueen = false;
             }
-            (int x, int y)  positionFrom = piece.GetPositionXY();
-            if (!callTaken) RemovePiece(positionFrom);
+            else
+            {
+                if (Cubes[position.x][position.y].IsTaken())
+                {
+                    ChessPiece takenPiece = null;
+                    bool taken = false;
+                    taken = true;
+                    takenPiece = Cubes[position.x][position.y].GetPiece();
+                    piece.CapturePiece(takenPiece);
+                }
+                if (Cubes[position.x][position.y].IsEnPassant())
+                {
+                    ChessPiece takenPiece = null;
+                    //3w 6b
+                    Position position2 = Cubes[position.x][position.y==2?3:5];
+                    Debug.Log(position2.GetCoordinates());
+                    takenPiece = position2.GetPiece();
+                    piece.CapturePiece(takenPiece);
+                    RemovePiece(position2.GetPos());
+                }
+                if (!callTaken) RemovePiece(lastPos);
+            }
             piece.transform.position = new Vector3(moveTransform.x, transform.position.y, moveTransform.z);
             piece.pos = nextPos;
-            piece.PieceController.MoveMade();
+            
             ClearBoard();
-            Debug.Log($"{piece.team.ToString()} {piece.NameType} moves from {GetCoordinates(positionFrom)} to {GetCoordinates(position)}");
+            Debug.Log($"{piece.team.ToString()} {piece.NameType} moves from {GetCoordinates(lastPos)} to {GetCoordinates(position)}");
             SetPosition(piece,position);
-            StoreAction(piece,position.x, position.y, positionFrom.x, positionFrom.y);
+            StoreAction(piece,position.x, position.y, lastPos.x, lastPos.y);
             // if (taken && takenPiece != null)
             // {
             //     Debug.Log($"{takenPiece.NameType} taken moving to {GetCoordinates((lastPos.x,lastPos.y))}");
             //     Move(Cubes[lastPos.x][lastPos.y]._positionObject.transform.position,new Vector2(lastPos.x, lastPos.y) ,Cubes[lastPos.x][lastPos.y].GetPos(), takenPiece, true);
             // }
             piece.Move(lastPos, ((int)nextPos.x, (int)nextPos.y));
+            piece.PieceController.MoveMade();
         }
 
         public void Move(Moves move)
         {
             Move(GetPositionVector(move.MoveResultPos), new Vector2(move.MoveResultPos.x, move.MoveResultPos.y),
-                move.MoveResultPos, move.Piece, false);
+                move.MoveResultPos, move.Piece, false, move.IsCastle);
         }
 
         Vector3 GetPositionVector((int x, int y) pos)
@@ -184,14 +210,11 @@ namespace Chess.Board
 
         public void SetPosition(ChessPiece chessPiece, (int x, int y) getPosition)
         {
-            // Debug.Log("SetPosition");
-            Cubes[getPosition.x][getPosition.y].piece = (chessPiece);
-            Cubes[getPosition.x][getPosition.y]._isTaken = true;
+            Cubes[getPosition.x][getPosition.y].SetPiece(chessPiece);
         }
 
         public void RemovePiece((int x, int y) move)
         {
-            // Debug.Log("RemovePiece");
             Cubes[move.x][move.y].RemovePiece();
         }
 
@@ -216,10 +239,10 @@ namespace Chess.Board
             return Cubes[posObj.x][posObj.y].Team();
         }
 
-        public void Activate(ChessPiece chessPiece, Controller con, (int x, int y) posObj)
+        public void Activate(ChessPiece chessPiece, Controller con, (int x, int y) posObj, Moves move)
         {
             // Debug.Log("Activate");
-            Cubes[posObj.x][posObj.y].Activate(chessPiece, con);
+            Cubes[posObj.x][posObj.y].Activate(chessPiece, con, move);
         }
 
         public float PieceValue((int x, int y) posObj)
@@ -252,7 +275,17 @@ namespace Chess.Board
 
         public Position GetPosition((int x, int y) movesMoveResultPos)
         {
-            return Cubes[movesMoveResultPos.x][movesMoveResultPos.y];
+            try
+            {
+                return Cubes[movesMoveResultPos.x][movesMoveResultPos.y];
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Debug.Log($"error with x={movesMoveResultPos.x} y={movesMoveResultPos.y}");
+                throw;
+            }
+            
         }
         public Position GetPosition(string pos)
         {
@@ -268,6 +301,36 @@ namespace Chess.Board
                 list.AddRange(positions);
             }
             return list;
+        }
+
+        public bool IsEnPassant(string s)
+        {
+            return CurrentBoardStateData.EnPassantSquare.ToLower() == s.ToLower();
+        }
+
+        public BoardStateData GetBoardStateData(Controller controller, Director director)
+        {
+            BoardToFenMapper mapper = new BoardToFenMapper(GetPositions(), controller, director);
+            fenParser = new FenParser(mapper.GetMap());
+            SetBoardStateData(fenParser.BoardStateData);
+            return CurrentBoardStateData;
+        }
+
+        public void SetBoardStateData(BoardStateData fenParserBoardStateData)
+        {
+            foreach (List<Position> posList in Cubes)
+            {
+                foreach (Position pos in posList)
+                {
+                    pos.SetEnPassant(false);
+                }
+            }
+            CurrentBoardStateData = fenParserBoardStateData;
+            if (CurrentBoardStateData.EnPassantSquare.Length > 0)
+            {
+                var enPassant = GetPosition(CurrentBoardStateData.EnPassantSquare);
+                enPassant.SetEnPassant(true);
+            }
         }
     }
     

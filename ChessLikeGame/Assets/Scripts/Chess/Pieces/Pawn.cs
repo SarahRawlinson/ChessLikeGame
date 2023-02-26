@@ -14,8 +14,9 @@ namespace Chess.Pieces
         private bool firstMove = true;
         private int endY;
         
-        private void Start()
+        protected override void Awake()
         {
+            base.Awake();
             OnMove += WhenMove;
             NameType = "Pawn";
             Key = "P";
@@ -31,12 +32,28 @@ namespace Chess.Pieces
             MovesList.AddRange(GetMoves(2));
         }
 
+        public override void WorkoutIfMoved()
+        {
+            if (team == Team.Black)
+            {
+                HasMoved = pos.y != 6;
+            }
+            else if (team == Team.White)
+            {
+                HasMoved = pos.y != 1;
+            }
+
+            if (HasMoved)
+            {
+                // Debug.Log("Pawn Has Moved");
+            }
+        }
+
         void WhenMove(((int x, int y) from, (int x, int y) to) valueTuple)
         {
             OnMoveStatic?.Invoke();
             var fromY = valueTuple.from.y;
             var toY = valueTuple.to.y;
-            Debug.Log(fromY - toY);
             if (firstMove && Mathf.Abs(fromY - toY) == 2)
             {
                 ActivateEnPassant(valueTuple, fromY, toY);
@@ -48,7 +65,7 @@ namespace Chess.Pieces
 
         private void DeactivateEnPassant()
         {
-            Debug.Log($"En Passant Deactivated {EnPassantString}");
+            // Debug.Log($"En Passant Deactivated {EnPassantString}");
             enPassant = false;
             EnPassantString = "";
         }
@@ -59,7 +76,7 @@ namespace Chess.Pieces
             // not sure if this is the correct way around need to test
             EnPassantString =
                 $"{Position.Number2String(valueTuple.from.x).ToLower()}{fromY + 1 + (fromY - toY > 0 ? -1 : 1)}";
-            Debug.Log($"En Passant Active {EnPassantString}");
+            // Debug.Log($"En Passant Active {EnPassantString}");
         }
 
         public override void SetPosition()
@@ -75,9 +92,9 @@ namespace Chess.Pieces
             }
         }
 
-        public override void SpecialActions(int x, int y)
+        public override void SpecialActions(int x, int y, Position positionFrom, Position positionTo)
         {
-            base.SpecialActions(x, y);
+            base.SpecialActions(x, y, positionFrom, positionTo);
             if (y == endY)
             {
                 SwapPiece(this, ReturnNewPiece());

@@ -1,4 +1,5 @@
 ﻿using System;
+using Chess.Pieces;
 using TMPro;
 using UnityEngine;
 
@@ -56,6 +57,13 @@ namespace Chess.Board
         private void OnMouseDown()
         {
             MoveSelected();
+        }
+
+        public void SetPiece(ChessPiece newPositionPiece)
+        {
+            newPositionPiece.transform.position = new Vector3(transform.position.x, newPositionPiece.transform.position.y, transform.position.z);
+            newPositionPiece.HasMoved = true;
+            newPositionPiece.SetPosition();
         }
     }
 }

@@ -1,5 +1,8 @@
-﻿namespace Chess.Enums
+﻿using System;
+
+namespace Chess.Enums
 {
+    [Serializable]
     public enum MoveTypes
     {
         Forward,
@@ -10,6 +13,10 @@
         DiagonalUpLeft,
         DiagonalDownRight,
         DiagonalDownLeft,
-        L
+        L,
+        CastleQueenSideWhite,
+        CastleQueenSideBlack,
+        CastleKingSideWhite,
+        CastleKingSideBlack
     }
 }

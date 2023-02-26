@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using Chess.Control;
 using Chess.Enums;
+using Chess.Fen;
+using Chess.Movement;
 using Chess.Pieces;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -15,17 +18,23 @@ namespace Chess.Board
         public ChessPiece piece = null;
         public Vector2 grid;
         public bool _isTaken = false;
+        public Moves PossibleMove = null;
+        public readonly PositionGameObject _positionObject;
         private ChessPiece isActiveForChessPiece;
         private bool isActive;
+        public bool enPassant = false;
         private int GetX => (int)grid.x;
         private int GetY => (int)grid.y;
-        public readonly PositionGameObject _positionObject;
         private readonly bool _hypothetical;
         public static string[] columns = new[]
         {
-            "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", 
-            "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+            "A", "B", "C", "D", "E", "F", "G", "H"
         };
+
+        public ChessPiece GetPiece()
+        {
+            return piece;
+        }
 
         public Position(PositionGameObject positionGameObject)
         {
@@ -60,8 +69,10 @@ namespace Chess.Board
         //     piece = obj;
         // }
 
-        public void Activate(ChessPiece piece, Controller con)
+        public void Activate(ChessPiece piece, Controller con, Moves possibleMove)
         {
+            PossibleMove = possibleMove;
+            // Debug.Log($"move set {GetCoordinates()} {piece.NameType}");
             bool aiCon = con.TryGetComponent(out AI ai);
             // piece.OnMove += Deactivate;
             isActiveForChessPiece = piece;
@@ -81,6 +92,8 @@ namespace Chess.Board
 
         public void Deactivate()
         {
+            // Debug.Log($"move removed {GetCoordinates()}");
+            PossibleMove = null;
             // if (isActive) isActiveForChessPiece.OnMove -= Deactivate;
             isActive = false;
             isActiveForChessPiece = null;
@@ -161,13 +174,14 @@ namespace Chess.Board
             _isTaken = false;
         }
 
+        public void SetEnPassant(bool on)
+        {
+            enPassant = on;
+        }
+
         public bool IsEnPassant()
         {
-            if (_isTaken)
-            {
-                return piece.IsEnPassant();
-            }
-            return false;
+            return enPassant;
         }
 
         public string GetEnPassantString()
@@ -178,5 +192,20 @@ namespace Chess.Board
             }
             return "";
         }
+
+        public void PlacePiece(ChessPiece newPositionPiece)
+        {
+            Debug.Log("place piece");
+            piece = newPositionPiece;
+            _positionObject.SetPiece(newPositionPiece);
+        }
+
+        public void SetPiece(ChessPiece chessPiece)
+        {
+            Debug.Log("set piece");
+            piece = chessPiece;
+            _isTaken = true;
+        }
+
     }
 }

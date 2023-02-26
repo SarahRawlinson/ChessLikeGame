@@ -142,7 +142,8 @@ namespace Chess.Control
         {
             if (!pieces.Contains(piece))
             {
-                piece.TryGetComponent(out _king);
+                if (piece.TryGetComponent(out King king)) _king = king;
+                
                 pieces.Add(piece);
             }
             
