@@ -2,14 +2,43 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a8bd5db2-093e-467d-80be-fb9945cdbaa2" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/Scripts/Chess/UI.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ChessLikeGame.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ChessLikeGame.dir/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Bishop.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Bishop.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Black_Set.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Black_Set.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Chess_Board.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Chess_Board.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/King.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/King.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Knight.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Knight.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Pawn.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Pawn.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Queen.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Queen.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Rook.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Rook.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Timer.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/Timer.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/White_Set.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/ClayfootStudios/Prefabs/White_Set.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Assets/Scenes/Chess_Board.unity" beforeDir="false" afterPath="$PROJECT_DIR$/ChessLikeGame/Assets/Scenes/Chess_Board.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Packages/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/ChessLikeGame/Packages/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/Packages/packages-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/ChessLikeGame/Packages/packages-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ChessLikeGame/ProjectSettings/Packages/com.unity.testtools.codecoverage/Settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/ChessLikeGame/ProjectSettings/Packages/com.unity.testtools.codecoverage/Settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/ProjectSettings/ProjectVersion.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ChessLikeGame/ProjectSettings/ProjectVersion.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChessLikeGame/UserSettings/EditorUserSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ChessLikeGame/UserSettings/EditorUserSettings.asset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ChessLikeGame/UserSettings/Layouts/default-2021.dwlt" beforeDir="false" afterPath="$PROJECT_DIR$/ChessLikeGame/UserSettings/Layouts/default-2021.dwlt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/ChessLikeGame/Assets/Scripts/Chess/Board/Position.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ChessLikeGame/Assets/Scripts/Chess/Multiplayer/NetworkManagerUI.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -28,9 +57,9 @@
   },
   "keyToStringList": {
     "rider.external.source.directories": [
-      "C:\\Users\\SRRaw\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
-      "C:\\Users\\SRRaw\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
-      "C:\\Users\\SRRaw\\AppData\\Local\\Symbols\\src"
+      "C:\\Users\\i-kee\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\DecompilerCache",
+      "C:\\Users\\i-kee\\AppData\\Roaming\\JetBrains\\Rider2022.3\\resharper-host\\SourcesCache",
+      "C:\\Users\\i-kee\\AppData\\Local\\Symbols\\src"
     ]
   }
 }]]></component>
@@ -43,6 +72,7 @@
       <option name="presentableId" value="Default" />
       <updated>1678204101268</updated>
       <workItem from="1678204102766" duration="104000" />
+      <workItem from="1678208946200" duration="1535000" />
     </task>
     <servers />
   </component>
