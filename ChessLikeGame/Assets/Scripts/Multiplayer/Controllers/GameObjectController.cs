@@ -18,8 +18,35 @@ namespace Multiplayer.Controllers
         [SerializeField] private GameObject blackBishopPrefab;
         [SerializeField] private GameObject blackQueenPrefab;
         [SerializeField] private GameObject blackKingPrefab;
-        private List<GameObject> _objectsInUse = new();
+        [SerializeField] private GameObject StartGameSquarePosition;
+        private List<GameObject> _objectsInUse = new List<GameObject>();
+        private List<int> gameSquares = new List<int>();
 
+        [SerializeField] private GameObject positionGameObjectPrefab; // Size of a Sqaure on the board.
+        
+
+        public  void CreateBoardPositions(int x, int y)
+        {
+            float size = positionGameObjectPrefab.transform.localScale.x;
+            
+            for (int a = 0; a < x; a++)
+            {
+                for (int b = 0; b < y; b++)
+                {
+                    gameSquares.Add(SpawnObject(positionGameObjectPrefab,  new Vector3(size * a + StartGameSquarePosition.transform.position.x,StartGameSquarePosition.transform.position.y, size * b + StartGameSquarePosition.transform.position.z)));
+                }
+            }
+        }
+
+        public GameObject GetGameObjectFromArray(int index)
+        {
+            return _objectsInUse[index];
+        }
+
+        public Vector3 GetPositionVectorfromGameSquare(int index )
+        {
+            return GetGameObjectFromArray(gameSquares[index]).transform.position;
+        }
 
         private int SpawnObject(GameObject gameObject, Vector3 position)
         {
