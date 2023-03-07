@@ -105,7 +105,7 @@ namespace Chess.Fen
         }
 
         private KeyValuePair<string, ChessPiece> CreatePieceString(Piece piece, Team team)
-        {
+        { 
             char lable = piece.Label;
             string name = "";
             switch (lable)
