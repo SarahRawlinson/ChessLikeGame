@@ -9,6 +9,10 @@ public class ChessGrid
     public MultiPiece pieceOnGrid;
     private GridColor _gridColor;
     private int location;
+    public static string[] columns = new[]
+    {
+        "A", "B", "C", "D", "E", "F", "G", "H"
+    };
     
     public ChessGrid(){}
 
@@ -44,6 +48,12 @@ public class ChessGrid
     public static int CalculateIndexFromXY(int x, int y)
     {
         return x * y;
+    }
+
+    public string GetKey()
+    {
+        (int x, int y) = CalculateXYFromIndex(location);
+        return $"{columns[x]}{y.ToString()}";
     }
     
 }
