@@ -14,7 +14,7 @@ public class ChessGrid
         "A", "B", "C", "D", "E", "F", "G", "H"
     };
     
-    public ChessGrid(){}
+    // public ChessGrid(){}
 
     public ChessGrid(MultiPiece pieceOnGrid, int location)
     {
@@ -53,7 +53,7 @@ public class ChessGrid
     public string GetKey()
     {
         (int x, int y) = CalculateXYFromIndex(location);
-        return $"{columns[x]}{y.ToString()}";
+        return $"{columns[x]}{(y+1).ToString()}";
     }
     
 }

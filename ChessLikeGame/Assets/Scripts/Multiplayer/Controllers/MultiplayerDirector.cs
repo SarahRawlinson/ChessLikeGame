@@ -27,8 +27,9 @@ public class MultiplayerDirector : MonoBehaviour
 
         for(; counter < 64; counter++)
         {
-            Debug.Log("Gameboard Count:" + gameBoard.Count);
-             gameBoard.Add(new ChessGrid(new MultiPiece(), counter));
+            ChessGrid chessGrid = new ChessGrid(new MultiPiece(), counter);
+            Debug.Log($"creating board position, index:{gameBoard.Count}, position: {chessGrid.GetKey()}");
+            gameBoard.Add(chessGrid);
         }
         
         
@@ -40,9 +41,9 @@ public class MultiplayerDirector : MonoBehaviour
          counter = 0; 
         foreach (var square in gameBoard)
         {
-            if (square.pieceOnGrid.type != ChessPieceTypes.NONE)
+            if (square.pieceOnGrid.GetType() != ChessPieceTypes.NONE)
             {
-                gameObjectController.SpawnPiece(square.pieceOnGrid.type, square.pieceOnGrid.Colour,gameObjectController.GetPositionVectorfromGameSquare(counter)) ;
+                gameObjectController.SpawnPiece(square.pieceOnGrid.GetType(), square.pieceOnGrid.Colour,gameObjectController.GetPositionVectorfromGameSquare(counter)) ;
             }
 
             counter++;
@@ -65,64 +66,58 @@ public class MultiplayerDirector : MonoBehaviour
             {
                 case 'P':
                     tmpPiece.Colour = TeamColor.White;
-                    tmpPiece.type = ChessPieceTypes.PAWN;
+                    tmpPiece.SetType(ChessPieceTypes.PAWN);
                     break;
                 case 'R':
                     tmpPiece.Colour = TeamColor.White;
-                    tmpPiece.type = ChessPieceTypes.ROOK;
+                    tmpPiece.SetType(ChessPieceTypes.ROOK);
                     break;
                 case 'N':
                     tmpPiece.Colour = TeamColor.White;
-                    tmpPiece.type = ChessPieceTypes.KNIGHT;
+                    tmpPiece.SetType(ChessPieceTypes.KNIGHT);
                     break;
-                
                 case 'B':
                     tmpPiece.Colour = TeamColor.White;
-                    tmpPiece.type = ChessPieceTypes.BISHOP;
+                    tmpPiece.SetType(ChessPieceTypes.BISHOP);
                     break;
                 case 'Q':
                     tmpPiece.Colour = TeamColor.White;
-                    tmpPiece.type = ChessPieceTypes.QUEEN;
+                    tmpPiece.SetType(ChessPieceTypes.QUEEN);
                     break;
                 case 'K':
                     tmpPiece.Colour = TeamColor.White;
-                    tmpPiece.type = ChessPieceTypes.KING;
+                    tmpPiece.SetType(ChessPieceTypes.KING);
                     break;
-               
                 case 'p':
                     tmpPiece.Colour = TeamColor.Black;
-                    tmpPiece.type = ChessPieceTypes.PAWN;
+                    tmpPiece.SetType(ChessPieceTypes.PAWN);
                     break;
                 case 'r':
                     tmpPiece.Colour = TeamColor.Black;
-                    tmpPiece.type = ChessPieceTypes.ROOK;
+                    tmpPiece.SetType(ChessPieceTypes.ROOK);
                     break;
                 case 'n':
                     tmpPiece.Colour = TeamColor.Black;
-                    tmpPiece.type = ChessPieceTypes.KNIGHT;
+                    tmpPiece.SetType(ChessPieceTypes.KNIGHT);
                     break;
-                
                 case 'b':
                     tmpPiece.Colour = TeamColor.Black;
-                    tmpPiece.type = ChessPieceTypes.BISHOP;
+                    tmpPiece.SetType(ChessPieceTypes.BISHOP);
                     break;
                 case 'q':
                     tmpPiece.Colour = TeamColor.Black;
-                    tmpPiece.type = ChessPieceTypes.QUEEN;
+                    tmpPiece.SetType(ChessPieceTypes.QUEEN);
                     break;
                 case 'k':
                     tmpPiece.Colour = TeamColor.Black;
-                    tmpPiece.type = ChessPieceTypes.KING;
+                    tmpPiece.SetType(ChessPieceTypes.KING);
                     break;
-                
                 default:
                     break;
             }
             
-            Debug.Log("Adding Piece to Board:" + tmpPiece.type + ":" + tmpPiece.Colour + " / Counter:" + counter);
-            
-            Debug.Log("Gameboard Count:" + gameBoard.Count);
-            
+            Debug.Log("Adding Piece to Board:" + tmpPiece.GetType() + ":" + tmpPiece.Colour + " / Counter:" + counter);
+
             gameBoard[counter].pieceOnGrid = tmpPiece;
 
             if (Char.IsDigit(character))
@@ -130,7 +125,6 @@ public class MultiplayerDirector : MonoBehaviour
               counter += (int) Char.GetNumericValue(character) -1;
             }
 
-            
             if(character != '/'){
                 counter++;
             }
