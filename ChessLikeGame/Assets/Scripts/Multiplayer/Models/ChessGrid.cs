@@ -2,6 +2,7 @@ using System;
 using Chess.Pieces;
 using Multiplayer;
 using Multiplayer.Models;
+using UnityEngine;
 
 [Serializable]
 public class ChessGrid
@@ -9,10 +10,7 @@ public class ChessGrid
     public MultiPiece pieceOnGrid;
     private GridColor _gridColor;
     private int location;
-    public static string[] columns = new[]
-    {
-        "A", "B", "C", "D", "E", "F", "G", "H"
-    };
+    static readonly string[] Columns = new[]{"A", "B", "C", "D", "E", "F", "G", "H"};
     
     // public ChessGrid(){}
 
@@ -53,7 +51,18 @@ public class ChessGrid
     public string GetKey()
     {
         (int x, int y) = CalculateXYFromIndex(location);
-        return $"{columns[x]}{(y+1).ToString()}";
+        return $"{Columns[x]}{(y+1).ToString()}";
+    }
+
+    public static int GetIndexFromKey(string key)
+    {
+        Debug.Log(key);
+        var x = Array.IndexOf(Columns, key[0].ToString());
+        var y_str = key[1].ToString();
+        Debug.Log(y_str);
+        var y = (Int32.Parse(y_str))-1;
+        return CalculateIndexFromXY(x, y);
+        
     }
     
 }

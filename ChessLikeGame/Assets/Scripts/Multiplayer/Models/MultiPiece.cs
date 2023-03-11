@@ -29,7 +29,11 @@ namespace Multiplayer.Models
         public void SetType(ChessPieceTypes pieceType)
         {
             type = pieceType;
-            key = type.ToString()[0].ToString();
+        }
+        
+        public void SetKey( string charKey)
+        {
+            key = charKey;
         }
 
         public new ChessPieceTypes GetType()
@@ -45,6 +49,12 @@ namespace Multiplayer.Models
         public bool HasMoved()
         {
             return _hasMoved;
+        }
+
+        public void SetXY(int x, int y)
+        {
+            X = x;
+            Y = y;
         }
     } 
 }
