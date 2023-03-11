@@ -5,6 +5,8 @@ using Chess.Interface;
 using Chess.Board;
 using Chess.Control;
 using Chess.Movement;
+using Multiplayer.Models;
+using Multiplayer.Models.Movement;
 using UnityEngine;
 
 namespace Chess.Pieces

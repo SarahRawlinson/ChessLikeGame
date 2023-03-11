@@ -1,8 +1,9 @@
 ﻿using System;
 
-namespace Chess.Enums
+namespace Multiplayer.Models.Movement
 {
     [Serializable]
+    //todo: remove CastleQueenSideWhite,CastleQueenSideBlack,CastleKingSideWhite,CastleKingSideBlack when replace the old code
     public enum MoveTypes
     {
         Forward,
@@ -17,6 +18,8 @@ namespace Chess.Enums
         CastleQueenSideWhite,
         CastleQueenSideBlack,
         CastleKingSideWhite,
-        CastleKingSideBlack
+        CastleKingSideBlack,
+        CastleKingSide,
+        CastleQueenSide
     }
 }

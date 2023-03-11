@@ -2,6 +2,8 @@
 using Chess.Board;
 using Chess.Enums;
 using Chess.Pieces;
+using Multiplayer.Models;
+using Multiplayer.Models.Movement;
 using UnityEngine.Serialization;
 
 namespace Chess.Movement

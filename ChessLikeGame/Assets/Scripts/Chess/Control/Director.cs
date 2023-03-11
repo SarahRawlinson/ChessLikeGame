@@ -8,6 +8,8 @@ using Chess.Enums;
 using Chess.Fen;
 using Chess.Movement;
 using Chess.Pieces;
+using Multiplayer.Models;
+using Multiplayer.Models.Movement;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;

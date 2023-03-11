@@ -4,6 +4,8 @@ using Chess.Board;
 using Chess.Control;
 using Chess.Enums;
 using Chess.Movement;
+using Multiplayer.Models;
+using Multiplayer.Models.Movement;
 using Unity.VisualScripting;
 using UnityEngine;
 

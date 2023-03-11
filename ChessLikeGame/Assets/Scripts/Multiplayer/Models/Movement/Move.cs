@@ -1,7 +1,4 @@
-﻿using Unity.Netcode;
-using Unity.VisualScripting;
-
-namespace Multiplayer.Models
+﻿namespace Multiplayer.Models.Movement
 {
     public class Move
     {
@@ -11,27 +8,25 @@ namespace Multiplayer.Models
         private bool _willResultInCapture;
         private ChessPieceTypes _capturedPiece;
         private TeamColor _colorToMove;
-      
-        public int StartPosition
+
+        public Move(int startPosition, int endPosition, TeamColor colorToMove)
         {
-            get => _startPosition;
-            set => _startPosition = value;
+            _startPosition = startPosition;
+            _endPosition = endPosition;
+            _colorToMove = colorToMove;
         }
+
 
         public int EndPosition => _endPosition;
         public bool WillResultInCapture => _willResultInCapture;
         public ChessPieceTypes CapturedPiece => _capturedPiece;
         public TeamColor ColorToMove => _colorToMove;
 
-
-        public Move()
+        public int StartPosition
         {
+            get => _startPosition;
         }
 
-        public Move(int startPosition)
-        {
-            _startPosition = startPosition;
-        }
 
         public override string ToString()
         {

@@ -1,42 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using Multiplayer.Models.Movement;
 
 namespace Multiplayer.Models.Rules
 {
     public class PawnMoves : IPieceMovement
     {
-        public List<Move> possibleMoves(int startIndex, MultiPiece piece)
+        public List<MoveToValidate> possibleMoves()
         {
-            List<Move> tmpList = new List<Move>();
-            
-            //Forward 1 and 2 Squares
-            tmpList.Add(new Move(Rules.incrementX(startIndex,1)));
-            if(!piece.HasMoved())
-                tmpList.Add(new Move(Rules.incrementX(startIndex,2)));
-
-            switch (piece.Colour)
-            {
-                case TeamColor.Black:
-                    break;
-                case TeamColor.White:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            //Diagonal Right
-            Move diagRight = new Move();
-            diagRight.StartPosition = Rules.incrementX(startIndex, 1);
-            diagRight.StartPosition = Rules.incrementY(diagRight.StartPosition, 1);
-            tmpList.Add(diagRight);
-            
-            //Diagonal Left
-            Move diagLeft = new Move();
-            diagRight.StartPosition = Rules.incrementX(startIndex, 1);
-            diagRight.StartPosition = Rules.incrementY(diagRight.StartPosition, 1);
-            tmpList.Add(diagLeft);
-            
-
-            return tmpList;
+            List<MoveToValidate> myMoves = new List<MoveToValidate>();
+            List<MoveValidationTypes> diagonal = new List<MoveValidationTypes>() {MoveValidationTypes.CheckOccupied};
+            List<MoveValidationTypes> forward = new List<MoveValidationTypes>() {MoveValidationTypes.CheckEmpty};
+            List<MoveValidationTypes> forwardIfNotMoved = new List<MoveValidationTypes>() {MoveValidationTypes.CheckEmpty, MoveValidationTypes.CheckHasNotMoved};
+            myMoves.Add(new MoveToValidate(MoveTypes.Forward, forward,1));
+            myMoves.Add(new MoveToValidate(MoveTypes.Forward, forwardIfNotMoved,2));
+            myMoves.Add(new MoveToValidate(MoveTypes.DiagonalUpLeft, diagonal,1));
+            myMoves.Add(new MoveToValidate(MoveTypes.DiagonalUpRight, diagonal,1));
+            return myMoves;
         }
     }
 }

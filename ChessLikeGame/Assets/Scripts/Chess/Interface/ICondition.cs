@@ -1,4 +1,6 @@
 ﻿using Chess.Enums;
+using Multiplayer.Models;
+using Multiplayer.Models.Movement;
 
 namespace Chess.Interface
 {

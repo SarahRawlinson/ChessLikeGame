@@ -1,5 +1,7 @@
 ﻿using Chess.Enums;
 using Chess.Movement;
+using Multiplayer.Models;
+using Multiplayer.Models.Movement;
 using UnityEngine;
 
 namespace Chess.Pieces

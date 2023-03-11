@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using Multiplayer.Models.Movement;
 
 namespace Multiplayer.Models.Rules
 {
     public interface IPieceMovement
     {
-        public List<Move> possibleMoves(int startIndex, MultiPiece piece);
+        public List<MoveToValidate> possibleMoves();
         
     }
 }
