@@ -19,6 +19,8 @@ namespace Multiplayer.Models
         private bool BlackCanQueensideCastle;
         private int HalfMoveCounter;
         private int FullMoveNumber;
+        private List<MultiPiece> whitePiece = new List<MultiPiece>();
+        private List<MultiPiece> blackPiece = new List<MultiPiece>();
 
         public MultiBoardStateData(string fen)
         {
@@ -63,17 +65,12 @@ namespace Multiplayer.Models
             foreach (var character in inputFEN)
             {
                 MultiPiece tmpPiece = new MultiPiece();
+                ChessGrid chessGrid = GameBoard[63-counter];
+                (int x, int y) calculateXYFromIndex = ChessGrid.CalculateXYFromIndex(counter);
+                tmpPiece.SetXY(calculateXYFromIndex.x, calculateXYFromIndex.y);
                 if (Char.IsLetter(character))
                 {
                     tmpPiece.SetKey(character.ToString());
-                    if (Char.IsLower(character))
-                    {
-                        tmpPiece.Colour = TeamColor.Black;
-                    }
-                    else
-                    {
-                        tmpPiece.Colour = TeamColor.White;
-                    }
                     switch (character.ToString().ToUpper())
                     {
                         case "P":
@@ -97,16 +94,26 @@ namespace Multiplayer.Models
                         default:
                             break;
                     }
+                    if (Char.IsLower(character))
+                    {
+                        tmpPiece.Colour = TeamColor.Black;
+                        blackPiece.Add(tmpPiece);
+                    }
+                    else
+                    {
+                        tmpPiece.Colour = TeamColor.White;
+                        whitePiece.Add(tmpPiece);
+                    }
+                    
                 }
                 else
                 {
                     tmpPiece.SetKey("");
                 }
 
-                ChessGrid chessGrid = GameBoard[63-counter];
+                
                 Debug.Log($"Adding Piece to Board: {tmpPiece.Colour} {tmpPiece.GetType()}  / Index: {63-counter} / key: {chessGrid.GetKey()}");
-                (int x, int y) calculateXYFromIndex = ChessGrid.CalculateXYFromIndex(counter);
-                tmpPiece.SetXY(calculateXYFromIndex.x, calculateXYFromIndex.y);
+                
                 chessGrid.pieceOnGrid = tmpPiece;
 
                 if (Char.IsDigit(character))
