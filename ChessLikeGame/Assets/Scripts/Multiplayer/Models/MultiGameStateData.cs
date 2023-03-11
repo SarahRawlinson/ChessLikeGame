@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Multiplayer.Models
 {
     [Serializable]
-    public class MultiBoardStateData
+    public class MultiGameStateData
     {
         private TeamColor ActivePlayer;
         private int EnPassantSquare;
@@ -22,7 +22,7 @@ namespace Multiplayer.Models
         private List<MultiPiece> whitePiece = new List<MultiPiece>();
         private List<MultiPiece> blackPiece = new List<MultiPiece>();
 
-        public MultiBoardStateData(string fen)
+        public MultiGameStateData(string fen)
         {
             CreateBoard();
             SetUpBoardFromFen(fen);
@@ -227,6 +227,10 @@ namespace Multiplayer.Models
             return castle;
         }
 
+        public MultiPiece GetPieceFromPositionOnBoard(int index)
+        {
+            return GameBoard[index].pieceOnGrid;
+        }
 
         private string GetBoardString()
         {
@@ -281,4 +285,6 @@ namespace Multiplayer.Models
         
     }
 
+    
+    
 }

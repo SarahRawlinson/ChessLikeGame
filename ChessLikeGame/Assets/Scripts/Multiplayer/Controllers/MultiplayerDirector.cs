@@ -14,7 +14,7 @@ public class MultiplayerDirector : MonoBehaviour
 {
     private bool _gameOver = false;
 
-    private MultiBoardStateData _boardStateData;
+    private MultiGameStateData _gameStateData;
 
     private string setupFenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
@@ -25,9 +25,9 @@ public class MultiplayerDirector : MonoBehaviour
         int counter = 0;
 
         
-        _boardStateData = new MultiBoardStateData(setupFenString);
+        _gameStateData = new MultiGameStateData(setupFenString);
         Debug.Log(setupFenString);
-        var gameBoardList = _boardStateData.GetGameBoardList();
+        var gameBoardList = _gameStateData.GetGameBoardList();
 
 
         gameObjectController.CreateBoardPositions(8,8);
