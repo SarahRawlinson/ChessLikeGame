@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Chess.Fen;
-using Unity.VisualScripting;
+using Multiplayer.Models.Movement;
 using UnityEngine;
 
 namespace Multiplayer.Models
@@ -22,6 +21,8 @@ namespace Multiplayer.Models
         private List<MultiPiece> whitePiece = new List<MultiPiece>();
         private List<MultiPiece> blackPiece = new List<MultiPiece>();
 
+        private Rules.Rules rules;
+        
         public MultiGameStateData(string fen)
         {
             CreateBoard();
@@ -44,6 +45,22 @@ namespace Multiplayer.Models
                 Debug.Log($"creating board position, index:{GameBoard.Count.ToString()}, position: {chessGrid.GetKey()}");
                 GameBoard.Add(chessGrid);
             }
+        }
+
+        public bool MakeMoveOnBoard(Move move)
+        {
+            rules = new Rules.Rules(this);
+
+            if (rules.isMoveValid(move))
+            {
+                //todo: move
+                ChessGrid start = GameBoard[move.StartPosition];
+                ChessGrid end = GameBoard[move.EndPosition];
+                end.pieceOnGrid = start.pieceOnGrid;
+                start.pieceOnGrid = new MultiPiece();
+                return true;
+            }
+            return false;
         }
 
 
@@ -90,8 +107,6 @@ namespace Multiplayer.Models
                             break;
                         case "K":
                             tmpPiece.SetType(ChessPieceTypes.KING);
-                            break;
-                        default:
                             break;
                     }
                     if (Char.IsLower(character))

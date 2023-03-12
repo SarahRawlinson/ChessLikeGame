@@ -20,6 +20,20 @@ namespace Multiplayer.Models.Rules
             SetGameStateData(game);
         }
 
+        public bool isMoveValid(Move moveToTest)
+        {
+            MultiPiece piece =
+                _gameStateData.GetGameBoardList()[moveToTest.StartPosition].pieceOnGrid;
+            foreach (var move in GetMovesByPiece(piece))
+            {
+                if (Move.CheckEqual(move, moveToTest))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         private void SetGameStateData(MultiGameStateData game)
         {
             _gameStateData = game;

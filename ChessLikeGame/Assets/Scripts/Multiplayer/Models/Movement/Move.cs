@@ -48,5 +48,22 @@
             return
                 $"{_colorToMove}  Move from: {_startPosition} To: {_endPosition} / Capture?: {_willResultInCapture} : {_capturedPiece} ";
         }
+
+        public static bool CheckEqual(Move move, Move moveToTest)
+        {
+            if (move.HasSecondMove != moveToTest.HasSecondMove)
+            {
+                return false;
+            }
+            if (moveToTest.HasSecondMove && move.HasSecondMove)
+            {
+                if (!CheckEqual(moveToTest.SecondMove, move.SecondMove))
+                {
+                    return false;
+                }
+            }
+            return move.StartPosition == moveToTest.StartPosition && move._endPosition == moveToTest._endPosition
+                && move.WillResultInCapture == moveToTest.WillResultInCapture && move.ColorToMove == moveToTest.ColorToMove;
+        }
     }
 }
