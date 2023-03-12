@@ -22,49 +22,15 @@ namespace Multiplayer.Models.Rules
             List<Move> moves = new List<Move>();
             //Todo: fill moves list, this is just the template
             int steps = toValidate.NumberOfSteps;
-            int endPos;
-            switch (toValidate.MoveType)
-            {
-                case MoveTypes.Forward:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forward * steps), basePos.y);
-                    moves.Add(new Move(startPos, endPos, color));
-                    break;
-                case MoveTypes.Backward:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forward * steps), basePos.y);
-                    moves.Add(new Move(startPos, endPos, color));
-                    break;
-                case MoveTypes.Left:
-                    break;
-                case MoveTypes.Right:
-                    break;
-                case MoveTypes.DiagonalUpRight:
-                    break;
-                case MoveTypes.DiagonalUpLeft:
-                    break;
-                case MoveTypes.DiagonalDownRight:
-                    break;
-                case MoveTypes.DiagonalDownLeft:
-                    break;
-                case MoveTypes.L:
-                    break;
-                case MoveTypes.CastleKingSide:
-                    break;
-                case MoveTypes.CastleQueenSide:
-                    break;
-                case MoveTypes.CastleQueenSideWhite:
-                case MoveTypes.CastleQueenSideBlack:
-                case MoveTypes.CastleKingSideWhite:
-                case MoveTypes.CastleKingSideBlack:
-                    throw new ArgumentOutOfRangeException(
-                        nameof(toValidate), 
-                        "specified castle depreciated use MoveTypes.CastleKingSide or MoveTypes.CastleQueenSide instead"
-                    );
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
+            
+            GetMovesByType(toValidate.MoveType, color, startPos, basePos, forward, steps, moves);
+            List<Move> validMoves = new List<Move>();
             foreach (Move move in moves)
             {
+                if (!CheckMoveViolations(move))
+                {
+                    continue;
+                }
                 foreach (var validate in toValidate.Validators)
                 {
                     switch (validate)
@@ -87,9 +53,104 @@ namespace Multiplayer.Models.Rules
                             throw new ArgumentOutOfRangeException();
                     }
                 }
+                validMoves.Add(move);
             }
             
-            return moves;
+            return validMoves;
+        }
+
+        private static void GetMovesByType(MoveTypes moveType, TeamColor color, int startPos, (int x, int y) basePos,
+            int forward, int steps, List<Move> moves)
+        {
+            int endPos;
+            Move firstMove;
+            switch (moveType)
+            {
+                case MoveTypes.Forward:
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forward * steps), basePos.y);
+                    moves.Add(new Move(startPos, endPos, color));
+                    break;
+                case MoveTypes.Backward:
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forward * steps), basePos.y);
+                    moves.Add(new Move(startPos, endPos, color));
+                    break;
+                case MoveTypes.Left:
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x, basePos.y - (forward * steps));
+                    moves.Add(new Move(startPos, endPos, color));
+                    break;
+                case MoveTypes.Right:
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x, basePos.y + (forward * steps));
+                    moves.Add(new Move(startPos, endPos, color));
+                    break;
+                case MoveTypes.DiagonalUpRight:
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forward * steps), basePos.y + (forward * steps));
+                    moves.Add(new Move(startPos, endPos, color));
+                    break;
+                case MoveTypes.DiagonalUpLeft:
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forward * steps), basePos.y + (forward * steps));
+                    moves.Add(new Move(startPos, endPos, color));
+                    break;
+                case MoveTypes.DiagonalDownRight:
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forward * steps), basePos.y - (forward * steps));
+                    moves.Add(new Move(startPos, endPos, color));
+                    break;
+                case MoveTypes.DiagonalDownLeft:
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forward * steps), basePos.y - (forward * steps));
+                    moves.Add(new Move(startPos, endPos, color));
+                    break;
+                case MoveTypes.L:
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + 2, basePos.y + 1);
+                    moves.Add(new Move(startPos, endPos, color));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + 2, basePos.y - 1);
+                    moves.Add(new Move(startPos, endPos, color));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + 1, basePos.y - 2);
+                    moves.Add(new Move(startPos, endPos, color));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - 1, basePos.y - 2);
+                    moves.Add(new Move(startPos, endPos, color));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - 2, basePos.y + 1);
+                    moves.Add(new Move(startPos, endPos, color));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - 2, basePos.y - 1);
+                    moves.Add(new Move(startPos, endPos, color));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + 1, basePos.y + 2);
+                    moves.Add(new Move(startPos, endPos, color));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - 1, basePos.y + 2);
+                    moves.Add(new Move(startPos, endPos, color));
+                    break;
+                case MoveTypes.CastleKingSide:
+                    firstMove = new Move(
+                        ChessGrid.CalculateIndexFromXY(basePos.x, 7),
+                        ChessGrid.CalculateIndexFromXY(basePos.x, 5),
+                        color);
+                    moves.Add(
+                        new Move(
+                            ChessGrid.CalculateIndexFromXY(basePos.x, 4),
+                            ChessGrid.CalculateIndexFromXY(basePos.x, 6),
+                            color,
+                            firstMove));
+                    break;
+                case MoveTypes.CastleQueenSide:
+                    firstMove = new Move(
+                        ChessGrid.CalculateIndexFromXY(basePos.x, 0),
+                        ChessGrid.CalculateIndexFromXY(basePos.x, 3),
+                        color);
+                    moves.Add(
+                        new Move(
+                            ChessGrid.CalculateIndexFromXY(basePos.x, 4),
+                            ChessGrid.CalculateIndexFromXY(basePos.x, 2),
+                            color,
+                            firstMove));
+                    break;
+                case MoveTypes.CastleQueenSideWhite:
+                case MoveTypes.CastleQueenSideBlack:
+                case MoveTypes.CastleKingSideWhite:
+                case MoveTypes.CastleKingSideBlack:
+                    throw new ArgumentOutOfRangeException(
+                        nameof(moveType),
+                        "specified castle depreciated use MoveTypes.CastleKingSide or MoveTypes.CastleQueenSide instead"
+                    );
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         public  bool CheckMoveViolations(Move move)
