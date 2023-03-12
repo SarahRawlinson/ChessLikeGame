@@ -8,94 +8,177 @@ namespace Multiplayer.Models.Rules
     {
         private  MultiGameStateData _gameStateData;
         public static int boardSize;
-        
+
+        public static int BoardSize
+        {
+            get => boardSize;
+            set => boardSize = value;
+        }
+
         public Rules(MultiGameStateData game)
+        {
+            SetGameStateData(game);
+        }
+
+        private void SetGameStateData(MultiGameStateData game)
         {
             _gameStateData = game;
             boardSize = game.GetGameBoardList().Count;
         }
-        
-        public List<Move> ValidateMove(MoveToValidate toValidate, TeamColor color, int startPos)
+
+        public List<Move> GetMovesByPiece(MultiPiece piece)
         {
-            int forward = color == TeamColor.White ? 1 : -1;
+            List<Move> moves = new List<Move>();
+            IPieceMovement movement;
+            switch (piece.GetType())
+            {
+                case ChessPieceTypes.NONE:
+                    return moves;
+                case ChessPieceTypes.PAWN:
+                    movement = new PawnMoves();
+                    break;
+                case ChessPieceTypes.BISHOP:
+                    movement = new BishopMoves();
+                    break;
+                case ChessPieceTypes.KNIGHT:
+                    movement = new KnightMoves();
+                    break;
+                case ChessPieceTypes.ROOK:
+                    movement = new RookMoves();
+                    break;
+                case ChessPieceTypes.QUEEN:
+                    movement = new QueenMoves();
+                    break;
+                case ChessPieceTypes.KING:
+                    movement = new KingMoves();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            List<MoveToValidate> movesToValidate = movement.possibleMoves();
+            foreach (var moveToValidate in movesToValidate)
+            {
+                moves.AddRange(GenerateValidatedMoves(moveToValidate, piece.Colour, ChessGrid.CalculateIndexFromXY(piece.X, piece.Y)));
+            }
+            return moves;
+        }
+        
+        public List<Move> GenerateValidatedMoves(MoveToValidate toValidate, TeamColor color, int startPos)
+        {
             (int x, int y) basePos = ChessGrid.CalculateXYFromIndex(startPos);
             List<Move> moves = new List<Move>();
-            //Todo: fill moves list, this is just the template
             int steps = toValidate.NumberOfSteps;
-            
-            GetMovesByType(toValidate.MoveType, color, startPos, basePos, forward, steps, moves);
+            GetMovesByType(toValidate.MoveType, color, startPos, basePos, steps, moves);
             List<Move> validMoves = new List<Move>();
             foreach (Move move in moves)
             {
-                if (!CheckMoveViolations(move))
-                {
-                    continue;
-                }
-                foreach (var validate in toValidate.Validators)
-                {
-                    switch (validate)
-                    {
-                        case MoveValidationTypes.CheckForClearPath:
-                            break;
-                        case MoveValidationTypes.CheckEmpty:
-                            break;
-                        case MoveValidationTypes.CheckOccupied:
-                            break;
-                        case MoveValidationTypes.CheckKingCantBeTaken:
-                            break;
-                        case MoveValidationTypes.CheckHasNotMoved:
-                            break;
-                        case MoveValidationTypes.CheckKingSideRookHasNotMoved:
-                            break;
-                        case MoveValidationTypes.CheckQueenSideRookHasNotMoved:
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                }
-                validMoves.Add(move);
+                bool canAdd = ValidateMove(toValidate, move);
+                if (canAdd) validMoves.Add(move);
             }
             
             return validMoves;
         }
 
-        private static void GetMovesByType(MoveTypes moveType, TeamColor color, int startPos, (int x, int y) basePos,
-            int forward, int steps, List<Move> moves)
+        private bool ValidateMove(MoveToValidate toValidate, Move move)
         {
+            bool canAdd = true;
+            if (move.HasSecondMove)
+            {
+                if (!ValidateMove(toValidate, move.SecondMove))
+                {
+                    return false;
+                }
+            }
+            
+            if (!CheckMoveViolations(move))
+            {
+                return false;
+            }
+
+            ChessGrid startPos = _gameStateData.GetGameBoardList()[move.StartPosition];
+            ChessGrid endPos = _gameStateData.GetGameBoardList()[move.EndPosition];
+            MultiPiece piece = startPos.pieceOnGrid;
+            foreach (var validate in toValidate.Validators)
+            {
+                switch (validate)
+                {
+                    case MoveValidationTypes.CheckForClearPath:
+                        //todo: need to work this out
+                        break;
+                    case MoveValidationTypes.CheckEmpty:
+                        if (endPos.pieceOnGrid.GetType() != ChessPieceTypes.NONE)
+                        {
+                            return false;
+                        }
+                        break;
+                    case MoveValidationTypes.CheckOccupied:
+                        if (endPos.pieceOnGrid.GetType() == ChessPieceTypes.NONE)
+                        {
+                            return false;
+                        }
+                        break;
+                    case MoveValidationTypes.CheckKingCantBeTaken:
+                        //todo: need to work this out
+                        break;
+                    case MoveValidationTypes.CheckHasNotMoved:
+                        if (piece.HasMoved())
+                        {
+                            return false;
+                        }
+                        break;
+                    case MoveValidationTypes.CheckIsKingOrRook:
+                        if (piece.GetType() != ChessPieceTypes.KING && piece.GetType() != ChessPieceTypes.ROOK)
+                        {
+                            return false;
+                        }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            return canAdd;
+        }
+
+        private static void GetMovesByType(MoveTypes moveType, TeamColor color, int startPos, (int x, int y) basePos, 
+            int steps, List<Move> moves)
+        {
+            int forwardDirection = color == TeamColor.White ? 1 : -1;
             int endPos;
             Move firstMove;
             switch (moveType)
             {
                 case MoveTypes.Forward:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forward * steps), basePos.y);
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forwardDirection * steps), basePos.y);
                     moves.Add(new Move(startPos, endPos, color));
                     break;
                 case MoveTypes.Backward:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forward * steps), basePos.y);
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forwardDirection * steps), basePos.y);
                     moves.Add(new Move(startPos, endPos, color));
                     break;
                 case MoveTypes.Left:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x, basePos.y - (forward * steps));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x, basePos.y - (forwardDirection * steps));
                     moves.Add(new Move(startPos, endPos, color));
                     break;
                 case MoveTypes.Right:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x, basePos.y + (forward * steps));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x, basePos.y + (forwardDirection * steps));
                     moves.Add(new Move(startPos, endPos, color));
                     break;
                 case MoveTypes.DiagonalUpRight:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forward * steps), basePos.y + (forward * steps));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forwardDirection * steps), basePos.y + (forwardDirection * steps));
                     moves.Add(new Move(startPos, endPos, color));
                     break;
                 case MoveTypes.DiagonalUpLeft:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forward * steps), basePos.y + (forward * steps));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forwardDirection * steps), basePos.y + (forwardDirection * steps));
                     moves.Add(new Move(startPos, endPos, color));
                     break;
                 case MoveTypes.DiagonalDownRight:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forward * steps), basePos.y - (forward * steps));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forwardDirection * steps), basePos.y - (forwardDirection * steps));
                     moves.Add(new Move(startPos, endPos, color));
                     break;
                 case MoveTypes.DiagonalDownLeft:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forward * steps), basePos.y - (forward * steps));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forwardDirection * steps), basePos.y - (forwardDirection * steps));
                     moves.Add(new Move(startPos, endPos, color));
                     break;
                 case MoveTypes.L:
@@ -155,6 +238,7 @@ namespace Multiplayer.Models.Rules
 
         public  bool CheckMoveViolations(Move move)
         {
+            
             //Check Bounds
             if (move.StartPosition < 0 || move.StartPosition >= _gameStateData.GetGameBoardList().Count ||
                 move.EndPosition < 0 || move.EndPosition > _gameStateData.GetGameBoardList().Count)

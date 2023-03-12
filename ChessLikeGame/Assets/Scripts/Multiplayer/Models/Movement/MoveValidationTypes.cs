@@ -7,7 +7,6 @@
         CheckOccupied,
         CheckKingCantBeTaken,
         CheckHasNotMoved,
-        CheckKingSideRookHasNotMoved,
-        CheckQueenSideRookHasNotMoved
+        CheckIsKingOrRook
     }
 }

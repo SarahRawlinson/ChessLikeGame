@@ -23,14 +23,14 @@ namespace Multiplayer.Models.Rules
                 MoveTypes.CastleKingSide, 
                 new List<MoveValidationTypes>()
                 {
-                    MoveValidationTypes.CheckKingCantBeTaken, MoveValidationTypes.CheckHasNotMoved, MoveValidationTypes.CheckKingSideRookHasNotMoved
+                    MoveValidationTypes.CheckKingCantBeTaken, MoveValidationTypes.CheckHasNotMoved, MoveValidationTypes.CheckIsKingOrRook
                 },
                 1));
             myMoves.Add(new MoveToValidate(
                 MoveTypes.CastleQueenSide, 
                 new List<MoveValidationTypes>()
                 {
-                    MoveValidationTypes.CheckKingCantBeTaken, MoveValidationTypes.CheckHasNotMoved, MoveValidationTypes.CheckQueenSideRookHasNotMoved
+                    MoveValidationTypes.CheckKingCantBeTaken, MoveValidationTypes.CheckHasNotMoved, MoveValidationTypes.CheckIsKingOrRook
                 },
                 1));
 

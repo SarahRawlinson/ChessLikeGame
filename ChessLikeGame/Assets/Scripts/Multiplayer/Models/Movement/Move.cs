@@ -11,6 +11,10 @@
         private bool _hasSecondMove = false;
         private Move _secondMove = null;
 
+        public bool HasSecondMove => _hasSecondMove;
+
+        public Move SecondMove => _secondMove;
+
         public Move(int startPosition, int endPosition, TeamColor colorToMove)
         {
             _startPosition = startPosition;
