@@ -45,23 +45,30 @@ public class ChessGrid
 
     public static int CalculateIndexFromXY(int x, int y)
     {
-        return x * y;
+        return (y * 8) + x ;
     }
 
     public string GetKey()
     {
-        (int x, int y) = CalculateXYFromIndex(location);
-        return $"{Columns[x]}{(y+1).ToString()}";
+        return GetKeyFromIndex(location);
     }
 
     public static int GetIndexFromKey(string key)
     {
-        Debug.Log(key);
+        (int x, int y) = CalculateXYFromKey(key);
+        return CalculateIndexFromXY(x, y);
+    }
+    public static  (int x, int y) CalculateXYFromKey(string key) {
+
         var x = Array.IndexOf(Columns, key[0].ToString());
         var y_str = key[1].ToString();
-        Debug.Log(y_str);
-        var y = (Int32.Parse(y_str))-1;
-        return CalculateIndexFromXY(x, y);
+        var y = (Int32.Parse(y_str)-1);
+        return (x, y);
+    }
+    public static string GetKeyFromIndex(int location)
+    {
+        (int x, int y) = CalculateXYFromIndex(location);
+        return $"{Columns[x]}{(y+1).ToString()}";
         
     }
     

@@ -1,15 +1,13 @@
 using System;
 using System.Collections.Generic;
-using Chess.Fen;
-using Chess.Pieces;
+
 using Multiplayer;
 using Multiplayer.Controllers;
 using Multiplayer.Models;
 using Multiplayer.Models.Movement;
 using Multiplayer.Models.Rules;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
+
 
 [RequireComponent(typeof(GameObjectController))]
 public class MultiplayerDirector : MonoBehaviour
@@ -17,6 +15,7 @@ public class MultiplayerDirector : MonoBehaviour
     private bool _gameOver = false;
 
     private MultiGameStateData _gameStateData;
+    private Dictionary<string, int> gameObjectsPieces = new Dictionary<string, int>();
 
     private string setupFenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
@@ -29,40 +28,55 @@ public class MultiplayerDirector : MonoBehaviour
 
         
         _gameStateData = new MultiGameStateData(setupFenString);
-        Debug.Log(setupFenString);
+        _rules = new Rules(_gameStateData);
         var gameBoardList = _gameStateData.GetGameBoardList();
-
-
         gameObjectController.CreateBoardPositions(8,8);
-
-         counter = 0;
+        counter = 0;
 
          foreach (var square in gameBoardList)
         {
-            if (square.pieceOnGrid.GetType() != ChessPieceTypes.NONE)
+            if (square.pieceOnGrid.GetPieceType() != ChessPieceTypes.NONE)
             {
-                gameObjectController.SpawnPiece(
-                    square.pieceOnGrid.GetType(), 
+                gameObjectsPieces.Add(square.GetKey(),gameObjectController.SpawnPiece(
+                    square.pieceOnGrid.GetPieceType(), 
                     square.pieceOnGrid.Colour,
                     gameObjectController.GetPositionVectorfromGameSquare(counter)
-                );
+                ));
+                
             }
-
+            else
+            {
+                gameObjectsPieces.Add(square.GetKey(), -1);
+            }
             counter++;
         }
-
-         _rules = new Rules(_gameStateData);
-        
+         
+        MovePiece();
         return true;
     }
 
     private void MovePiece()
     {
-        Move move = _rules.GetMovesByPiece(_gameStateData.GetGameBoardList()[ChessGrid.GetIndexFromKey("B2")]
-            .pieceOnGrid)[0];
+        int fromKey = ChessGrid.GetIndexFromKey("B2");
+        ChessGrid startGrid = _gameStateData.GetGameBoardList()[fromKey];
+        (int x, int y) = ChessGrid.CalculateXYFromIndex(9);
+        Debug.Log($"index: {fromKey}, XY: ({x},{y}), key: {startGrid.GetKey()}, piece: {startGrid.pieceOnGrid.GetPieceType()}, piece XY: ({startGrid.pieceOnGrid.X},{startGrid.pieceOnGrid.Y})");
+        var movesByPiece = _rules.GetMovesByPiece(startGrid
+            .pieceOnGrid);
+        
+        Move move = movesByPiece[0];
         if (_gameStateData.MakeMoveOnBoard(move))
         {
-            gameObjectController.MoveGameObject()
+            ChessGrid endGrid = _gameStateData.GetGameBoardList()[move.EndPosition];
+            if (gameObjectsPieces[endGrid.GetKey()] != -1)
+            {
+                gameObjectController.RemoveGameObjectFromGame(gameObjectsPieces[endGrid.GetKey()]);
+            }
+            int gameObjectIndex = gameObjectsPieces[startGrid.GetKey()];
+            gameObjectController.MoveGameObject(gameObjectIndex,
+                gameObjectController.GetPositionVectorfromGameSquare(move.EndPosition));
+            gameObjectsPieces[endGrid.GetKey()] = gameObjectIndex;
+            gameObjectsPieces[startGrid.GetKey()] = -1;
         }
         
     }
@@ -70,6 +84,6 @@ public class MultiplayerDirector : MonoBehaviour
     private void Start()
     {
         gameObjectController = gameObject.GetComponent<GameObjectController>();
-        MovePiece();
+        
     }
 }

@@ -33,7 +33,7 @@ namespace Multiplayer.Controllers
             {
                 for (int b = 0; b < y; b++)
                 {
-                    gameSquares.Add(SpawnObject(positionGameObjectPrefab,  new Vector3(size * a + StartGameSquarePosition.transform.position.x,StartGameSquarePosition.transform.position.y, size * b + StartGameSquarePosition.transform.position.z)));
+                    gameSquares.Add(SpawnObject(positionGameObjectPrefab,  new Vector3(size * a + StartGameSquarePosition.transform.position.x,StartGameSquarePosition.transform.position.y, -size * b + StartGameSquarePosition.transform.position.z)));
                 }
             }
         }
@@ -54,7 +54,7 @@ namespace Multiplayer.Controllers
             _objectsInUse.Add(newGameObject);
             return _objectsInUse.Count-1;
         }
-        
+
         public int SpawnPiece(ChessPieceTypes type, TeamColor teamColor, Vector3 position)
         {
             switch (teamColor)
@@ -109,7 +109,16 @@ namespace Multiplayer.Controllers
 
             return -1;
         }
-        
+
+        public void MoveGameObject(int gameObjectIndex, Vector3 moveVector)
+        {
+            _objectsInUse[gameObjectIndex].transform.position = moveVector;
+        }
+
+        public void RemoveGameObjectFromGame(int gameObjectIndex)
+        {
+            _objectsInUse[gameObjectIndex].SetActive(false);
+        }
     }
 
 }

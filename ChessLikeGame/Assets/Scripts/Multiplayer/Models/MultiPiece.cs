@@ -21,8 +21,10 @@ namespace Multiplayer.Models
             _hasMoved = hasMoved;
         }
 
-        public MultiPiece()
+        public MultiPiece(int x, int y)
         {
+            X = x;
+            Y = y;
             _hasMoved = false;
         }
 
@@ -36,7 +38,7 @@ namespace Multiplayer.Models
             key = charKey;
         }
 
-        public new ChessPieceTypes GetType()
+        public new ChessPieceTypes GetPieceType()
         {
             return type;
         }

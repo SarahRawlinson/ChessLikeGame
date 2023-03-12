@@ -41,8 +41,11 @@ namespace Multiplayer.Models
             GameBoard.Clear();
             for (; counter < 64; counter++)
             {
-                ChessGrid chessGrid = new ChessGrid(new MultiPiece(), counter);
-                Debug.Log($"creating board position, index:{GameBoard.Count.ToString()}, position: {chessGrid.GetKey()}");
+                (int x, int y) = ChessGrid.CalculateXYFromIndex(counter);
+                ChessGrid chessGrid = new ChessGrid(new MultiPiece(x, y), counter);
+                (int bx, int by) = ChessGrid.CalculateXYFromKey(chessGrid.GetKey());
+                int checkIndex = ChessGrid.CalculateIndexFromXY(x, y);
+                Debug.Log($"creating board position, index:{GameBoard.Count.ToString()}/{checkIndex}, position: {chessGrid.GetKey()}, aXY: ({x},{y}), bXY: ({bx},{by})");
                 GameBoard.Add(chessGrid);
             }
         }
@@ -55,9 +58,10 @@ namespace Multiplayer.Models
             {
                 //todo: move
                 ChessGrid start = GameBoard[move.StartPosition];
+                (int x, int y) = ChessGrid.CalculateXYFromIndex(move.StartPosition);
                 ChessGrid end = GameBoard[move.EndPosition];
                 end.pieceOnGrid = start.pieceOnGrid;
-                start.pieceOnGrid = new MultiPiece();
+                start.pieceOnGrid = new MultiPiece(x, y);
                 return true;
             }
             return false;
@@ -81,53 +85,22 @@ namespace Multiplayer.Models
             int counter = 0;
             foreach (var character in inputFEN)
             {
-                MultiPiece tmpPiece = new MultiPiece();
-                ChessGrid chessGrid = GameBoard[63-counter];
-                (int x, int y) calculateXYFromIndex = ChessGrid.CalculateXYFromIndex(counter);
-                tmpPiece.SetXY(calculateXYFromIndex.x, calculateXYFromIndex.y);
+                (int x, int y) = ChessGrid.CalculateXYFromIndex(counter);
+                y = 7 - y;
+                int index = ChessGrid.CalculateIndexFromXY(x, y);
+                
+                MultiPiece tmpPiece = new MultiPiece(x, y);
+                ChessGrid chessGrid = GameBoard[index];
+                
                 if (Char.IsLetter(character))
                 {
-                    tmpPiece.SetKey(character.ToString());
-                    switch (character.ToString().ToUpper())
-                    {
-                        case "P":
-                            tmpPiece.SetType(ChessPieceTypes.PAWN);
-                            break;
-                        case "R":
-                            tmpPiece.SetType(ChessPieceTypes.ROOK);
-                            break;
-                        case "N":
-                            tmpPiece.SetType(ChessPieceTypes.KNIGHT);
-                            break;
-                        case "B":
-                            tmpPiece.SetType(ChessPieceTypes.BISHOP);
-                            break;
-                        case "Q":
-                            tmpPiece.SetType(ChessPieceTypes.QUEEN);
-                            break;
-                        case "K":
-                            tmpPiece.SetType(ChessPieceTypes.KING);
-                            break;
-                    }
-                    if (Char.IsLower(character))
-                    {
-                        tmpPiece.Colour = TeamColor.Black;
-                        blackPiece.Add(tmpPiece);
-                    }
-                    else
-                    {
-                        tmpPiece.Colour = TeamColor.White;
-                        whitePiece.Add(tmpPiece);
-                    }
-                    
+                    WorkOutCharacter(tmpPiece, character);
                 }
                 else
                 {
                     tmpPiece.SetKey("");
                 }
-
-                
-                Debug.Log($"Adding Piece to Board: {tmpPiece.Colour} {tmpPiece.GetType()}  / Index: {63-counter} / key: {chessGrid.GetKey()}");
+                Debug.Log($"Adding Piece to Board: {tmpPiece.Colour} {tmpPiece.GetPieceType()}  / Index: {index} / key: {chessGrid.GetKey()}, XY: ({x},{y})");
                 
                 chessGrid.pieceOnGrid = tmpPiece;
 
@@ -142,7 +115,44 @@ namespace Multiplayer.Models
                 }
             }
         }
-        
+
+        private void WorkOutCharacter(MultiPiece tmpPiece, char character)
+        {
+            tmpPiece.SetKey(character.ToString());
+            switch (character.ToString().ToUpper())
+            {
+                case "P":
+                    tmpPiece.SetType(ChessPieceTypes.PAWN);
+                    break;
+                case "R":
+                    tmpPiece.SetType(ChessPieceTypes.ROOK);
+                    break;
+                case "N":
+                    tmpPiece.SetType(ChessPieceTypes.KNIGHT);
+                    break;
+                case "B":
+                    tmpPiece.SetType(ChessPieceTypes.BISHOP);
+                    break;
+                case "Q":
+                    tmpPiece.SetType(ChessPieceTypes.QUEEN);
+                    break;
+                case "K":
+                    tmpPiece.SetType(ChessPieceTypes.KING);
+                    break;
+            }
+
+            if (Char.IsLower(character))
+            {
+                tmpPiece.Colour = TeamColor.Black;
+                blackPiece.Add(tmpPiece);
+            }
+            else
+            {
+                tmpPiece.Colour = TeamColor.White;
+                whitePiece.Add(tmpPiece);
+            }
+        }
+
         private void LoadActivePlayerFromString(string fenString)
         {
             switch (fenString)
@@ -257,7 +267,7 @@ namespace Multiplayer.Models
             {
                 ChessGrid pos = GameBoard[i];
                 MultiPiece piece = pos.pieceOnGrid;
-                if (piece.GetType() == ChessPieceTypes.NONE)
+                if (piece.GetPieceType() == ChessPieceTypes.NONE)
                 {
                     freeSpaces++;
                 }

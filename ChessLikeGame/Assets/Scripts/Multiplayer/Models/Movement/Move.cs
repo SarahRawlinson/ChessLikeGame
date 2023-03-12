@@ -10,20 +10,24 @@
         private TeamColor _colorToMove;
         private bool _hasSecondMove = false;
         private Move _secondMove = null;
+        private MoveTypes _type;
 
         public bool HasSecondMove => _hasSecondMove;
+        public MoveTypes MoveType => _type;
 
         public Move SecondMove => _secondMove;
 
-        public Move(int startPosition, int endPosition, TeamColor colorToMove)
+        public Move(MoveTypes type, int startPosition, int endPosition, TeamColor colorToMove)
         {
+            _type = type;
             _startPosition = startPosition;
             _endPosition = endPosition;
             _colorToMove = colorToMove;
         }
         
-        public Move(int startPosition, int endPosition, TeamColor colorToMove, Move secondMove)
+        public Move(MoveTypes type, int startPosition, int endPosition, TeamColor colorToMove, Move secondMove)
         {
+            _type = type;
             _startPosition = startPosition;
             _endPosition = endPosition;
             _colorToMove = colorToMove;
@@ -41,6 +45,8 @@
         {
             get => _startPosition;
         }
+
+        
 
 
         public override string ToString()

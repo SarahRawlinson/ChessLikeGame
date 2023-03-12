@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Multiplayer.Models.Movement;
+using UnityEngine;
 
 namespace Multiplayer.Models.Rules
 {
@@ -44,7 +45,7 @@ namespace Multiplayer.Models.Rules
         {
             List<Move> moves = new List<Move>();
             IPieceMovement movement;
-            switch (piece.GetType())
+            switch (piece.GetPieceType())
             {
                 case ChessPieceTypes.NONE:
                     return moves;
@@ -121,14 +122,16 @@ namespace Multiplayer.Models.Rules
                         //todo: need to work this out
                         break;
                     case MoveValidationTypes.CheckEmpty:
-                        if (endPos.pieceOnGrid.GetType() != ChessPieceTypes.NONE)
+                        if (endPos.pieceOnGrid.GetPieceType() != ChessPieceTypes.NONE)
                         {
+                            Debug.Log($"{move.MoveType}: {piece.GetPieceType()} {startPos.GetKey()} cant move to {endPos.GetKey()} square not empty");
                             return false;
                         }
                         break;
                     case MoveValidationTypes.CheckOccupied:
-                        if (endPos.pieceOnGrid.GetType() == ChessPieceTypes.NONE)
+                        if (endPos.pieceOnGrid.GetPieceType() == ChessPieceTypes.NONE)
                         {
+                            Debug.Log($"{move.MoveType}: {piece.GetPieceType()} {startPos.GetKey()} cant move to {endPos.GetKey()} square not occupied");
                             return false;
                         }
                         break;
@@ -138,12 +141,14 @@ namespace Multiplayer.Models.Rules
                     case MoveValidationTypes.CheckHasNotMoved:
                         if (piece.HasMoved())
                         {
+                            Debug.Log($"{move.MoveType}: {piece.GetPieceType()} {startPos.GetKey()} cant move to {endPos.GetKey()} has already moved");
                             return false;
                         }
                         break;
                     case MoveValidationTypes.CheckIsKingOrRook:
-                        if (piece.GetType() != ChessPieceTypes.KING && piece.GetType() != ChessPieceTypes.ROOK)
+                        if (piece.GetPieceType() != ChessPieceTypes.KING && piece.GetPieceType() != ChessPieceTypes.ROOK)
                         {
+                            Debug.Log($"{move.MoveType}: {piece.GetPieceType()} {startPos.GetKey()} cant move to {endPos.GetKey()} square does not contain King or Castle");
                             return false;
                         }
                         break;
@@ -164,74 +169,74 @@ namespace Multiplayer.Models.Rules
             switch (moveType)
             {
                 case MoveTypes.Forward:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forwardDirection * steps), basePos.y);
-                    moves.Add(new Move(startPos, endPos, color));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x , basePos.y + (forwardDirection * steps));
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     break;
                 case MoveTypes.Backward:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forwardDirection * steps), basePos.y);
-                    moves.Add(new Move(startPos, endPos, color));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x , basePos.y - (forwardDirection * steps));
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     break;
                 case MoveTypes.Left:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x, basePos.y - (forwardDirection * steps));
-                    moves.Add(new Move(startPos, endPos, color));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forwardDirection * steps), basePos.y);
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     break;
                 case MoveTypes.Right:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x, basePos.y + (forwardDirection * steps));
-                    moves.Add(new Move(startPos, endPos, color));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forwardDirection * steps), basePos.y);
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     break;
                 case MoveTypes.DiagonalUpRight:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forwardDirection * steps), basePos.y + (forwardDirection * steps));
-                    moves.Add(new Move(startPos, endPos, color));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forwardDirection * steps), basePos.y + (forwardDirection * steps));
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     break;
                 case MoveTypes.DiagonalUpLeft:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forwardDirection * steps), basePos.y + (forwardDirection * steps));
-                    moves.Add(new Move(startPos, endPos, color));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forwardDirection * steps), basePos.y + (forwardDirection * steps));
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     break;
                 case MoveTypes.DiagonalDownRight:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forwardDirection * steps), basePos.y - (forwardDirection * steps));
-                    moves.Add(new Move(startPos, endPos, color));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forwardDirection * steps), basePos.y - (forwardDirection * steps));
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     break;
                 case MoveTypes.DiagonalDownLeft:
-                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forwardDirection * steps), basePos.y - (forwardDirection * steps));
-                    moves.Add(new Move(startPos, endPos, color));
+                    endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forwardDirection * steps), basePos.y - (forwardDirection * steps));
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     break;
                 case MoveTypes.L:
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x + 2, basePos.y + 1);
-                    moves.Add(new Move(startPos, endPos, color));
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x + 2, basePos.y - 1);
-                    moves.Add(new Move(startPos, endPos, color));
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x + 1, basePos.y - 2);
-                    moves.Add(new Move(startPos, endPos, color));
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x - 1, basePos.y - 2);
-                    moves.Add(new Move(startPos, endPos, color));
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x - 2, basePos.y + 1);
-                    moves.Add(new Move(startPos, endPos, color));
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x - 2, basePos.y - 1);
-                    moves.Add(new Move(startPos, endPos, color));
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x + 1, basePos.y + 2);
-                    moves.Add(new Move(startPos, endPos, color));
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x - 1, basePos.y + 2);
-                    moves.Add(new Move(startPos, endPos, color));
+                    moves.Add(new Move(moveType, startPos, endPos, color));
                     break;
                 case MoveTypes.CastleKingSide:
-                    firstMove = new Move(
-                        ChessGrid.CalculateIndexFromXY(basePos.x, 7),
-                        ChessGrid.CalculateIndexFromXY(basePos.x, 5),
+                    firstMove = new Move(moveType, 
+                        ChessGrid.CalculateIndexFromXY(7, basePos.y),
+                        ChessGrid.CalculateIndexFromXY(5, basePos.y),
                         color);
                     moves.Add(
-                        new Move(
-                            ChessGrid.CalculateIndexFromXY(basePos.x, 4),
-                            ChessGrid.CalculateIndexFromXY(basePos.x, 6),
+                        new Move(moveType, 
+                            ChessGrid.CalculateIndexFromXY(4, basePos.y),
+                            ChessGrid.CalculateIndexFromXY(6, basePos.y),
                             color,
                             firstMove));
                     break;
                 case MoveTypes.CastleQueenSide:
-                    firstMove = new Move(
-                        ChessGrid.CalculateIndexFromXY(basePos.x, 0),
-                        ChessGrid.CalculateIndexFromXY(basePos.x, 3),
+                    firstMove = new Move(moveType, 
+                        ChessGrid.CalculateIndexFromXY(0, basePos.y),
+                        ChessGrid.CalculateIndexFromXY(3, basePos.y),
                         color);
                     moves.Add(
-                        new Move(
+                        new Move(moveType, 
                             ChessGrid.CalculateIndexFromXY(basePos.x, 4),
                             ChessGrid.CalculateIndexFromXY(basePos.x, 2),
                             color,
@@ -252,20 +257,27 @@ namespace Multiplayer.Models.Rules
 
         public  bool CheckMoveViolations(Move move)
         {
-            
             //Check Bounds
             if (move.StartPosition < 0 || move.StartPosition >= _gameStateData.GetGameBoardList().Count ||
                 move.EndPosition < 0 || move.EndPosition > _gameStateData.GetGameBoardList().Count)
-            { return false;
+            { 
+                Debug.Log($"{move.MoveType}: {move.StartPosition} cant move to {move.EndPosition} is out of bounds");
+                return false;
             }
+            ChessGrid startPos = _gameStateData.GetGameBoardList()[move.StartPosition];
+            ChessGrid endPos = _gameStateData.GetGameBoardList()[move.EndPosition];
             //Check if an emtpy square moves
-            if (_gameStateData.GetGameBoardList()[move.StartPosition].pieceOnGrid.GetType() == ChessPieceTypes.NONE)
-            { return false;
+            if (_gameStateData.GetGameBoardList()[move.StartPosition].pieceOnGrid.GetPieceType() == ChessPieceTypes.NONE)
+            { 
+                Debug.Log($"{move.MoveType}: {startPos.GetKey()} cant move to {endPos.GetKey()} nothing to move");
+                return false;
             }
             //Check if Same Team moves;
             if (_gameStateData.GetGameBoardList()[move.StartPosition].pieceOnGrid.Colour ==
                 _gameStateData.GetGameBoardList()[move.EndPosition].pieceOnGrid.Colour)
-            { return false;
+            { 
+                Debug.Log($"{move.MoveType}: {startPos.GetKey()} cant move to {endPos.GetKey()} square contains team piece");
+                return false;
             }
             return true;
         }
