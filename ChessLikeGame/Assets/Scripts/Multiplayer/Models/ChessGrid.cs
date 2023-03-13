@@ -1,18 +1,19 @@
 using System;
-using Chess.Pieces;
 using Multiplayer;
 using Multiplayer.Models;
-using UnityEngine;
 
 [Serializable]
 public class ChessGrid
 {
-    public MultiPiece pieceOnGrid;
+    private MultiPiece pieceOnGrid;
     private GridColor _gridColor;
     private int location;
     static readonly string[] Columns = new[]{"A", "B", "C", "D", "E", "F", "G", "H"};
-    
-    // public ChessGrid(){}
+
+    public MultiPiece PieceOnGrid => pieceOnGrid;
+    public GridColor GridColor => _gridColor;
+    public int Location => location;
+
 
     public ChessGrid(MultiPiece pieceOnGrid, int location)
     {
@@ -20,31 +21,31 @@ public class ChessGrid
         _gridColor = CalculateGridColorFromLocation(location);
         this.location = location;
     }
-    
-    
-    private GridColor CalculateGridColorFromLocation(int location) {
 
+    private GridColor CalculateGridColorFromLocation(int location) 
+    {
         int x, y;
-
         x = location % 8;
         y = location / 8;
-
         if ((x % 2) == (y % 2)) {
             return GridColor.BLACK;
         } else return GridColor.WHITE;
     }
-    public static  (int x, int y) CalculateXYFromIndex(int index) {
-
+    
+    public static  (int x, int y) CalculateXYFromIndex(int index) 
+    {
         int x, y;
-
         x = index % 8;
         y = index / 8;
-
         return (x, y);
     }
 
     public static int CalculateIndexFromXY(int x, int y)
     {
+        if (x < 0 || x > 7 || y < 0 || y > 7)
+        {
+            return -1;
+        }
         return (y * 8) + x ;
     }
 
@@ -58,6 +59,7 @@ public class ChessGrid
         (int x, int y) = CalculateXYFromKey(key);
         return CalculateIndexFromXY(x, y);
     }
+    
     public static  (int x, int y) CalculateXYFromKey(string key) {
 
         var x = Array.IndexOf(Columns, key[0].ToString());
@@ -65,13 +67,17 @@ public class ChessGrid
         var y = (Int32.Parse(y_str)-1);
         return (x, y);
     }
+    
     public static string GetKeyFromIndex(int location)
     {
         (int x, int y) = CalculateXYFromIndex(location);
         return $"{Columns[x]}{(y+1).ToString()}";
-        
     }
-    
+
+    public void SetPieceOnGrid(MultiPiece tmpPiece)
+    {
+        pieceOnGrid = tmpPiece;
+    }
 }
 
 

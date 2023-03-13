@@ -35,14 +35,13 @@ public class MultiplayerDirector : MonoBehaviour
 
          foreach (var square in gameBoardList)
         {
-            if (square.pieceOnGrid.GetPieceType() != ChessPieceTypes.NONE)
+            if (square.PieceOnGrid.GetPieceType() != ChessPieceTypes.NONE)
             {
                 gameObjectsPieces.Add(square.GetKey(),gameObjectController.SpawnPiece(
-                    square.pieceOnGrid.GetPieceType(), 
-                    square.pieceOnGrid.Colour,
+                    square.PieceOnGrid.GetPieceType(), 
+                    square.PieceOnGrid.Colour,
                     gameObjectController.GetPositionVectorfromGameSquare(counter)
                 ));
-                
             }
             else
             {
@@ -57,12 +56,12 @@ public class MultiplayerDirector : MonoBehaviour
 
     private void MovePiece()
     {
-        int fromKey = ChessGrid.GetIndexFromKey("B2");
+        int fromKey = ChessGrid.GetIndexFromKey("G1");
         ChessGrid startGrid = _gameStateData.GetGameBoardList()[fromKey];
-        (int x, int y) = ChessGrid.CalculateXYFromIndex(9);
-        Debug.Log($"index: {fromKey}, XY: ({x},{y}), key: {startGrid.GetKey()}, piece: {startGrid.pieceOnGrid.GetPieceType()}, piece XY: ({startGrid.pieceOnGrid.X},{startGrid.pieceOnGrid.Y})");
+        (int x, int y) = ChessGrid.CalculateXYFromIndex(fromKey);
+        Debug.Log($"index: {fromKey}, XY: ({x},{y}), key: {startGrid.GetKey()}, piece: {startGrid.PieceOnGrid.GetPieceType()}, piece XY: ({startGrid.PieceOnGrid.X},{startGrid.PieceOnGrid.Y})");
         var movesByPiece = _rules.GetMovesByPiece(startGrid
-            .pieceOnGrid);
+            .PieceOnGrid);
         
         Move move = movesByPiece[0];
         if (_gameStateData.MakeMoveOnBoard(move))
@@ -73,8 +72,10 @@ public class MultiplayerDirector : MonoBehaviour
                 gameObjectController.RemoveGameObjectFromGame(gameObjectsPieces[endGrid.GetKey()]);
             }
             int gameObjectIndex = gameObjectsPieces[startGrid.GetKey()];
-            gameObjectController.MoveGameObject(gameObjectIndex,
-                gameObjectController.GetPositionVectorfromGameSquare(move.EndPosition));
+            gameObjectController.MoveGameObject(
+                gameObjectIndex,
+                gameObjectController.GetPositionVectorfromGameSquare(move.EndPosition)
+                );
             gameObjectsPieces[endGrid.GetKey()] = gameObjectIndex;
             gameObjectsPieces[startGrid.GetKey()] = -1;
         }

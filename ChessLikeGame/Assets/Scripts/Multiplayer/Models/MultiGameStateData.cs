@@ -57,11 +57,15 @@ namespace Multiplayer.Models
             if (rules.isMoveValid(move))
             {
                 //todo: move
+                
                 ChessGrid start = GameBoard[move.StartPosition];
-                (int x, int y) = ChessGrid.CalculateXYFromIndex(move.StartPosition);
+                (int sx, int sy) = ChessGrid.CalculateXYFromIndex(move.StartPosition);
                 ChessGrid end = GameBoard[move.EndPosition];
-                end.pieceOnGrid = start.pieceOnGrid;
-                start.pieceOnGrid = new MultiPiece(x, y);
+                (int ex, int ey) = ChessGrid.CalculateXYFromIndex(move.EndPosition);
+                Debug.Log($"Moving | colour: {start.PieceOnGrid.Colour} {start.PieceOnGrid.GetPieceType()}  / from XY: ({sx},{sy}), to XY: ({ex},{ey})");
+                start.PieceOnGrid.SetXY(ex, ey);
+                end.SetPieceOnGrid(start.PieceOnGrid);
+                start.SetPieceOnGrid(new MultiPiece(sx, sy));
                 return true;
             }
             return false;
@@ -102,7 +106,7 @@ namespace Multiplayer.Models
                 }
                 Debug.Log($"Adding Piece to Board: {tmpPiece.Colour} {tmpPiece.GetPieceType()}  / Index: {index} / key: {chessGrid.GetKey()}, XY: ({x},{y})");
                 
-                chessGrid.pieceOnGrid = tmpPiece;
+                chessGrid.SetPieceOnGrid(tmpPiece);
 
                 if (Char.IsDigit(character))
                 {
@@ -254,19 +258,18 @@ namespace Multiplayer.Models
 
         public MultiPiece GetPieceFromPositionOnBoard(int index)
         {
-            return GameBoard[index].pieceOnGrid;
+            return GameBoard[index].PieceOnGrid;
         }
 
         private string GetBoardString()
         {
             StringBuilder mapStringBuilder = new StringBuilder();
-
             int freeSpaces = 0;
 
             for (int i = GameBoard.Count -1; i >= 0; i--)
             {
                 ChessGrid pos = GameBoard[i];
-                MultiPiece piece = pos.pieceOnGrid;
+                MultiPiece piece = pos.PieceOnGrid;
                 if (piece.GetPieceType() == ChessPieceTypes.NONE)
                 {
                     freeSpaces++;

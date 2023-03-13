@@ -4,8 +4,12 @@ namespace Multiplayer.Models
 {
     public class MultiPiece
     {
-        public int X { get; set; }
-        public int Y { get; set; }
+        private int x;
+        private int y;
+
+        public int X => x;
+        public int Y => y;
+
         public TeamColor Colour { get; set; }
         public string key;
         
@@ -13,18 +17,18 @@ namespace Multiplayer.Models
         private bool _hasMoved;
         private ChessPieceTypes type;
         
-        public MultiPiece(int x, int y, TeamColor color, bool hasMoved)
+        public MultiPiece(int xa, int ya, TeamColor color, bool hasMoved)
         {
-            X = x;
-            Y = y;
+            x = xa;
+            y = ya;
             Colour = color;
             _hasMoved = hasMoved;
         }
 
-        public MultiPiece(int x, int y)
+        public MultiPiece(int xa, int ya)
         {
-            X = x;
-            Y = y;
+            x = xa;
+            y = ya;
             _hasMoved = false;
         }
 
@@ -53,10 +57,10 @@ namespace Multiplayer.Models
             return _hasMoved;
         }
 
-        public void SetXY(int x, int y)
+        public void SetXY(int xa, int ya)
         {
-            X = x;
-            Y = y;
+            x = xa;
+            y = ya;
         }
     } 
 }

@@ -24,7 +24,7 @@ namespace Multiplayer.Models.Rules
         public bool isMoveValid(Move moveToTest)
         {
             MultiPiece piece =
-                _gameStateData.GetGameBoardList()[moveToTest.StartPosition].pieceOnGrid;
+                _gameStateData.GetGameBoardList()[moveToTest.StartPosition].PieceOnGrid;
             foreach (var move in GetMovesByPiece(piece))
             {
                 if (Move.CheckEqual(move, moveToTest))
@@ -113,7 +113,7 @@ namespace Multiplayer.Models.Rules
 
             ChessGrid startPos = _gameStateData.GetGameBoardList()[move.StartPosition];
             ChessGrid endPos = _gameStateData.GetGameBoardList()[move.EndPosition];
-            MultiPiece piece = startPos.pieceOnGrid;
+            MultiPiece piece = startPos.PieceOnGrid;
             foreach (var validate in toValidate.Validators)
             {
                 switch (validate)
@@ -122,14 +122,14 @@ namespace Multiplayer.Models.Rules
                         //todo: need to work this out
                         break;
                     case MoveValidationTypes.CheckEmpty:
-                        if (endPos.pieceOnGrid.GetPieceType() != ChessPieceTypes.NONE)
+                        if (endPos.PieceOnGrid.GetPieceType() != ChessPieceTypes.NONE)
                         {
                             Debug.Log($"{move.MoveType}: {piece.GetPieceType()} {startPos.GetKey()} cant move to {endPos.GetKey()} square not empty");
                             return false;
                         }
                         break;
                     case MoveValidationTypes.CheckOccupied:
-                        if (endPos.pieceOnGrid.GetPieceType() == ChessPieceTypes.NONE)
+                        if (endPos.PieceOnGrid.GetPieceType() == ChessPieceTypes.NONE)
                         {
                             Debug.Log($"{move.MoveType}: {piece.GetPieceType()} {startPos.GetKey()} cant move to {endPos.GetKey()} square not occupied");
                             return false;
@@ -202,21 +202,37 @@ namespace Multiplayer.Models.Rules
                     break;
                 case MoveTypes.L:
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x + 2, basePos.y + 1);
+                    PrintLMove(startPos, basePos, endPos);
                     moves.Add(new Move(moveType, startPos, endPos, color));
+                    
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x + 2, basePos.y - 1);
+                    PrintLMove(startPos, basePos, endPos);
                     moves.Add(new Move(moveType, startPos, endPos, color));
+                    
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x + 1, basePos.y - 2);
+                    PrintLMove(startPos, basePos, endPos);
                     moves.Add(new Move(moveType, startPos, endPos, color));
+                    
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x - 1, basePos.y - 2);
+                    PrintLMove(startPos, basePos, endPos);
                     moves.Add(new Move(moveType, startPos, endPos, color));
+                    
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x - 2, basePos.y + 1);
+                    PrintLMove(startPos, basePos, endPos);
                     moves.Add(new Move(moveType, startPos, endPos, color));
+                    
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x - 2, basePos.y - 1);
+                    PrintLMove(startPos, basePos, endPos);
                     moves.Add(new Move(moveType, startPos, endPos, color));
+                    
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x + 1, basePos.y + 2);
+                    PrintLMove(startPos, basePos, endPos);
                     moves.Add(new Move(moveType, startPos, endPos, color));
+                    
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x - 1, basePos.y + 2);
+                    PrintLMove(startPos, basePos, endPos);
                     moves.Add(new Move(moveType, startPos, endPos, color));
+                    
                     break;
                 case MoveTypes.CastleKingSide:
                     firstMove = new Move(moveType, 
@@ -255,6 +271,18 @@ namespace Multiplayer.Models.Rules
             }
         }
 
+        private static void PrintLMove(int startPos, (int x, int y) basePos, int endPos)
+        {
+            (int x, int y) tuple;
+            tuple = ChessGrid.CalculateXYFromIndex(endPos);
+            Debug.Log($"({basePos.x}, {basePos.y}), ({tuple.x},{tuple.y})");
+            if (startPos < 0 || startPos > 63 || endPos < 0 || endPos > 63)
+            {
+                return;
+            }
+            Debug.Log($"({ChessGrid.GetKeyFromIndex(startPos)}), ({ChessGrid.GetKeyFromIndex(endPos)})");
+        }
+
         public  bool CheckMoveViolations(Move move)
         {
             //Check Bounds
@@ -267,14 +295,14 @@ namespace Multiplayer.Models.Rules
             ChessGrid startPos = _gameStateData.GetGameBoardList()[move.StartPosition];
             ChessGrid endPos = _gameStateData.GetGameBoardList()[move.EndPosition];
             //Check if an emtpy square moves
-            if (_gameStateData.GetGameBoardList()[move.StartPosition].pieceOnGrid.GetPieceType() == ChessPieceTypes.NONE)
+            if (_gameStateData.GetGameBoardList()[move.StartPosition].PieceOnGrid.GetPieceType() == ChessPieceTypes.NONE)
             { 
                 Debug.Log($"{move.MoveType}: {startPos.GetKey()} cant move to {endPos.GetKey()} nothing to move");
                 return false;
             }
             //Check if Same Team moves;
-            if (_gameStateData.GetGameBoardList()[move.StartPosition].pieceOnGrid.Colour ==
-                _gameStateData.GetGameBoardList()[move.EndPosition].pieceOnGrid.Colour)
+            if (_gameStateData.GetGameBoardList()[move.StartPosition].PieceOnGrid.Colour ==
+                _gameStateData.GetGameBoardList()[move.EndPosition].PieceOnGrid.Colour)
             { 
                 Debug.Log($"{move.MoveType}: {startPos.GetKey()} cant move to {endPos.GetKey()} square contains team piece");
                 return false;
