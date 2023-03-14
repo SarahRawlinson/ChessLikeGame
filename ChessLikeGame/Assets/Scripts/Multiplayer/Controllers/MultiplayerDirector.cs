@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Multiplayer;
 using Multiplayer.Controllers;
 using Multiplayer.Models;
+using Multiplayer.Models.BoardState;
 using Multiplayer.Models.Movement;
 using Multiplayer.Models.Rules;
 using UnityEngine;
@@ -56,13 +57,17 @@ public class MultiplayerDirector : MonoBehaviour
 
     private void MovePiece()
     {
-        int fromKey = ChessGrid.GetIndexFromKey("G1");
+        int fromKey = ChessGrid.GetIndexFromKey("H8");
         ChessGrid startGrid = _gameStateData.GetGameBoardList()[fromKey];
         (int x, int y) = ChessGrid.CalculateXYFromIndex(fromKey);
         Debug.Log($"index: {fromKey}, XY: ({x},{y}), key: {startGrid.GetKey()}, piece: {startGrid.PieceOnGrid.GetPieceType()}, piece XY: ({startGrid.PieceOnGrid.X},{startGrid.PieceOnGrid.Y})");
         var movesByPiece = _rules.GetMovesByPiece(startGrid
             .PieceOnGrid);
-        
+        if (movesByPiece.Count == 0)
+        {
+            Debug.Log($"cant move {startGrid.PieceOnGrid.GetPieceType()}");
+            return;
+        }
         Move move = movesByPiece[0];
         if (_gameStateData.MakeMoveOnBoard(move))
         {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Multiplayer.Models
+﻿namespace Multiplayer.Models.BoardState
 {
     public class MultiPiece
     {

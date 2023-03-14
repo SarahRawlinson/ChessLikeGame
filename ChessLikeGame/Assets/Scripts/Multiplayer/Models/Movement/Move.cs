@@ -1,4 +1,6 @@
-﻿namespace Multiplayer.Models.Movement
+﻿using Multiplayer.Models.BoardState;
+
+namespace Multiplayer.Models.Movement
 {
     public class Move
     {

@@ -4,7 +4,7 @@ using System.Text;
 using Multiplayer.Models.Movement;
 using UnityEngine;
 
-namespace Multiplayer.Models
+namespace Multiplayer.Models.BoardState
 {
     [Serializable]
     public class MultiGameStateData

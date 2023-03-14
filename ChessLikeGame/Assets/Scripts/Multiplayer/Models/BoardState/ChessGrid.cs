@@ -1,7 +1,8 @@
 using System;
-using Multiplayer;
-using Multiplayer.Models;
 
+namespace Multiplayer.Models.BoardState
+{
+    
 [Serializable]
 public class ChessGrid
 {
@@ -81,3 +82,5 @@ public class ChessGrid
 }
 
 
+
+}

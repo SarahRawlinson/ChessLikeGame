@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Multiplayer.Models.BoardState;
 using Multiplayer.Models.Movement;
 using UnityEngine;
 

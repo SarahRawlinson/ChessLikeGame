@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Multiplayer
+namespace Multiplayer.Models.BoardState
 {
     [Serializable]
     public enum TeamColor
