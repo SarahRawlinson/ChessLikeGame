@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1210361511415355095}
-  - component: {fileID: 5214448273906796177}
   - component: {fileID: 8762126277250768143}
   m_Layer: 0
   m_Name: NetworkDirector
@@ -33,32 +32,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5214448273906796177
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2601220365501845700}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd120ab0f104477c8a768c85bb2edc15, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  whitePawnPrefab: {fileID: 877495652560219357, guid: 11a77bb785d43b346808c54ddbf042ae, type: 3}
-  whiteRookPrefab: {fileID: 3934154414428013112, guid: 06d59116c1e8d764783f8a1ab33351b3, type: 3}
-  whiteKnightPrefab: {fileID: 3040328321067746487, guid: 576c5ee7268eb6545adde6a40ce6a80d, type: 3}
-  whiteBishopPrefab: {fileID: 2936402892049222056, guid: f217e3b0cb4f2394eaa37e9b14ee9d33, type: 3}
-  whiteQueenPrefab: {fileID: 179434164800878134, guid: c0cd37fcd109ea044bf5a5d9aaab4745, type: 3}
-  whiteKingPrefab: {fileID: 457397701942563709, guid: 30fb5512920a5a54c85639a6385b1598, type: 3}
-  blackPawnPrefab: {fileID: 3552711939787177921, guid: c54fa386ee1ba6f40b5a9b057628f50b, type: 3}
-  blackRookPrefab: {fileID: 1858599415417190260, guid: 6dd5a788a8a076f4e9c22643c2626150, type: 3}
-  blackKnightPrefab: {fileID: 8347419260074043354, guid: 79e0ebe0a9976944ba9627761eac5eec, type: 3}
-  blackBishopPrefab: {fileID: 5161514920313920477, guid: 8532a47e4fce0dc44b346b83687dbab1, type: 3}
-  blackQueenPrefab: {fileID: 2159701217042013166, guid: 140e47b6d0c9ac8499e287c56dc49486, type: 3}
-  blackKingPrefab: {fileID: 2999871336804723636, guid: 1455e063dcad7a9409427f761b35ebb0, type: 3}
-  StartGameSquarePosition: {fileID: 0}
-  positionGameObjectPrefab: {fileID: 9178368310937145661, guid: b5d0fc15cc86ac84e8bcde85ff85bf6a, type: 3}
 --- !u!114 &8762126277250768143
 MonoBehaviour:
   m_ObjectHideFlags: 0

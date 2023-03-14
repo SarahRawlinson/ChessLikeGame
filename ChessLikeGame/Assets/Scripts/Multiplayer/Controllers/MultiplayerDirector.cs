@@ -9,8 +9,6 @@ using Multiplayer.Models.Movement;
 using Multiplayer.Models.Rules;
 using UnityEngine;
 
-
-[RequireComponent(typeof(GameObjectController))]
 public class MultiplayerDirector : MonoBehaviour
 {
     private bool _gameOver = false;
@@ -26,8 +24,6 @@ public class MultiplayerDirector : MonoBehaviour
     public bool SetupNewGame()
     {
         int counter = 0;
-
-        
         _gameStateData = new MultiGameStateData(setupFenString);
         _rules = new Rules(_gameStateData);
         var gameBoardList = _gameStateData.GetGameBoardList();
@@ -89,7 +85,7 @@ public class MultiplayerDirector : MonoBehaviour
 
     private void Start()
     {
-        gameObjectController = gameObject.GetComponent<GameObjectController>();
+        gameObjectController = FindObjectOfType<GameObjectController>();
         
     }
 }
