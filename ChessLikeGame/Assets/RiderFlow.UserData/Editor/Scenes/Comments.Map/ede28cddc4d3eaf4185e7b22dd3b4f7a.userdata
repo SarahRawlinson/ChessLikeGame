@@ -1,0 +1,20 @@
+{
+  "GlobalObjectId_V1-2-ede28cddc4d3eaf4185e7b22dd3b4f7a-9178368310937145661-7300292313565028946": {
+    "GameObjectId": "GlobalObjectId_V1-2-ede28cddc4d3eaf4185e7b22dd3b4f7a-9178368310937145661-7300292313565028946",
+    "CommentText": "starting position for the grid",
+    "AssetGUID": "ede28cddc4d3eaf4185e7b22dd3b4f7a",
+    "UniqueItemID": "GlobalObjectId_V1-2-ede28cddc4d3eaf4185e7b22dd3b4f7a-9178368310937145661-7300292313565028946"
+  },
+  "GlobalObjectId_V1-2-ede28cddc4d3eaf4185e7b22dd3b4f7a-2601220365501845700-1020561275": {
+    "GameObjectId": "GlobalObjectId_V1-2-ede28cddc4d3eaf4185e7b22dd3b4f7a-2601220365501845700-1020561275",
+    "CommentText": "This will control:\n-Game Play\n-Activation of Player Controller\n-Recive & Validate Player Input\n",
+    "AssetGUID": "ede28cddc4d3eaf4185e7b22dd3b4f7a",
+    "UniqueItemID": "GlobalObjectId_V1-2-ede28cddc4d3eaf4185e7b22dd3b4f7a-2601220365501845700-1020561275"
+  },
+  "GlobalObjectId_V1-2-ede28cddc4d3eaf4185e7b22dd3b4f7a-2400308361341204352-1381679481996137219": {
+    "GameObjectId": "GlobalObjectId_V1-2-ede28cddc4d3eaf4185e7b22dd3b4f7a-2400308361341204352-1381679481996137219",
+    "CommentText": "this will handle:\n-Movement\n-Spawning\n-Activation\n-Deactivation",
+    "AssetGUID": "ede28cddc4d3eaf4185e7b22dd3b4f7a",
+    "UniqueItemID": "GlobalObjectId_V1-2-ede28cddc4d3eaf4185e7b22dd3b4f7a-2400308361341204352-1381679481996137219"
+  }
+}
