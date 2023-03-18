@@ -17,9 +17,14 @@ public class WebSocketTest : MonoBehaviour
         await webSocket.ConnectAsync(serverUri, CancellationToken.None);
 
         // Send a message to the server
-        string message = "Hello, server!";
-        ArraySegment<byte> buffer = new ArraySegment<byte>(System.Text.Encoding.UTF8.GetBytes(message));
-        await webSocket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+        
+        string Authmessage = "AUTHENTICATE:Manic:Moscow";
+        await SendMessage(Authmessage);
+        string GetUserListMessage = "GETUSERLIST";
+        await SendMessage(GetUserListMessage);
+        
+        //ArraySegment<byte> buffer = new ArraySegment<byte>(System.Text.Encoding.UTF8.GetBytes(message));
+        //await webSocket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
 
         // Start a receive loop to handle incoming messages from the server
         byte[] receiveBuffer = new byte[1024];
@@ -31,8 +36,26 @@ public class WebSocketTest : MonoBehaviour
             {
                 string receivedMessage = System.Text.Encoding.UTF8.GetString(receiveBuffer, 0, result.Count);
                 Debug.Log("Received message: " + receivedMessage);
+                if (receivedMessage.StartsWith("AUTH"))
+                {
+                    // code goes here
+                    Console.WriteLine("Got Auth" + receivedMessage);
+                }
+                Debug.Log("Received message: " + receivedMessage);
+                if (receivedMessage.StartsWith("IDIS"))
+                {
+                    // code goes here
+                    Console.WriteLine("Got ID: " + receivedMessage);
+                }
             }
         }
+    }
+
+    private async Task SendMessage(string message)
+    {
+        ArraySegment<byte> buffer = new ArraySegment<byte>(System.Text.Encoding.UTF8.GetBytes(message));
+        await webSocket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+
     }
 
     // Close the WebSocket connection when the script is destroyed
