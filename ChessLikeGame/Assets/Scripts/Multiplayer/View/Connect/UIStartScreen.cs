@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Multiplayer.Controllers;
 using UnityEngine;
 
 public class UIStartScreen : MonoBehaviour
@@ -12,6 +14,17 @@ public class UIStartScreen : MonoBehaviour
     [SerializeField] private GameObject joinGameButton;
     [SerializeField] private GameObject startMenuDisplay;
 
+    private void Start()
+    {
+        WebSocketConnection.onAuthenicate += Authenticated;
+    }
+
+    public void Authenticated(bool on)
+    {
+        hostGameButton.SetActive(on);
+        joinGameButton.SetActive(on);
+        loginButton.SetActive(!on);
+    }
     public void ShowDisplay()
     {
         startMenuDisplay.SetActive(true);
@@ -24,6 +37,7 @@ public class UIStartScreen : MonoBehaviour
 
     public void Login()
     {
+        Debug.Log("login show");
         loginDisplay.SetActive(true);
     }
 
