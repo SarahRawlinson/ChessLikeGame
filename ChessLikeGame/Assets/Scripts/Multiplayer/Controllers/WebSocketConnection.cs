@@ -12,6 +12,7 @@ namespace Multiplayer.Controllers
     {
         private ClientWebSocket webSocket;
         public static event Action<bool> onAuthenicate;
+        public static event Action<bool> onHostGame;
         public static event Action<string>onUserList;
         public User user { get; set; }
 
@@ -51,7 +52,8 @@ namespace Multiplayer.Controllers
                             }
                             break;
                         case "USERLIST":
-                            onUserList?.Invoke(receivedMessage.Substring(9));
+                            int pos = receivedMessage.IndexOf("::");
+                            onUserList?.Invoke(receivedMessage.Substring(pos+2));
                             break;
                         default:
                             break;
