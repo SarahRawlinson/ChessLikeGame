@@ -312,6 +312,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: JoinGame
       objectReference: {fileID: 0}
+    - target: {fileID: 3911135368627118195, guid: 7e6c3f8d89416274bbc03184c437cba3, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3911135368627118195, guid: 7e6c3f8d89416274bbc03184c437cba3, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7050163552866564674, guid: 7e6c3f8d89416274bbc03184c437cba3, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.058068365
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7e6c3f8d89416274bbc03184c437cba3, type: 3}
 --- !u!224 &2079658111951297625 stripped

@@ -13,6 +13,11 @@ namespace Multiplayer.View.Connect
             WebSocketConnection.onHostGame += StartGame;
         }
 
+        public void AskToHostGame()
+        {
+            FindObjectOfType<WebSocketConnection>().CreateNewRoom(2,true);
+        }
+
         private void StartGame(bool obj)
         {
             if (activeObject != null || !obj) return;

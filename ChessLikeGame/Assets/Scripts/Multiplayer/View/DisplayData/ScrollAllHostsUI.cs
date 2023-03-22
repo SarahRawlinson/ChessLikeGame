@@ -18,10 +18,10 @@ namespace Multiplayer.View.DisplayData
 
         private void Start()
         {
-            WebSocketConnection.onUserList += ProcessUsers;
+            WebSocketConnection.onHostsList += ProcessHosts;
         }
 
-        private void ProcessUsers(string obj)
+        private void ProcessHosts(string obj)
         {
             string[] ls = obj.Split(":");
             List<string> activeUser = new List<string>();
@@ -33,7 +33,10 @@ namespace Multiplayer.View.DisplayData
                 {
                     activeUser.Add(user.Username);
                 }
-                RemoveHost(user);
+                else
+                {
+                    RemoveHost(user);
+                }
             }
 
             foreach (var u in ls)
@@ -41,6 +44,7 @@ namespace Multiplayer.View.DisplayData
                 if (!activeUser.Contains(u))
                 {
                     AddHost(new User(u));
+                    
                 }
             }
         }
@@ -52,6 +56,7 @@ namespace Multiplayer.View.DisplayData
         
         public void ShowDisplay()
         {
+            FindObjectOfType<WebSocketConnection>().GetRoomList();
             displayPanel.SetActive(true);
         }
         

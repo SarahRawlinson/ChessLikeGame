@@ -13,19 +13,18 @@ namespace Multiplayer.Controllers
         private ClientWebSocket webSocket;
         public static event Action<bool> onAuthenicate;
         public static event Action<bool> onHostGame;
-        public static event Action<string>onUserList;
+        public static event Action<string>onHostsList;
+        public static event Action<string>onUsersList;
         public User user { get; set; }
+        private int clientID = -1;
 
         // Start is called before the first frame update
         public async void Connect(User userData)
         {
             user = userData;
             await ConnectToWebSocket();
-            await AthenticateUser(user);
-            string GetUserListMessage = "GETUSERLIST";
-            await SendMessage(GetUserListMessage);
             StartCoroutine(nameof(Listen));
-            
+            await AthenticateUser(user);
         }
 
         private async Task Listen()
@@ -51,15 +50,56 @@ namespace Multiplayer.Controllers
                                 await CloseSocket();
                             }
                             break;
+                        case "IDIS":
+                            clientID = Int32.Parse(message[1]);
+                            break;
+                        case "ROOMLIST":
+                            if (message.Length < 3)
+                            {
+                                break;
+                            }
+                            onHostsList?.Invoke(receivedMessage.Substring(message[0].Length + message[1].Length + 2));
+                            break;
                         case "USERLIST":
-                            int pos = receivedMessage.IndexOf("::");
-                            onUserList?.Invoke(receivedMessage.Substring(pos+2));
+                            if (message.Length < 3)
+                            {
+                                break;
+                            }
+                            onUsersList?.Invoke(receivedMessage.Substring(message[0].Length + message[1].Length + 2));
+                            break;
+                        case "RECIEVEMESSAGE":
+                            Debug.Log(receivedMessage.Substring(message[0].Length + 1));
+                            break;
+                        case "ROOMJOINED":
+                            Debug.Log($"joined room {message[1]}");
+                            break;
+                        case "ROOMCREATED":
+                            Debug.Log($"room {message[1]} has been created");
+                            break;
+                        case "USERJOINED":
+                            Debug.Log($"{message[1]} joined room");
                             break;
                         default:
                             break;
                     }
                 }
             }
+        }
+        public void SendMessageToUser(string userName, string Message)
+        {
+            string msg = $"SENDMESGTOUSER:{userName}:{Message}";
+            SendMessage(msg);
+        }
+
+        
+        public void GetRoomList()
+        {
+            SendMessage("GETROOMLIST");
+        }
+        
+        public void CreateNewRoom(int roomSize, bool isPublic)
+        {
+            SendMessage($"CREATEROOM:{roomSize}:{(isPublic?"PUBLIC":"PRIVATE")}");
         }
 
         private async Task AthenticateUser(User user)

@@ -8,7 +8,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Chess_Board.unity
     guid: 056867c4bba3cca2c86624e2dbdeb7ca
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/multiplayer scene.unity
     guid: ede28cddc4d3eaf4185e7b22dd3b4f7a
+  - enabled: 1
+    path: Assets/Scenes/TestWebSocketConnection.unity
+    guid: b911825973625a547abd551dd9a61455
   m_configObjects: {}
