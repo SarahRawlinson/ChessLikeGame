@@ -65,7 +65,7 @@ namespace Multiplayer.View.LoadData
             _users.Add(user);
             GameObject gObject = _scrollContentUI.AddContent(_gameObjectPrefab.gameObject);
             DisplayHostUI ui = gObject.GetComponent<DisplayHostUI>();
-            ui.UpdateText(user.Username);
+            ui.UpdateHostInfo(user.Username, user.Username);
             _usersUI.Add(ui);
         }
         

@@ -223,7 +223,7 @@ GameObject:
   - component: {fileID: 2225300488665085993}
   - component: {fileID: 6261278308982027710}
   m_Layer: 5
-  m_Name: RoomUI
+  m_Name: ChatRoomUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

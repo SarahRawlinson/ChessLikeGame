@@ -1,16 +1,25 @@
 ﻿using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Multiplayer.View.DisplayData
 {
     public class DisplayHostUI : MonoBehaviour
     {
-        [SerializeField] private TMP_Text _tmpText;
-
-        public void UpdateText(string txt)
+        [FormerlySerializedAs("_tmpText")] [SerializeField] private TMP_Text _roomNameText;
+        private string id = "-1";
+        private static event Action<string> onJoinRoom; 
+        public void UpdateHostInfo(string txt, string index)
         {
-            _tmpText.text = txt;
+            _roomNameText.text = txt;
+            id = index;
         }
+
+        public void Join()
+        {
+            onJoinRoom?.Invoke(id);
+        }
+        
     }
 }
