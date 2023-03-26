@@ -12,6 +12,7 @@ namespace Multiplayer.View.LoadData
         [SerializeField] private GameObject hostGameButton;
         [SerializeField] private GameObject joinGameButton;
         [SerializeField] private GameObject startMenuDisplay;
+        [SerializeField] private GameObject chatMenuDisplay;
 
         private void Start()
         {
@@ -23,6 +24,7 @@ namespace Multiplayer.View.LoadData
             hostGameButton.SetActive(on);
             joinGameButton.SetActive(on);
             loginButton.SetActive(!on);
+            chatMenuDisplay.SetActive(on);
         }
         public void ShowDisplay()
         {

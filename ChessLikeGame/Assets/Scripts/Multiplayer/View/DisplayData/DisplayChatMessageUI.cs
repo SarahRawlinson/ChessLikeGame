@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 
 namespace Multiplayer.View.DisplayData
@@ -13,7 +14,7 @@ namespace Multiplayer.View.DisplayData
         {
             user.text = userText;
             message.text = messageText;
-            // time.text = DateTime.Now.ToUniversalTime().ToString(CultureInfo.InvariantCulture);
+            time.text = DateTime.Now.ToString("MM/dd/yyyy HH:mm");
         }
         
     }

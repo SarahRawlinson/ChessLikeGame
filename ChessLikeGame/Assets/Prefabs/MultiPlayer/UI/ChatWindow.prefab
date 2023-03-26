@@ -363,8 +363,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _inputField: {fileID: 7578023621301447983}
-  _chatMessageUIPrefab: {fileID: 2531086163931748255, guid: 6e64d3cd02d217345ac6bb587fb178b2, type: 3}
+  displayChatMessageUIPrefab: {fileID: 2531086163931748255, guid: 6e64d3cd02d217345ac6bb587fb178b2, type: 3}
   _scrollContentUI: {fileID: 6786649952655560898}
+  header: {fileID: 6642445757255247130}
 --- !u!1 &965967197800206111
 GameObject:
   m_ObjectHideFlags: 0
@@ -688,7 +689,7 @@ GameObject:
   - component: {fileID: 9178722065245921189}
   - component: {fileID: 6642445757255247130}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: HeaderText (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
