@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using MessageServer.Data;
 using Multiplayer.Controllers;
-using Multiplayer.Models.Connection;
 using Multiplayer.View.DisplayData;
 using Multiplayer.View.UI;
 using UnityEngine;
+using User = Multiplayer.Models.Connection.User;
 
 namespace Multiplayer.View.LoadData
 {
@@ -21,9 +22,10 @@ namespace Multiplayer.View.LoadData
             WebSocketConnection.onHostsList += ProcessHosts;
         }
 
-        private void ProcessHosts(string obj)
+        private void ProcessHosts(List<Room> obj)
         {
-            string[] ls = obj.Split(":");
+            List<string> ls = new List<string>();
+            obj.ForEach(a => ls.Add(a.roomKey));
             List<string> activeUser = new List<string>();
 
             for (var index = _users.Count -1; index >= 0; index--)

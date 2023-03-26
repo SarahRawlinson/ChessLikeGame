@@ -13,17 +13,17 @@ namespace Multiplayer.View.LoadData
             WebSocketConnection.onHostGame += StartGame;
         }
 
-        public void AskToHostGame()
+        private void StartGame(int obj)
         {
-            FindObjectOfType<WebSocketConnection>().CreateNewRoom(2,true);
-        }
-
-        private void StartGame(bool obj)
-        {
-            if (activeObject != null || !obj) return;
+            if (activeObject != null || obj == -1) return;
             activeObject = Instantiate(createOnStartPrefab);
         }
-        
+
+        public void AskToHostGame()
+        {
+            FindObjectOfType<WebSocketConnection>().CreateNewRoom("GameChess",2,true);
+        }
+
         private void EndGame()
         {
             if (activeObject == null) return;

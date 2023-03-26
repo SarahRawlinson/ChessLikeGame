@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Multiplayer.Models.Connection;
+using MessageServer.Data;
 using NetClient;
 using UnityEngine;
+using User = Multiplayer.Models.Connection.User;
 
 
 namespace Multiplayer.Controllers
@@ -15,137 +16,136 @@ namespace Multiplayer.Controllers
         private ClientWebSocket webSocket;
 
         private Client client = new Client();
-       
+
+        public static event Action<string> onMessageRecieved;
         public static event Action<bool> onAuthenicate;
-        public static event Action<bool> onHostGame;
-        public static event Action<string>onHostsList;
-        public static event Action<string>onUsersList;
+        public static event Action<List<MessageServer.Data.User>> onUsersList;
+        public static event Action<string> onUserJoinedGame;
+        public static event Action<string> onUserJoinedChat;
+        public static event Action<string> onUserLeftGame;
+        public static event Action<string> onUserLeftChat;
+        public static event Action<List<Room>>onHostsList;
+        public static event Action<List<Room>>onChatRoomList;
+        public static event Action<int> onHostGame;
+        public static event Action<int> onHostChat;
+        public static event Action<string> onJoinedGame;
+        public static event Action<string> onJoinedChat;
+        public event Action<(int RoomID, string Message)> onChatRoomMessageRecieved;
+        public event Action<(int RoomID, string Message)> onGameRoomMessageRecieved;
+        
+        
+        
         public User user { get; set; }
         private int clientID = -1;
+
+        private void Start()
+        {
+            client.onMessageRecievedEvent += MessageRecieved;
+            client.onAuthenticateEvent += Authentication;
+            client.onUserListRecievedEvent += UserListReceived;
+            client.onUserJoinedEvent += UserJoined;
+            client.onUserLeftEvent += UserLeft;
+            client.onRoomListRecievedEvent += RoomListReceived;
+            client.onRoomCreatedEvent += CreatedRoom;
+            client.onRoomJoinedEvent += JoinedRoom;
+            client.onRoomMessageRecievedEvent += RoomMessageRecieved;
+            client.onIDRecievedEvent += ClientIDRecieved;
+        }
+
+        private void ClientIDRecieved(int obj)
+        {
+            clientID = obj;
+        }
+
+        private void RoomMessageRecieved((int RoomID, string Message) obj)
+        {
+            //TODO: WORK OUT WHICH
+            onChatRoomMessageRecieved?.Invoke(obj);
+            onGameRoomMessageRecieved?.Invoke(obj);
+        }
+
+        private void JoinedRoom(string obj)
+        {
+            //TODO: WORK OUT WHICH
+            onJoinedGame?.Invoke(obj);
+            onJoinedChat?.Invoke(obj);
+        }
+
+        private void CreatedRoom(int obj)
+        {
+            //TODO: WORK OUT WHICH
+            onHostGame?.Invoke(obj);
+            onHostChat?.Invoke(obj);
+        }
+
+        private void RoomListReceived(List<Room> obj)
+        {
+            //TODO: WORK OUT WHICH
+            onHostsList?.Invoke(obj);
+            onChatRoomList?.Invoke(obj);
+        }
+
+        private void UserLeft(string obj)
+        {
+            //TODO: WORK OUT WHICH
+            onUserLeftGame?.Invoke(obj);
+            onUserLeftGame?.Invoke(obj);
+        }
+
+        private void UserJoined(string obj)
+        {
+            //TODO: WORK OUT WHICH
+            onUserJoinedChat?.Invoke(obj);
+            onUserJoinedGame?.Invoke(obj);
+        }
+
+
+        private void UserListReceived(List<MessageServer.Data.User> obj)
+        {
+            onUsersList?.Invoke(obj);
+        }
+
+        private void MessageRecieved(string obj)
+        {
+            onMessageRecieved?.Invoke(obj);
+        }
+
+        private void Authentication(bool obj)
+        {
+            onAuthenicate?.Invoke(obj);
+        }
 
         // Start is called before the first frame update
         public async void Connect(User userData)
         {
-            await client.Connect();
-            await client.Authenticate(userData.Username, userData.Password);
-            
-            
-            
-            // user = userData;
-            // await ConnectToWebSocket();
-            // StartCoroutine(nameof(Listen));
-            // await AthenticateUser(user);
+            Debug.Log("login");
+            await Task.FromResult(client.Connect());
+            await Task.FromResult(client.Authenticate(userData.Username, userData.Password));
         }
 
-        private async Task Listen()
-        {
-            // Start a receive loop to handle incoming messages from the server
-            byte[] receiveBuffer = new byte[1024];
-            ArraySegment<byte> receiveSegment = new ArraySegment<byte>(receiveBuffer);
-            while (webSocket.State == WebSocketState.Open)
-            {
-                WebSocketReceiveResult result = await webSocket.ReceiveAsync(receiveSegment, CancellationToken.None);
-                if (result.MessageType == WebSocketMessageType.Text)
-                {
-                    string receivedMessage = System.Text.Encoding.UTF8.GetString(receiveBuffer, 0, result.Count);
-                    Debug.Log("Received message: " + receivedMessage);
-                    string[] message = receivedMessage.Split(":");
-                    if (message.Length < 2) return;
-                    switch (message[0])
-                    {
-                        case "AUTH":
-                            onAuthenicate?.Invoke(message[1] == "OK");
-                            if (message[1] != "OK")
-                            {
-                                await CloseSocket();
-                            }
-                            break;
-                        case "IDIS":
-                            clientID = Int32.Parse(message[1]);
-                            break;
-                        case "ROOMLIST":
-                            if (message.Length < 3)
-                            {
-                                break;
-                            }
-                            onHostsList?.Invoke(receivedMessage.Substring(message[0].Length + message[1].Length + 2));
-                            break;
-                        case "USERLIST":
-                            if (message.Length < 3)
-                            {
-                                break;
-                            }
-                            onUsersList?.Invoke(receivedMessage.Substring(message[0].Length + message[1].Length + 2));
-                            break;
-                        case "RECIEVEMESSAGE":
-                            Debug.Log(receivedMessage.Substring(message[0].Length + 1));
-                            break;
-                        case "ROOMJOINED":
-                            Debug.Log($"joined room {message[1]}");
-                            break;
-                        case "ROOMCREATED":
-                            Debug.Log($"room {message[1]} has been created");
-                            break;
-                        case "USERJOINED":
-                            Debug.Log($"{message[1]} joined room");
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
+        
         public void SendMessageToUser(string userName, string Message)
         {
-            string msg = $"SENDMESGTOUSER:{userName}:{Message}";
-            SendMessage(msg);
+            client.SendMessageToUser(userName, Message);
         }
 
         
         public void GetRoomList()
         {
-            SendMessage("GETROOMLIST");
+            client.GetRoomList();
         }
         
-        public void CreateNewRoom(int roomSize, bool isPublic)
+        public void CreateNewRoom(string meta, int roomSize, bool isPublic)
         {
-            SendMessage($"CREATEROOM:{roomSize}:{(isPublic?"PUBLIC":"PRIVATE")}");
+            client.CreateRoom(meta, roomSize, isPublic);
         }
 
-        private async Task AthenticateUser(User user)
-        {
-            // Send a message to the server
-            string Authmessage = $"AUTHENTICATE:{user.Username}:{user.Password}";
-            await SendMessage(Authmessage);
-        }
-
-        private async Task ConnectToWebSocket()
-        {
-            // Create a new WebSocket instance and connect to the server
-            webSocket = new ClientWebSocket();
-            Uri serverUri = new Uri("ws://localhost:8080/");
-            await webSocket.ConnectAsync(serverUri, CancellationToken.None);
-        }
-
-        private async Task SendMessage(string message)
-        {
-            ArraySegment<byte> buffer = new ArraySegment<byte>(System.Text.Encoding.UTF8.GetBytes(message));
-            await webSocket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
-
-        }
 
         // Close the WebSocket connection when the script is destroyed
         private async void OnDestroy()
         {
-            await CloseSocket();
+            await client.CloseSocket();
         }
-
-        private async Task CloseSocket()
-        {
-            if (webSocket != null && webSocket.State == WebSocketState.Open)
-            {
-                await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Script destroyed", CancellationToken.None);
-            }
-        }
+        
     }
 }

@@ -14,10 +14,10 @@ namespace Multiplayer.View.LoadData
 
         private void Start()
         {
-            WebSocketConnection.onAuthenicate += loginSuccess;
+            WebSocketConnection.onAuthenicate += LoginSuccess;
         }
 
-        public void loginSuccess(bool auth)
+        public void LoginSuccess(bool auth)
         {
             if (auth)
             {

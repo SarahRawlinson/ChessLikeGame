@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using MessageServer.Data;
 using Multiplayer.Controllers;
 using Multiplayer.Models.Connection;
 using Multiplayer.View.DisplayData;
@@ -19,12 +20,14 @@ namespace Multiplayer.View.LoadData
         {
             WebSocketConnection.onHostsList += ProcessHosts;
         }
+        
 
-        private void ProcessHosts(string obj)
+        private void ProcessHosts(List<Room> obj)
         {
-            string[] ls = obj.Split(":");
+            List<string> ls = new List<string>();
+            obj.ForEach(a => ls.Add(a.roomKey));
             List<string> activeUser = new List<string>();
-
+            
             for (var index = _rooms.Count -1; index >= 0; index--)
             {
                 var user = _rooms[index];
@@ -37,7 +40,7 @@ namespace Multiplayer.View.LoadData
                     RemoveHost(user);
                 }
             }
-
+            
             foreach (var u in ls)
             {
                 if (!activeUser.Contains(u))
