@@ -4,13 +4,18 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Multiplayer.Models.Connection;
+using NetClient;
 using UnityEngine;
+
 
 namespace Multiplayer.Controllers
 {
     public class WebSocketConnection : MonoBehaviour
     {
         private ClientWebSocket webSocket;
+
+        private Client client = new Client();
+       
         public static event Action<bool> onAuthenicate;
         public static event Action<bool> onHostGame;
         public static event Action<string>onHostsList;
@@ -21,10 +26,15 @@ namespace Multiplayer.Controllers
         // Start is called before the first frame update
         public async void Connect(User userData)
         {
-            user = userData;
-            await ConnectToWebSocket();
-            StartCoroutine(nameof(Listen));
-            await AthenticateUser(user);
+            await client.Connect();
+            await client.Authenticate(userData.Username, userData.Password);
+            
+            
+            
+            // user = userData;
+            // await ConnectToWebSocket();
+            // StartCoroutine(nameof(Listen));
+            // await AthenticateUser(user);
         }
 
         private async Task Listen()
