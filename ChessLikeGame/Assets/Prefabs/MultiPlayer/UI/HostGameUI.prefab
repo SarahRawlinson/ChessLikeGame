@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 33865634013850527}
   - component: {fileID: 8287938679576376484}
   m_Layer: 0
-  m_Name: HostGame
+  m_Name: HostGameUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

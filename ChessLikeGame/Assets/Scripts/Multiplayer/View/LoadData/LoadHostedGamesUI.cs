@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Multiplayer.Controllers;
 using Multiplayer.Models.Connection;
+using Multiplayer.View.DisplayData;
 using Multiplayer.View.UI;
 using UnityEngine;
 
-namespace Multiplayer.View.DisplayData
+namespace Multiplayer.View.LoadData
 {
-    public class ScrollAllHostsUI : MonoBehaviour
+    public class LoadHostedGamesUI : MonoBehaviour
     {
         [SerializeField] private ScrollContentUI _scrollContentUI;
         [SerializeField] private DisplayHostUI _gameObjectPrefab;

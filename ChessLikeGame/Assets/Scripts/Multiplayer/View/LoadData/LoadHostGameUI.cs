@@ -1,9 +1,9 @@
 using Multiplayer.Controllers;
 using UnityEngine;
 
-namespace Multiplayer.View.Connect
+namespace Multiplayer.View.LoadData
 {
-    public class UIHostGame : MonoBehaviour
+    public class LoadHostGameUI : MonoBehaviour
     {
         [SerializeField] private GameObject createOnStartPrefab;
         private GameObject activeObject = null;
