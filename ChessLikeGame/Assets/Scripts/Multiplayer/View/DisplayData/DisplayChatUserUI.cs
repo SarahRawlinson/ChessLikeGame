@@ -1,15 +1,25 @@
+using MessageServer.Data;
+using Multiplayer.View.LoadData;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Multiplayer.View.DisplayData
 {
     public class DisplayChatUserUI : MonoBehaviour
     {
-        [SerializeField] private TMP_Text user;
+        [FormerlySerializedAs("user")] [SerializeField] private TMP_Text userText;
+        private User _user;
 
-        public void SetUser(string userText)
+        public void SetUser(User user)
         {
-            user.text = userText;
+            _user = user;
+            userText.text = user.GetUserName();
+        }
+
+        public void StartChat()
+        {
+            FindObjectOfType<HandleChat>().StartNewChatWithUser(_user);
         }
     }
 }

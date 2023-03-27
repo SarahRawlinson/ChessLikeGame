@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Threading;
@@ -37,10 +38,11 @@ namespace Multiplayer.Controllers
         
         public User user { get; set; }
         private int clientID = -1;
-
+        private bool refresh;
         private void Start()
         {
-            client.onMessageRecievedEvent += MessageRecieved;
+            client.SetDisconnectOnFailAuthentication(true);
+            client.onMessageRecievedEvent += MessageReceived;
             client.onAuthenticateEvent += Authentication;
             client.onUserListRecievedEvent += UserListReceived;
             client.onUserJoinedEvent += UserJoined;
@@ -48,38 +50,43 @@ namespace Multiplayer.Controllers
             client.onRoomListRecievedEvent += RoomListReceived;
             client.onRoomCreatedEvent += CreatedRoom;
             client.onRoomJoinedEvent += JoinedRoom;
-            client.onRoomMessageRecievedEvent += RoomMessageRecieved;
-            client.onIDRecievedEvent += ClientIDRecieved;
+            client.onRoomMessageRecievedEvent += RoomMessageReceived;
+            client.onIDRecievedEvent += ClientIDReceived;
         }
 
-        private void ClientIDRecieved(int obj)
+        private void ClientIDReceived(int obj)
         {
+            Debug.Log($"ClientIDReceived={obj}");
             clientID = obj;
         }
 
-        private void RoomMessageRecieved((int RoomID, string Message) obj)
+        private void RoomMessageReceived((int RoomID, string Message) obj)
         {
+            Debug.Log($"RoomMessageReceived={obj}");
             //TODO: WORK OUT WHICH
             onChatRoomMessageRecieved?.Invoke(obj);
             onGameRoomMessageRecieved?.Invoke(obj);
         }
 
-        private void JoinedRoom(string obj)
+        private static void JoinedRoom(string obj)
         {
+            Debug.Log($"JoinedRoom={obj}");
             //TODO: WORK OUT WHICH
             onJoinedGame?.Invoke(obj);
             onJoinedChat?.Invoke(obj);
         }
 
-        private void CreatedRoom(int obj)
+        private static void CreatedRoom(int obj)
         {
+            Debug.Log($"CreatedRoom={obj}");
             //TODO: WORK OUT WHICH
             onHostGame?.Invoke(obj);
             onHostChat?.Invoke(obj);
         }
 
-        private void RoomListReceived(List<Room> obj)
+        private static void RoomListReceived(List<Room> obj)
         {
+            // Debug.Log($"RoomListReceived={obj}");
             //TODO: WORK OUT WHICH
             onHostsList?.Invoke(obj);
             onChatRoomList?.Invoke(obj);
@@ -87,6 +94,7 @@ namespace Multiplayer.Controllers
 
         private void UserLeft(string obj)
         {
+            Debug.Log($"UserLeft={obj}");
             //TODO: WORK OUT WHICH
             onUserLeftGame?.Invoke(obj);
             onUserLeftGame?.Invoke(obj);
@@ -94,24 +102,36 @@ namespace Multiplayer.Controllers
 
         private void UserJoined(string obj)
         {
+            Debug.Log($"UserJoined={obj}");
             //TODO: WORK OUT WHICH
             onUserJoinedChat?.Invoke(obj);
             onUserJoinedGame?.Invoke(obj);
         }
 
 
-        private void UserListReceived(List<MessageServer.Data.User> obj)
+        private static void UserListReceived(List<MessageServer.Data.User> obj)
         {
+            // Debug.Log($"UserListReceived={obj}");
             onUsersList?.Invoke(obj);
         }
 
-        private void MessageRecieved(string obj)
+        private static void MessageReceived(string obj)
         {
+            Debug.Log($"MessageReceived={obj}");
             onMessageRecieved?.Invoke(obj);
         }
 
         private void Authentication(bool obj)
         {
+            Debug.Log($"Authentication={obj}");
+            if (!obj)
+            {
+                StopCoroutine(nameof(CloseSocket));
+            }
+            else
+            {
+                StartCoroutine(nameof(RefreshSubscribed));
+            }
             onAuthenicate?.Invoke(obj);
         }
 
@@ -119,10 +139,29 @@ namespace Multiplayer.Controllers
         public async void Connect(User userData)
         {
             Debug.Log("login");
-            await Task.FromResult(client.Connect());
-            await Task.FromResult(client.Authenticate(userData.Username, userData.Password));
+            await client.Connect();
+            StartCoroutine(nameof(StartConnection));
+            await client.Authenticate(userData.Username, userData.Password);
         }
 
+        public async Task StartConnection()
+        {
+            await client.Listen();
+            Debug.Log("Stopped Listening");
+        }
+
+        public IEnumerator RefreshSubscribed()
+        {
+            if (refresh) yield break;
+            refresh = true;
+            while (refresh)
+            {
+                client.RequestRoomList();
+                client.UpdateUserList();
+                yield return new WaitForSeconds(5.0f);
+            }
+            Debug.Log("Stopped Asking Server For Updates");
+        }
         
         public void SendMessageToUser(string userName, string Message)
         {
@@ -132,7 +171,8 @@ namespace Multiplayer.Controllers
         
         public void GetRoomList()
         {
-            client.GetRoomList();
+            Debug.Log("asked for rooms");
+            client.RequestRoomList();
         }
         
         public void CreateNewRoom(string meta, int roomSize, bool isPublic)
@@ -144,8 +184,16 @@ namespace Multiplayer.Controllers
         // Close the WebSocket connection when the script is destroyed
         private async void OnDestroy()
         {
-            await client.CloseSocket();
+            await CloseSocket();
         }
+        
+        private async Task CloseSocket()
+        {
+            refresh = false;
+            client.Disconnect();
+            await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Stop Web Socket", CancellationToken.None);
+        }
+        
         
     }
 }

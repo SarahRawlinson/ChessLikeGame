@@ -1,4 +1,5 @@
 using System;
+using MessageServer.Data;
 using Multiplayer.View.DisplayData;
 using TMPro;
 using UnityEngine;
@@ -12,10 +13,12 @@ namespace Multiplayer.View.UI
         [FormerlySerializedAs("_chatMessageUIPrefab")] [SerializeField] private DisplayChatMessageUI displayChatMessageUIPrefab;
         [SerializeField] private ScrollContentUI _scrollContentUI;
         [SerializeField] private TMP_Text header;
-        public static event Action<string> onSendMessage;
+        private User _user;
+        public event Action<(User user, string message)> onSendMessage;
 
-        public void SetChattingWith(string with)
+        public void SetChattingWith(string with, User user)
         {
+            _user = user;
             header.text = $"Chatting with {with}";
         }
         public void SendMessageToUI(string user, string message)
@@ -27,7 +30,7 @@ namespace Multiplayer.View.UI
 
         public void SendMessage()
         {
-            onSendMessage?.Invoke(_inputField.text);
+            onSendMessage?.Invoke((_user, _inputField.text));
             SendMessageToUI("Me",_inputField.text);
             _inputField.text = "";
         }

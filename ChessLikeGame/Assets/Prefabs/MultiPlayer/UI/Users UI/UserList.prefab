@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4754112684450684369}
   - component: {fileID: 5951844372984656991}
   - component: {fileID: 4126121687330758913}
-  - component: {fileID: 6252039011101022337}
+  - component: {fileID: 926375591619776854}
   m_Layer: 5
   m_Name: UserList
   m_TagString: Untagged
@@ -78,7 +78,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6252039011101022337
+--- !u!114 &926375591619776854
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -87,11 +87,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 300827522317026222}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e87181f67b4cdeb41a29089419167416, type: 3}
+  m_Script: {fileID: 11500000, guid: 66aa55722c334d4aa902bd060ecea0c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _userUIPrefab: {fileID: 7001705579711779675, guid: 23cb09b8025344c49aacefc46971d4fe, type: 3}
   _scrollContentUI: {fileID: 8444423030779502039}
+  _gameObjectPrefab: {fileID: 7001705579711779675, guid: 23cb09b8025344c49aacefc46971d4fe, type: 3}
 --- !u!1001 &8159988133996335645
 PrefabInstance:
   m_ObjectHideFlags: 0

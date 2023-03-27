@@ -91,8 +91,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scrollContentUI: {fileID: 8410159644165993589}
-  _gameObjectPrefab: {fileID: 0}
-  displayPanel: {fileID: 1958742548992434591}
+  _gameObjectPrefab: {fileID: 6261278308982027710, guid: 1223c5856c3fb6743881b0dc574ef7b1, type: 3}
 --- !u!1001 &8122352273560615871
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -226,11 +225,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 887ec4c4129ec354f84cf54351d59028, type: 3}
---- !u!1 &1958742548992434591 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7752592319446620704, guid: 887ec4c4129ec354f84cf54351d59028, type: 3}
-  m_PrefabInstance: {fileID: 8122352273560615871}
-  m_PrefabAsset: {fileID: 0}
 --- !u!224 &5189812278341256668 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4088580849792417379, guid: 887ec4c4129ec354f84cf54351d59028, type: 3}

@@ -308,10 +308,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: ChatRoomList
       objectReference: {fileID: 0}
-    - target: {fileID: 770876450812246639, guid: a524f86517a003c4b9dca7d1d9ab068a, type: 3}
-      propertyPath: _gameObjectPrefab
-      value: 
-      objectReference: {fileID: 6261278308982027710, guid: 1223c5856c3fb6743881b0dc574ef7b1, type: 3}
     - target: {fileID: 6728135357127016575, guid: a524f86517a003c4b9dca7d1d9ab068a, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0

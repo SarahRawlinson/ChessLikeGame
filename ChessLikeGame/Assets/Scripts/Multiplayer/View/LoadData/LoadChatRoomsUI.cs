@@ -25,7 +25,10 @@ namespace Multiplayer.View.LoadData
         private void ProcessHosts(List<Room> obj)
         {
             List<string> ls = new List<string>();
-            obj.ForEach(a => ls.Add(a.roomKey));
+            foreach (var room in obj)
+            {
+                ls.Add(room.RoomID.ToString());
+            }
             List<string> activeUser = new List<string>();
             
             for (var index = _rooms.Count -1; index >= 0; index--)

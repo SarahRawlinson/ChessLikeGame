@@ -84,6 +84,7 @@ namespace Multiplayer.Models.BoardState
             LoadHalfMoveCounterFromString(processed[4]);
             LoadFullmoveNumberFromString(processed[5]);
         }
+        
         public void LoadPositionsFromString(string inputFEN)
         {
             int counter = 0;

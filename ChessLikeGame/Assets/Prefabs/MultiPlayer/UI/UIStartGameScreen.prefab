@@ -595,14 +595,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4924267664134178301}
     m_Modifications:
-    - target: {fileID: 2183432127402487927, guid: 2525173797a1fdb48b5f5cb57cb333de, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 2524367964387370070}
-    - target: {fileID: 2183432127402487927, guid: 2525173797a1fdb48b5f5cb57cb333de, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: SetActive
-      objectReference: {fileID: 0}
     - target: {fileID: 7330157997053512177, guid: 2525173797a1fdb48b5f5cb57cb333de, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -701,10 +693,5 @@ RectTransform:
 --- !u!1 &1980331081946818613 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8092434621096886045, guid: 2525173797a1fdb48b5f5cb57cb333de, type: 3}
-  m_PrefabInstance: {fileID: 7725246530077562664}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &2524367964387370070 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5205542694154728318, guid: 2525173797a1fdb48b5f5cb57cb333de, type: 3}
   m_PrefabInstance: {fileID: 7725246530077562664}
   m_PrefabAsset: {fileID: 0}

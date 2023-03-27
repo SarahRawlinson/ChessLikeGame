@@ -1,76 +1,63 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections;
+using System.Collections.Generic;
 using MessageServer.Data;
 using Multiplayer.Controllers;
 using Multiplayer.View.DisplayData;
 using Multiplayer.View.UI;
 using UnityEngine;
-using User = Multiplayer.Models.Connection.User;
 
 namespace Multiplayer.View.LoadData
 {
-    public class LoadHostedGamesUI : MonoBehaviour
+    public class LoadChatUsersUI : MonoBehaviour
     {
         [SerializeField] private ScrollContentUI _scrollContentUI;
-        [SerializeField] private DisplayHostUI _gameObjectPrefab;
-        [SerializeField] private GameObject displayPanel;
+        [SerializeField] private DisplayChatUserUI _gameObjectPrefab;
         private List<User> _users = new List<User>();
-        private List<DisplayHostUI> _usersUI = new List<DisplayHostUI>();
+        private List<DisplayChatUserUI> _usersUI = new List<DisplayChatUserUI>();
 
         private void Start()
         {
-            WebSocketConnection.onHostsList += ProcessHosts;
+            WebSocketConnection.onUsersList += ProcessUsers;
         }
 
-        private void ProcessHosts(List<Room> obj)
+        private void ProcessUsers(List<User> obj)
         {
-            List<string> ls = new List<string>();
-            foreach (var room in obj)
+            var ls = new List<User>();
+            foreach (var user in obj)
             {
-                ls.Add(room.RoomID.ToString());
+                ls.Add(user);
             }
-            List<string> activeUser = new List<string>();
-
+            List<User> activeUser = new List<User>();
+            
             for (var index = _users.Count -1; index >= 0; index--)
             {
                 var user = _users[index];
-                if (ls.Contains(user.Username))
+                if (((IList) ls).Contains(user))
                 {
-                    activeUser.Add(user.Username);
+                    activeUser.Add(user);
                 }
                 else
                 {
                     RemoveHost(user);
                 }
             }
-
+            
             foreach (var u in ls)
             {
                 if (!activeUser.Contains(u))
                 {
-                    AddHost(new User(u));
+                    AddHost(u);
                     
                 }
             }
         }
 
-        public void HideDisplay()
-        {
-            displayPanel.SetActive(false);
-        }
-        
-        public void ShowDisplay()
-        {
-            FindObjectOfType<WebSocketConnection>().GetRoomList();
-            displayPanel.SetActive(true);
-        }
-        
         public void AddHost(User user)
         {
             _users.Add(user);
             GameObject gObject = _scrollContentUI.AddContent(_gameObjectPrefab.gameObject);
-            DisplayHostUI ui = gObject.GetComponent<DisplayHostUI>();
-            ui.UpdateHostInfo(user.Username, user.Username);
+            DisplayChatUserUI ui = gObject.GetComponent<DisplayChatUserUI>();
+            ui.SetUser(user);
             _usersUI.Add(ui);
         }
         
@@ -82,12 +69,11 @@ namespace Multiplayer.View.LoadData
                 if (Equals(u, user))
                 {
                     _users.Remove(u);
-                    DisplayHostUI ui = _usersUI[index];
+                    DisplayChatUserUI ui = _usersUI[index];
                     _usersUI.Remove(ui);
                     Destroy(ui.gameObject);
                 }
             }
         }
-        
     }
 }
