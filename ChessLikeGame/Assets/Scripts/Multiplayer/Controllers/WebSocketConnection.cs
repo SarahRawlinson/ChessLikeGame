@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using MessageServer.Data;
 using NetClient;
 using UnityEngine;
-using User = Multiplayer.Models.Connection.User;
 
 
 namespace Multiplayer.Controllers
@@ -18,7 +17,7 @@ namespace Multiplayer.Controllers
 
         private Client client = new Client();
 
-        public static event Action<string> onMessageRecieved;
+        public static event Action<(User user, string message)> onMessageRecieved;
         public static event Action<bool> onAuthenicate;
         public static event Action<List<MessageServer.Data.User>> onUsersList;
         public static event Action<string> onUserJoinedGame;
@@ -52,6 +51,16 @@ namespace Multiplayer.Controllers
             client.onRoomJoinedEvent += JoinedRoom;
             client.onRoomMessageRecievedEvent += RoomMessageReceived;
             client.onIDRecievedEvent += ClientIDReceived;
+            client.onIncomingWebSocketMessage += LogMessage;
+        }
+
+        private void LogMessage(string obj)
+        {
+            if (obj.Contains("RECIEVEMESSAGE")) Debug.LogWarning($"WEB SOCKET RECEIVED MESSAGE {obj}");
+            else
+            {
+                Debug.Log($"WEB SOCKET RECEIVED MESSAGE {obj}");
+            }
         }
 
         private void ClientIDReceived(int obj)
@@ -115,9 +124,9 @@ namespace Multiplayer.Controllers
             onUsersList?.Invoke(obj);
         }
 
-        private static void MessageReceived(string obj)
+        private static void MessageReceived((User user, string message) obj)
         {
-            Debug.Log($"MessageReceived={obj}");
+            Debug.LogWarning($"MessageReceived=From={obj.user.GetUserName()}/Message={obj.message}");
             onMessageRecieved?.Invoke(obj);
         }
 
@@ -136,12 +145,12 @@ namespace Multiplayer.Controllers
         }
 
         // Start is called before the first frame update
-        public async void Connect(User userData)
+        public async void Connect(User userData, string password)
         {
             Debug.Log("login");
             await client.Connect();
             StartCoroutine(nameof(StartConnection));
-            await client.Authenticate(userData.Username, userData.Password);
+            await client.Authenticate(userData.GetUserName(), password);
         }
 
         public async Task StartConnection()
@@ -163,9 +172,9 @@ namespace Multiplayer.Controllers
             Debug.Log("Stopped Asking Server For Updates");
         }
         
-        public void SendMessageToUser(string userName, string Message)
+        public void SendMessageToUser(User user, string Message)
         {
-            client.SendMessageToUser(userName, Message);
+            client.SendMessageToUser(user, Message);
         }
 
         

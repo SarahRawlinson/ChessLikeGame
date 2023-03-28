@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using MessageServer.Data;
 using Multiplayer.Controllers;
-using Multiplayer.Models.Connection;
 using Multiplayer.View.DisplayData;
 using Multiplayer.View.UI;
 using UnityEngine;

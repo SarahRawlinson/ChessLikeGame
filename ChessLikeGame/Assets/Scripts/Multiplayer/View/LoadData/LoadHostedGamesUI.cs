@@ -5,7 +5,6 @@ using Multiplayer.Controllers;
 using Multiplayer.View.DisplayData;
 using Multiplayer.View.UI;
 using UnityEngine;
-using User = Multiplayer.Models.Connection.User;
 
 namespace Multiplayer.View.LoadData
 {
@@ -14,8 +13,8 @@ namespace Multiplayer.View.LoadData
         [SerializeField] private ScrollContentUI _scrollContentUI;
         [SerializeField] private DisplayHostUI _gameObjectPrefab;
         [SerializeField] private GameObject displayPanel;
-        private List<User> _users = new List<User>();
-        private List<DisplayHostUI> _usersUI = new List<DisplayHostUI>();
+        private List<Room> _rooms = new List<Room>();
+        private List<DisplayHostUI> _roomUI = new List<DisplayHostUI>();
 
         private void Start()
         {
@@ -24,31 +23,31 @@ namespace Multiplayer.View.LoadData
 
         private void ProcessHosts(List<Room> obj)
         {
-            List<string> ls = new List<string>();
+            List<Room> ls = new List<Room>();
             foreach (var room in obj)
             {
-                ls.Add(room.RoomID.ToString());
+                ls.Add(room);
             }
-            List<string> activeUser = new List<string>();
+            List<Room> activeRooms = new List<Room>();
 
-            for (var index = _users.Count -1; index >= 0; index--)
+            for (var index = _rooms.Count -1; index >= 0; index--)
             {
-                var user = _users[index];
-                if (ls.Contains(user.Username))
+                var room = _rooms[index];
+                if (ls.Contains(room))
                 {
-                    activeUser.Add(user.Username);
+                    activeRooms.Add(room);
                 }
                 else
                 {
-                    RemoveHost(user);
+                    RemoveHost(room);
                 }
             }
 
             foreach (var u in ls)
             {
-                if (!activeUser.Contains(u))
+                if (!activeRooms.Contains(u))
                 {
-                    AddHost(new User(u));
+                    AddHost(u);
                     
                 }
             }
@@ -65,25 +64,25 @@ namespace Multiplayer.View.LoadData
             displayPanel.SetActive(true);
         }
         
-        public void AddHost(User user)
+        public void AddHost(Room room)
         {
-            _users.Add(user);
+            _rooms.Add(room);
             GameObject gObject = _scrollContentUI.AddContent(_gameObjectPrefab.gameObject);
             DisplayHostUI ui = gObject.GetComponent<DisplayHostUI>();
-            ui.UpdateHostInfo(user.Username, user.Username);
-            _usersUI.Add(ui);
+            ui.UpdateHostInfo(room);
+            _roomUI.Add(ui);
         }
         
-        public void RemoveHost(User user)
+        public void RemoveHost(Room user)
         {
-            for (var index = 0; index < _users.Count; index++)
+            for (var index = 0; index < _rooms.Count; index++)
             {
-                var u = _users[index];
+                var u = _rooms[index];
                 if (Equals(u, user))
                 {
-                    _users.Remove(u);
-                    DisplayHostUI ui = _usersUI[index];
-                    _usersUI.Remove(ui);
+                    _rooms.Remove(u);
+                    DisplayHostUI ui = _roomUI[index];
+                    _roomUI.Remove(ui);
                     Destroy(ui.gameObject);
                 }
             }

@@ -1,5 +1,5 @@
+using MessageServer.Data;
 using Multiplayer.Controllers;
-using Multiplayer.Models.Connection;
 using TMPro;
 using UnityEngine;
 
@@ -33,7 +33,7 @@ namespace Multiplayer.View.LoadData
         public void Login()
         {
             WebSocketConnection socket = FindObjectOfType<WebSocketConnection>();
-            socket.Connect(new User(username.text, password.text));
+            socket.Connect(new User(username.text, false),password.text);
         }
 
         public void ShowDisplay()

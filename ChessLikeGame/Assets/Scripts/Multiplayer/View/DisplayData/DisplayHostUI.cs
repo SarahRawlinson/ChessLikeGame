@@ -1,4 +1,5 @@
 ﻿using System;
+using MessageServer.Data;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -8,12 +9,14 @@ namespace Multiplayer.View.DisplayData
     public class DisplayHostUI : MonoBehaviour
     {
         [FormerlySerializedAs("_tmpText")] [SerializeField] private TMP_Text _roomNameText;
-        private string id = "-1";
-        private static event Action<string> onJoinRoom; 
-        public void UpdateHostInfo(string txt, string index)
+        private Guid id;
+        private Room _room;
+        private static event Action<Guid> onJoinRoom; 
+        public void UpdateHostInfo(Room room)
         {
-            _roomNameText.text = txt;
-            id = index;
+            _room = room;
+            _roomNameText.text = room.GetGuid().ToString();
+            id = room.GetGuid();
         }
 
         public void Join()
