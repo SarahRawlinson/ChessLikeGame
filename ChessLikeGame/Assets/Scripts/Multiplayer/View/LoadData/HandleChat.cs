@@ -23,7 +23,7 @@ namespace Multiplayer.View.LoadData
 
         [SerializeField] private Transform window;
         [SerializeField] private SendTextToWindow prefab;
-        private Dictionary<User, Chat> chats = new Dictionary<User, Chat>();
+        private Dictionary<string, Chat> chats = new Dictionary<string, Chat>();
 
         private void Start()
         {
@@ -32,26 +32,26 @@ namespace Multiplayer.View.LoadData
 
         private void MessageRecievedFromSocket((User user, string message) obj)
         {
-            if (!chats.ContainsKey(obj.user))
+            if (!chats.ContainsKey(obj.user.GetUserName()))
             {
-                chats[obj.user].window.SendMessageToUI("", $"A new chat with {obj.user.GetUserName()} has started");
+                chats[obj.user.GetUserName()].window.SendMessageToUI("", $"A new chat with {obj.user.GetUserName()} has started");
                 StartNewChatWithUser(obj.user);
             }
-            chats[obj.user].window.SendMessageToUI(obj.user.GetUserName(), obj.message);
+            chats[obj.user.GetUserName()].window.SendMessageToUI(obj.user.GetUserName(), obj.message);
         }
 
         public void StartNewChatWithUser(User user)
         {
-            if (chats.ContainsKey(user))
+            if (chats.ContainsKey(user.GetUserName()))
             {
-                chats[user].window.gameObject.SetActive(true);
+                chats[user.GetUserName()].window.gameObject.SetActive(true);
                 return;
             }
             GameObject obj =  Instantiate(prefab.gameObject, window);
             SendTextToWindow sendTextToWindow = obj.GetComponent<SendTextToWindow>();
             sendTextToWindow.SetChattingWith(user.GetUserName(), user);
             sendTextToWindow.onSendMessage += SendMessage;
-            chats.Add(user, new Chat(sendTextToWindow, user));
+            chats.Add(user.GetUserName(), new Chat(sendTextToWindow, user));
         }
 
         private void SendMessage((User user, string message) obj)

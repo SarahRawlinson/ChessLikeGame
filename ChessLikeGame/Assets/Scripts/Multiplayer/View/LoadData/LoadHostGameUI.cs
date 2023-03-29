@@ -21,7 +21,7 @@ namespace Multiplayer.View.LoadData
 
         public void AskToHostGame()
         {
-            FindObjectOfType<WebSocketConnection>().CreateNewRoom("GameChess",2,true);
+            FindObjectOfType<WebSocketConnection>().CreateNewGameRoom(2,true);
         }
 
         private void EndGame()

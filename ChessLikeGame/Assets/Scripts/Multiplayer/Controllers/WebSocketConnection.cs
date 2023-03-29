@@ -184,9 +184,14 @@ namespace Multiplayer.Controllers
             client.RequestRoomList();
         }
         
-        public void CreateNewRoom(string meta, int roomSize, bool isPublic)
+        public void CreateNewGameRoom(int roomSize, bool isPublic)
         {
-            client.CreateRoom(meta, roomSize, isPublic);
+            client.CreateRoom("ChessGameRoom", roomSize, isPublic);
+        }
+        
+        public void CreateNewChatRoom(int roomSize, bool isPublic)
+        {
+            client.CreateRoom("ChessChatRoom", roomSize, isPublic);
         }
 
 
@@ -200,7 +205,7 @@ namespace Multiplayer.Controllers
         {
             refresh = false;
             client.Disconnect();
-            await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Stop Web Socket", CancellationToken.None);
+            // await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Stop Web Socket", CancellationToken.None);
         }
         
         
