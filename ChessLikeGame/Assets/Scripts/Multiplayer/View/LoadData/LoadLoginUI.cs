@@ -33,7 +33,7 @@ namespace Multiplayer.View.LoadData
         public void Login()
         {
             WebSocketConnection socket = FindObjectOfType<WebSocketConnection>();
-            socket.Connect(new User(username.text, false),password.text);
+            socket.Connect(username.text,password.text);
         }
 
         public void ShowDisplay()

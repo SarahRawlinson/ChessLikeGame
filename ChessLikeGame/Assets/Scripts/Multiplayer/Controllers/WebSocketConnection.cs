@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using LibObjects;
 using MessageServer.Data;
 using NetClient;
 using UnityEngine;
@@ -26,17 +27,18 @@ namespace Multiplayer.Controllers
         public static event Action<string> onUserLeftChat;
         public static event Action<List<Room>>onHostsList;
         public static event Action<List<Room>>onChatRoomList;
-        public static event Action<int> onHostGame;
-        public static event Action<int> onHostChat;
-        public static event Action<string> onJoinedGame;
-        public static event Action<string> onJoinedChat;
-        public event Action<(int RoomID, string Message)> onChatRoomMessageRecieved;
-        public event Action<(int RoomID, string Message)> onGameRoomMessageRecieved;
+        public static event Action<Room> onHostGame;
+        public static event Action<Room> onHostChat;
+        public static event Action<Room> onJoinedGame;
+        public static event Action<Room> onJoinedChat;
+        public static event Action<(Room room, User user, string Message)> onChatRoomMessageRecieved;
+        public static event Action<(Room room, User user, string Message)> onGameRoomMessageRecieved;
+        [SerializeField] private bool refreshSubscribed = false;
         
         
         
         public User user { get; set; }
-        private int clientID = -1;
+        private Guid clientID = Guid.Empty;
         private bool refresh;
         private void Start()
         {
@@ -51,25 +53,20 @@ namespace Multiplayer.Controllers
             client.onRoomJoinedEvent += JoinedRoom;
             client.onRoomMessageRecievedEvent += RoomMessageReceived;
             client.onIDRecievedEvent += ClientIDReceived;
-            client.onIncomingWebSocketMessage += LogMessage;
+            client.onIncomingWebSocketMessage += LogMessageReceived;
+            client.onRecievedUserWithGuid += UserWithGuidReceived;
+            client.onMessageSentToSocket += LogMessageSent;
         }
 
-        private void LogMessage(string obj)
+        private void UserWithGuidReceived((User user, Guid guid) obj)
         {
-            if (obj.Contains("RECIEVEMESSAGE")) Debug.LogWarning($"WEB SOCKET RECEIVED MESSAGE {obj}");
-            else
+            if (obj.guid == clientID)
             {
-                Debug.Log($"WEB SOCKET RECEIVED MESSAGE {obj}");
+                user = obj.user;
             }
         }
 
-        private void ClientIDReceived(int obj)
-        {
-            Debug.Log($"ClientIDReceived={obj}");
-            clientID = obj;
-        }
-
-        private void RoomMessageReceived((int RoomID, string Message) obj)
+        private void RoomMessageReceived((Room room, User user, string Message) obj)
         {
             Debug.Log($"RoomMessageReceived={obj}");
             //TODO: WORK OUT WHICH
@@ -77,7 +74,7 @@ namespace Multiplayer.Controllers
             onGameRoomMessageRecieved?.Invoke(obj);
         }
 
-        private static void JoinedRoom(string obj)
+        private void JoinedRoom(Room obj)
         {
             Debug.Log($"JoinedRoom={obj}");
             //TODO: WORK OUT WHICH
@@ -85,12 +82,38 @@ namespace Multiplayer.Controllers
             onJoinedChat?.Invoke(obj);
         }
 
-        private static void CreatedRoom(int obj)
+        private void CreatedRoom(Room obj)
         {
             Debug.Log($"CreatedRoom={obj}");
             //TODO: WORK OUT WHICH
             onHostGame?.Invoke(obj);
             onHostChat?.Invoke(obj);
+        }
+
+        private void LogMessageReceived(string obj)
+        {
+            if (obj.Contains("RECIEVEMESSAGE")) Debug.LogWarning($"WEB SOCKET RECEIVED MESSAGE {obj}");
+            else
+            {
+                Debug.Log($"WEB SOCKET RECEIVED MESSAGE {obj}");
+            }
+        }
+        
+        private void LogMessageSent(string obj)
+        {
+            if (obj.Contains("RECIEVEMESSAGE")) Debug.LogWarning($"WEB SOCKET SENT MESSAGE {obj}");
+            else
+            {
+                Debug.Log($"WEB SOCKET SENT MESSAGE {obj}");
+            }
+        }
+        
+
+        private void ClientIDReceived(Guid obj)
+        {
+            Debug.Log($"ClientIDReceived={obj}");
+            clientID = obj;
+            client.RequestUserFromGuid(obj);
         }
 
         private static void RoomListReceived(List<Room> obj)
@@ -145,12 +168,12 @@ namespace Multiplayer.Controllers
         }
 
         // Start is called before the first frame update
-        public async void Connect(User userData, string password)
+        public async void Connect(string userName, string password)
         {
             Debug.Log("login");
             await client.Connect();
             StartCoroutine(nameof(StartConnection));
-            await client.Authenticate(userData.GetUserName(), password);
+            await client.Authenticate(userName, password);
         }
 
         public async Task StartConnection()
@@ -159,8 +182,19 @@ namespace Multiplayer.Controllers
             Debug.Log("Stopped Listening");
         }
 
+        public void RefreshRooms()
+        {
+            client.RequestRoomList();
+        }
+        
+        public void RefreshUsers()
+        {
+            client.UpdateUserList();
+        }
+
         public IEnumerator RefreshSubscribed()
         {
+            if (!refreshSubscribed) yield break;
             if (refresh) yield break;
             refresh = true;
             while (refresh)
@@ -178,7 +212,7 @@ namespace Multiplayer.Controllers
         }
 
         
-        public void GetRoomList()
+        public void RefreshRoomList()
         {
             Debug.Log("asked for rooms");
             client.RequestRoomList();
@@ -207,7 +241,16 @@ namespace Multiplayer.Controllers
             client.Disconnect();
             // await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Stop Web Socket", CancellationToken.None);
         }
-        
-        
+
+
+        public void SendMessageToRoom(Room room, string objMessage)
+        {
+            client.SendMessageToRoomAsync(room.GetGuid(), objMessage);
+        }
+
+        public void JoinRoom(Guid room)
+        {
+            client.RequestToAddUserToRoom(user, room);
+        }
     }
 }

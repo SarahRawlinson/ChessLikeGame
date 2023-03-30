@@ -105,9 +105,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8241131094022887647}
     m_Modifications:
+    - target: {fileID: 189257240771339268, guid: 3e11ea6d21b1b6644aca6ffa30689b49, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -325.00003
+      objectReference: {fileID: 0}
     - target: {fileID: 300827522317026222, guid: 3e11ea6d21b1b6644aca6ffa30689b49, type: 3}
       propertyPath: m_Name
       value: UserList
+      objectReference: {fileID: 0}
+    - target: {fileID: 2153848234888905013, guid: 3e11ea6d21b1b6644aca6ffa30689b49, type: 3}
+      propertyPath: m_Size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2153848234888905013, guid: 3e11ea6d21b1b6644aca6ffa30689b49, type: 3}
+      propertyPath: m_Value
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4754112684450684369, guid: 3e11ea6d21b1b6644aca6ffa30689b49, type: 3}
       propertyPath: m_Pivot.x
@@ -199,6 +211,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6690483000794606045, guid: 3e11ea6d21b1b6644aca6ffa30689b49, type: 3}
       propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6690483000794606045, guid: 3e11ea6d21b1b6644aca6ffa30689b49, type: 3}
+      propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

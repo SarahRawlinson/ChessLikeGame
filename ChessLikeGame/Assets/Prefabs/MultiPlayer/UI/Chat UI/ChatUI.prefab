@@ -443,6 +443,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3966121667470814056}
     m_Modifications:
+    - target: {fileID: 3862142477131955112, guid: 413d192a9b1588f48a1e7a163078cac3, type: 3}
+      propertyPath: m_Value
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5756215688702800774, guid: 413d192a9b1588f48a1e7a163078cac3, type: 3}
       propertyPath: m_Name
       value: ChatInfoPannel
@@ -529,6 +533,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8241131094022887647, guid: 413d192a9b1588f48a1e7a163078cac3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8404923375614726976, guid: 413d192a9b1588f48a1e7a163078cac3, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8404923375614726976, guid: 413d192a9b1588f48a1e7a163078cac3, type: 3}
+      propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using LibObjects;
 using MessageServer.Data;
 using Multiplayer.Controllers;
 using Multiplayer.View.DisplayData;
@@ -52,6 +53,12 @@ namespace Multiplayer.View.LoadData
                 }
             }
         }
+        
+        public void RefreshRooms()
+        {
+            Debug.Log("refreshed rooms button pressed");
+            FindObjectOfType<WebSocketConnection>().RefreshRooms();
+        }
 
         public void HideDisplay()
         {
@@ -60,7 +67,7 @@ namespace Multiplayer.View.LoadData
         
         public void ShowDisplay()
         {
-            FindObjectOfType<WebSocketConnection>().GetRoomList();
+            FindObjectOfType<WebSocketConnection>().RefreshRoomList();
             displayPanel.SetActive(true);
         }
         

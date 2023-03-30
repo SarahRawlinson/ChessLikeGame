@@ -1,3 +1,5 @@
+using System;
+using LibObjects;
 using Multiplayer.Controllers;
 using UnityEngine;
 
@@ -13,9 +15,9 @@ namespace Multiplayer.View.LoadData
             WebSocketConnection.onHostGame += StartGame;
         }
 
-        private void StartGame(int obj)
+        private void StartGame(Room obj)
         {
-            if (activeObject != null || obj == -1) return;
+            if (activeObject != null || obj != null) return;
             activeObject = Instantiate(createOnStartPrefab);
         }
 

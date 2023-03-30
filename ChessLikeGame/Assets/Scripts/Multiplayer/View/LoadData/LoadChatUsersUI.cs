@@ -51,6 +51,12 @@ namespace Multiplayer.View.LoadData
                 }
             }
         }
+        
+        public void RefreshUsers()
+        {
+            Debug.Log("refreshed users button pressed");
+            FindObjectOfType<WebSocketConnection>().RefreshUsers();
+        }
 
         public void AddHost(User user)
         {

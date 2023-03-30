@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using LibObjects;
 using MessageServer.Data;
 using Multiplayer.Controllers;
 using Multiplayer.View.DisplayData;
@@ -12,47 +13,52 @@ namespace Multiplayer.View.LoadData
     {
         [SerializeField] private ScrollContentUI _scrollContentUI;
         [SerializeField] private DisplayChatRoomUI _gameObjectPrefab;
-        private List<string> _rooms = new List<string>();
+        private List<Room> _rooms = new List<Room>();
         private List<DisplayChatRoomUI> _roomsUI = new List<DisplayChatRoomUI>();
 
         private void Start()
         {
             WebSocketConnection.onHostsList += ProcessHosts;
         }
-        
+
+        public void RefreshRooms()
+        {
+            Debug.Log("refreshed rooms button pressed");
+            FindObjectOfType<WebSocketConnection>().RefreshRooms();
+        }
 
         private void ProcessHosts(List<Room> obj)
         {
-            List<string> ls = new List<string>();
+            List<Room> ls = new List<Room>();
             foreach (var room in obj)
             {
-                ls.Add(room.RoomID.ToString());
+                ls.Add(room);
             }
-            List<string> activeUser = new List<string>();
-            
+            List<Room> activeRooms = new List<Room>();
+
             for (var index = _rooms.Count -1; index >= 0; index--)
             {
-                var user = _rooms[index];
-                if (((IList) ls).Contains(user))
+                var room = _rooms[index];
+                if (ls.Contains(room))
                 {
-                    activeUser.Add(user);
+                    activeRooms.Add(room);
                 }
                 else
                 {
-                    RemoveHost(user);
+                    RemoveHost(room);
                 }
             }
-            
+
             foreach (var u in ls)
             {
-                if (!activeUser.Contains(u))
+                if (!activeRooms.Contains(u))
                 {
                     AddHost(u);
                     
                 }
             }
         }
-        public void AddHost(string room)
+        public void AddHost(Room room)
         {
             _rooms.Add(room);
             GameObject gObject = _scrollContentUI.AddContent(_gameObjectPrefab.gameObject);
@@ -61,12 +67,12 @@ namespace Multiplayer.View.LoadData
             _roomsUI.Add(ui);
         }
         
-        public void RemoveHost(string room)
+        public void RemoveHost(Room user)
         {
             for (var index = 0; index < _rooms.Count; index++)
             {
                 var u = _rooms[index];
-                if (Equals(u, room))
+                if (Equals(u, user))
                 {
                     _rooms.Remove(u);
                     DisplayChatRoomUI ui = _roomsUI[index];
