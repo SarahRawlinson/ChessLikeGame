@@ -14,7 +14,7 @@ namespace Multiplayer.View.DisplayData
         public void SetRoom( Room room)
         {
             _room = room;
-            roomString.text = room.RoomID.ToString();
+            roomString.text = room.GetGuid().ToString();
         }
         
         public void StartChat()

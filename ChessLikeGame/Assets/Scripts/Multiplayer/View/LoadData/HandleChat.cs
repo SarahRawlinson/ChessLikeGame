@@ -84,7 +84,7 @@ namespace Multiplayer.View.LoadData
                 return;
             }
             //todo wait for validated response
-            FindObjectOfType<WebSocketConnection>().JoinRoom(room.RoomID);
+            FindObjectOfType<WebSocketConnection>().JoinRoom(room.GetGuid());
             GameObject obj =  Instantiate(prefab.gameObject, window);
             SendTextToWindow sendTextToWindow = obj.GetComponent<SendTextToWindow>();
             var value = new Chat(sendTextToWindow, room);
