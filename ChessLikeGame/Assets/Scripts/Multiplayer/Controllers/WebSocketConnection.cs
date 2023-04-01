@@ -21,10 +21,10 @@ namespace Multiplayer.Controllers
         public static event Action<(User user, string message)> onMessageRecieved;
         public static event Action<bool> onAuthenicate;
         public static event Action<List<MessageServer.Data.User>> onUsersList;
-        public static event Action<string> onUserJoinedGame;
-        public static event Action<string> onUserJoinedChat;
-        public static event Action<string> onUserLeftGame;
-        public static event Action<string> onUserLeftChat;
+        public static event Action<(User user, Guid roomGuid)> onUserJoinedGame;
+        public static event Action<(User user, Guid roomGuid)> onUserJoinedChat;
+        public static event Action<(User user, Guid roomGuid)> onUserLeftGame;
+        public static event Action<(User user, Guid roomGuid)> onUserLeftChat;
         public static event Action<List<Room>>onHostsList;
         public static event Action<List<Room>>onChatRoomList;
         public static event Action<Room> onHostGame;
@@ -46,7 +46,7 @@ namespace Multiplayer.Controllers
             client.onMessageRecievedEvent += MessageReceived;
             client.onAuthenticateEvent += Authentication;
             client.onUserListRecievedEvent += UserListReceived;
-            client.onUserJoinedEvent += UserJoined;
+            client.onUserJoinedRoomEvent += UserJoined;
             client.onUserLeftEvent += UserLeft;
             client.onRoomListRecievedEvent += RoomListReceived;
             client.onRoomCreatedEvent += CreatedRoom;
@@ -124,7 +124,7 @@ namespace Multiplayer.Controllers
             onChatRoomList?.Invoke(obj);
         }
 
-        private void UserLeft(string obj)
+        private void UserLeft((User user, Guid roomGuid) obj)
         {
             Debug.Log($"UserLeft={obj}");
             //TODO: WORK OUT WHICH
@@ -132,7 +132,7 @@ namespace Multiplayer.Controllers
             onUserLeftGame?.Invoke(obj);
         }
 
-        private void UserJoined(string obj)
+        private void UserJoined((User user, Guid id) obj)
         {
             Debug.Log($"UserJoined={obj}");
             //TODO: WORK OUT WHICH
