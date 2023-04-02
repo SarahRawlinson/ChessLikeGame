@@ -1,6 +1,7 @@
 ﻿using System;
 using LibObjects;
 using MessageServer.Data;
+using Multiplayer.Controllers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -22,6 +23,7 @@ namespace Multiplayer.View.DisplayData
 
         public void Join()
         {
+            FindObjectOfType<WebSocketConnection>().JoinRoom(_room.GetGuid());
             onJoinRoom?.Invoke(id);
         }
         

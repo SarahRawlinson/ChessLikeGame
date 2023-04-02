@@ -46,8 +46,8 @@ namespace Multiplayer.Controllers
             client.onMessageRecievedEvent += MessageReceived;
             client.onAuthenticateEvent += Authentication;
             client.onUserListRecievedEvent += UserListReceived;
-            client.onUserJoinedRoomEvent += UserJoined;
-            client.onUserLeftEvent += UserLeft;
+            client.onUserJoinedRoomEvent += UserJoinedRoom;
+            client.onUserLeftRoomEvent += UserLeftRoom;
             client.onRoomListRecievedEvent += RoomListReceived;
             client.onRoomCreatedEvent += CreatedRoom;
             client.onRoomJoinedEvent += JoinedRoom;
@@ -124,17 +124,17 @@ namespace Multiplayer.Controllers
             onChatRoomList?.Invoke(obj);
         }
 
-        private void UserLeft((User user, Guid roomGuid) obj)
+        private void UserLeftRoom((User user, Guid roomGuid) obj)
         {
-            Debug.Log($"UserLeft={obj}");
+            Debug.Log($"UserLeftRoom={obj}");
             //TODO: WORK OUT WHICH
             onUserLeftGame?.Invoke(obj);
             onUserLeftGame?.Invoke(obj);
         }
 
-        private void UserJoined((User user, Guid id) obj)
+        private void UserJoinedRoom((User user, Guid id) obj)
         {
-            Debug.Log($"UserJoined={obj}");
+            Debug.Log($"UserJoinedRoom={obj.user.GetUserName()}");
             //TODO: WORK OUT WHICH
             onUserJoinedChat?.Invoke(obj);
             onUserJoinedGame?.Invoke(obj);
@@ -173,7 +173,7 @@ namespace Multiplayer.Controllers
             Debug.Log("login");
             await client.Connect();
             StartCoroutine(nameof(StartConnection));
-            await client.Authenticate(userName, password);
+            await client.RequestAuthenticate(userName, password);
         }
 
         public async Task StartConnection()
@@ -189,7 +189,7 @@ namespace Multiplayer.Controllers
         
         public void RefreshUsers()
         {
-            client.UpdateUserList();
+            client.RequestUserList();
         }
 
         public IEnumerator RefreshSubscribed()
@@ -200,7 +200,7 @@ namespace Multiplayer.Controllers
             while (refresh)
             {
                 client.RequestRoomList();
-                client.UpdateUserList();
+                client.RequestUserList();
                 yield return new WaitForSeconds(5.0f);
             }
             Debug.Log("Stopped Asking Server For Updates");
@@ -220,12 +220,12 @@ namespace Multiplayer.Controllers
         
         public void CreateNewGameRoom(int roomSize, bool isPublic)
         {
-            client.CreateRoom("ChessGameRoom", roomSize, isPublic);
+            client.RequestCreateRoom("ChessGameRoom", roomSize, isPublic);
         }
         
         public void CreateNewChatRoom(int roomSize, bool isPublic)
         {
-            client.CreateRoom("ChessChatRoom", roomSize, isPublic);
+            client.RequestCreateRoom("ChessChatRoom", roomSize, isPublic);
         }
 
 

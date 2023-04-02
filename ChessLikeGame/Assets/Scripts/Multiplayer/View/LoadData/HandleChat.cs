@@ -38,11 +38,23 @@ namespace Multiplayer.View.LoadData
         {
             WebSocketConnection.onMessageRecieved += MessageReceivedFromSocket;
             WebSocketConnection.onChatRoomMessageRecieved += RoomMessageReceivedFromSocket;
+            WebSocketConnection.onUserLeftChat += UserLeftChat;
+            WebSocketConnection.onUserJoinedChat += UserJoinedChat;
+        }
+
+        private void UserLeftChat((User user, Guid roomGuid) obj)
+        {
+            chatsWithRooms[obj.roomGuid].window.SendMessageToUI("", $"{obj.user.GetUserName()} Has Left the Room");
+        }
+        
+        private void UserJoinedChat((User user, Guid roomGuid) obj)
+        {
+            chatsWithRooms[obj.roomGuid].window.SendMessageToUI("", $"{obj.user.GetUserName()} Has Joined the Room");
         }
 
         private void RoomMessageReceivedFromSocket((Room room, User user, string Message) obj)
         {
-            if (!chatsWithRooms.ContainsKey(obj.user.GetUserGuid()))
+            if (!chatsWithRooms.ContainsKey(obj.room.GetGuid()))
             {
                 chatsWithRooms[obj.room.GetGuid()].window.SendMessageToUI("", $"A new chat with {obj.user.GetUserName()} has started");
                 StartNewChatWithRoom(obj.room);
