@@ -43,19 +43,19 @@ namespace Multiplayer.Controllers
         private void Start()
         {
             client.SetDisconnectOnFailAuthentication(true);
-            client.onMessageRecievedEvent += MessageReceived;
-            client.onAuthenticateEvent += Authentication;
-            client.onUserListRecievedEvent += UserListReceived;
-            client.onUserJoinedRoomEvent += UserJoinedRoom;
-            client.onUserLeftRoomEvent += UserLeftRoom;
-            client.onRoomListRecievedEvent += RoomListReceived;
-            client.onRoomCreatedEvent += CreatedRoom;
-            client.onRoomJoinedEvent += JoinedRoom;
-            client.onRoomMessageRecievedEvent += RoomMessageReceived;
-            client.onIDRecievedEvent += ClientIDReceived;
-            client.onIncomingWebSocketMessage += LogMessageReceived;
-            client.onRecievedUserWithGuid += UserWithGuidReceived;
-            client.onMessageSentToSocket += LogMessageSent;
+            client.onRecievedMessageFromUserEvent += MessageReceived;
+            client.onReceivedAuthenticateEvent += Authentication;
+            client.onRecievedUserListEvent += UserListReceived;
+            client.onRecievedUserJoinedRoomEvent += UserJoinedRoom;
+            client.onRecievedUserLeftRoomEvent += UserLeftRoom;
+            client.onRecievedRoomListEvent += RoomListReceived;
+            client.onRecievedRoomCreatedEvent += CreatedRoom;
+            client.onRecievedRoomJoinedEvent += JoinedRoom;
+            client.onRecievedRoomMessageEvent += RoomMessageReceived;
+            client.onRecievedGuidEvent += ClientGuidReceived;
+            client.onIncomingWebSocketMessageEvent += LogMessageReceived;
+            client.onRecievedUserWithGuidEvent += UserWithGuidReceived;
+            client.onMessageSentToSocketEvent += LogMessageSent;
         }
 
         private void UserWithGuidReceived((User user, Guid guid) obj)
@@ -109,11 +109,10 @@ namespace Multiplayer.Controllers
         }
         
 
-        private void ClientIDReceived(Guid obj)
+        private void ClientGuidReceived(Guid obj)
         {
-            Debug.Log($"ClientIDReceived={obj}");
+            Debug.Log($"ClientGuidReceived={obj}");
             clientID = obj;
-            client.RequestUserFromGuid(obj);
         }
 
         private static void RoomListReceived(List<Room> obj)
@@ -208,7 +207,7 @@ namespace Multiplayer.Controllers
         
         public void SendMessageToUser(User user, string Message)
         {
-            client.SendMessageToUser(user, Message);
+            client.RequestSendMessageToUser(user, Message);
         }
 
         
@@ -245,7 +244,7 @@ namespace Multiplayer.Controllers
 
         public void SendMessageToRoom(Room room, string objMessage)
         {
-            client.SendMessageToRoomAsync(room.GetGuid(), objMessage);
+            client.RequestSendMessageToRoomAsync(room.GetGuid(), objMessage);
         }
 
         public void JoinRoom(Guid room)
