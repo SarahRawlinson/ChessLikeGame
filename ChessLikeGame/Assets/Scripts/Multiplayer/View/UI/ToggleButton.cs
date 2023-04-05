@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Multiplayer.View.UI
 {
@@ -7,7 +8,7 @@ namespace Multiplayer.View.UI
     {
         [SerializeField] string onText;
         [SerializeField] string offText;
-        [SerializeField] bool on;
+        [FormerlySerializedAs("on")] [SerializeField] bool isOn;
         [SerializeField] private TMP_Text _tmpText;
 
         private void Start()
@@ -17,17 +18,23 @@ namespace Multiplayer.View.UI
 
         public bool IsOn()
         {
-            return on;
+            return isOn;
+        }
+
+        public void SetIsOn(bool on)
+        {
+            isOn = on;
+            UpdateText();
         }
 
         public void UpdateText()
         {
-            _tmpText.text = on ? onText : offText;
+            _tmpText.text = isOn ? onText : offText;
         }
 
         public void Toggle()
         {
-            on = !on;
+            isOn = !isOn;
             UpdateText();
         }
     }

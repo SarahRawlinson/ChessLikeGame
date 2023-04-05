@@ -18,7 +18,7 @@ namespace Multiplayer.View.LoadData
 
         private void Start()
         {
-            WebSocketConnection.onHostsList += ProcessHosts;
+            WebSocketConnection.onChatRoomList += ProcessHosts;
         }
 
         public void RefreshRooms()

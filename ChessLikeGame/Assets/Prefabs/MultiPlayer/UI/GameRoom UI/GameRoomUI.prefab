@@ -493,7 +493,7 @@ GameObject:
   - component: {fileID: 1504337201093034680}
   - component: {fileID: 5997596925631075451}
   m_Layer: 5
-  m_Name: HostGameRoomUI
+  m_Name: GameRoomUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -10,19 +10,21 @@ namespace Multiplayer.View.UI
 {
     public class SendTextToWindow : MonoBehaviour
     {
-        
+        [SerializeField] private GameObject ActivateOnOpen;
         [SerializeField] private TMP_InputField _inputField;
         [FormerlySerializedAs("_chatMessageUIPrefab")] [SerializeField] private DisplayChatMessageUI displayChatMessageUIPrefab;
         [SerializeField] private ScrollContentUI _scrollContentUI;
         [SerializeField] private TMP_Text header;
         private WindowType _user;
+        private string _userName = "Me";
 
         public event Action<(WindowType user, string message)> onSendMessage;
 
-        public void SetChattingWith(string with, WindowType user)
+        public void SetChattingWith(string with, WindowType user, string userName)
         {
             _user = user;
             header.text = $"Chatting with {with}";
+            _userName = userName;
         }
         public void SendMessageToUI(string user, string message)
         {
@@ -34,7 +36,10 @@ namespace Multiplayer.View.UI
         public void SendMessage()
         {
             onSendMessage?.Invoke((_user, _inputField.text));
-            SendMessageToUI("Me",_inputField.text);
+            if (_user.IsUser)
+            {
+                SendMessageToUI(_userName,_inputField.text);
+            }
             _inputField.text = "";
         }
         
@@ -60,6 +65,16 @@ namespace Multiplayer.View.UI
                 _room = room;
                 isUser = false;
             }
+        }
+
+        public void Show()
+        {
+            ActivateOnOpen.SetActive(true);
+        }
+        
+        public void Hide()
+        {
+            ActivateOnOpen.SetActive(false);
         }
     }
 }

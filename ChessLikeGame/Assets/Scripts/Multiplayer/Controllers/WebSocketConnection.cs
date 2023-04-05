@@ -6,56 +6,142 @@ using System.Threading;
 using System.Threading.Tasks;
 using LibObjects;
 using MessageServer.Data;
+using Multiplayer.View.DisplayData;
 using NetClient;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 
 namespace Multiplayer.Controllers
 {
     public class WebSocketConnection : MonoBehaviour
     {
-        private ClientWebSocket webSocket;
-
-        private readonly Client client = new Client();
-
+        private const string GameRoomMeta = "ChessGameRoom";
+        private const string ChatRoomMeta = "ChatApp";
         public static event Action<(User user, string message)> onMessageRecieved;
         public static event Action<bool> onAuthenicate;
-        public static event Action<List<MessageServer.Data.User>> onUsersList;
-        public static event Action<(User user, Guid roomGuid)> onUserJoinedGame;
-        public static event Action<(User user, Guid roomGuid)> onUserJoinedChat;
-        public static event Action<(User user, Guid roomGuid)> onUserLeftGame;
-        public static event Action<(User user, Guid roomGuid)> onUserLeftChat;
+        public static event Action<List<User>> onUsersList;
+        public static event Action<(User user, Guid roomGuid)> onUserJoinedRoom;
+        public static event Action<(User user, Guid roomGuid)> onUserLeftRoom;
         public static event Action<List<Room>>onHostsList;
         public static event Action<List<Room>>onChatRoomList;
         public static event Action<Room> onHostGame;
         public static event Action<Room> onHostChat;
-        public static event Action<Room> onJoinedGame;
+        
+        public static event Action<Room> onRecievedYouWhereRemovedFromTheRoom;
+        public static event Action<Room> onRecievedYouHaveBeenBannedFromRoom;
+        public static event Action<Room> onRecievedYouAreNoLongerBannedFromRoom;
+        public static event Action<Room> onRecievedYouHaveBeenApprovedForRoom;
+        public static event Action<Room> onRecievedYouAreNoLongerApprovedForRoom;
+        
+        public static event Action<Room> onRecievedRoomLeft;
+        
         public static event Action<Room> onJoinedChat;
+        
+        public static event Action<Room> onJoinedGame;
         public static event Action<(Room room, User user, string Message)> onChatRoomMessageRecieved;
         public static event Action<(Room room, User user, string Message)> onGameRoomMessageRecieved;
+        public static event Action<(User user, string messageSent)> onReceivedCommunicationToAll;
+        public static event Action<Room> onRoomDestroyed;
+        public static event Action<(Room room, List<User> users)> onReceivedUsersListInRoom;
+        public static event Action<User> onSetUser;
+
+
         [SerializeField] private bool refreshSubscribed = false;
-        
-        
-        
+        [SerializeField] private float refreshTime = 10f;
         public User user { get; set; }
         private Guid clientID = Guid.Empty;
         private bool refresh;
+        private ClientWebSocket webSocket;
+        private readonly Client client = new Client();
+        
         private void Start()
         {
             client.SetDisconnectOnFailAuthentication(true);
             client.onRecievedMessageFromUserEvent += MessageReceived;
             client.onReceivedAuthenticateEvent += Authentication;
+            client.onRecievedRoomDestroyedEvent += RoomDestroyed;
             client.onRecievedUserListEvent += UserListReceived;
             client.onRecievedUserJoinedRoomEvent += UserJoinedRoom;
             client.onRecievedUserLeftRoomEvent += UserLeftRoom;
             client.onRecievedRoomListEvent += RoomListReceived;
             client.onRecievedRoomCreatedEvent += CreatedRoom;
+            client.onRecievedRemovedFromTheRoomEvent += RemovedFromTheRoom;
+            client.onRecievedBannedFromRoomEvent += BannedFromTheRoom;
+            client.onRecievedNoLongerBannedFromRoomEvent += NoLongerBannedFromRoom;
+            client.onRecievedApprovedForRoomEvent += ApprovedForRoom;
+            client.onRecievedNoLongerApprovedForRoomEvent += NoLongerApprovedForRoom;
             client.onRecievedRoomJoinedEvent += JoinedRoom;
+            client.onRecievedRoomLeftEvent += RoomLeft;
             client.onRecievedRoomMessageEvent += RoomMessageReceived;
+            client.onReceivedUsersListInRoomEvent += UsersInRoom;
+            client.onReceivedMessageWasReceivedByUserEvent += ReceivedMessageWasReceivedByUser;
+            client.onReceivedCommunicationToAllEvent += ReceivedCommunicationToAll;
+            client.onReceivedErrorResponseFromServerEvent += ReceivedErrorResponseFromServer;
             client.onRecievedGuidEvent += ClientGuidReceived;
             client.onIncomingWebSocketMessageEvent += LogMessageReceived;
             client.onRecievedUserWithGuidEvent += UserWithGuidReceived;
             client.onMessageSentToSocketEvent += LogMessageSent;
+        }
+
+        private void RoomLeft(Room obj)
+        {
+            onRecievedRoomLeft?.Invoke(obj);
+        }
+
+        private void NoLongerApprovedForRoom(Room obj)
+        {
+            onRecievedYouAreNoLongerApprovedForRoom?.Invoke(obj);
+        }
+
+        private void ApprovedForRoom(Room obj)
+        {
+            onRecievedYouHaveBeenApprovedForRoom?.Invoke(obj);
+        }
+
+        private void NoLongerBannedFromRoom(Room obj)
+        {
+            onRecievedYouAreNoLongerBannedFromRoom?.Invoke(obj);
+        }
+
+        private void BannedFromTheRoom(Room obj)
+        {
+            onRecievedYouHaveBeenBannedFromRoom?.Invoke(obj);
+        }
+
+        private void RemovedFromTheRoom(Room obj)
+        {
+            onRecievedYouWhereRemovedFromTheRoom?.Invoke(obj);
+        }
+
+        public User GetClientUser()
+        {
+            return user;
+        }
+
+        private void ReceivedErrorResponseFromServer((CommunicationTypeEnum comEnum, string message) obj)
+        {
+            Debug.Log($"{obj.comEnum.ToString()}");
+        }
+
+        private void ReceivedMessageWasReceivedByUser((User user, string messageSent) obj)
+        {
+            Debug.Log($"{obj.user.GetUserName()} received message: {obj.messageSent}");
+        }
+
+        private void ReceivedCommunicationToAll((User user, string messageSent) obj)
+        {
+            onReceivedCommunicationToAll?.Invoke(obj);
+        }
+
+        private void UsersInRoom((Room room, List<User> users) obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void RoomDestroyed(Room obj)
+        {
+            onRoomDestroyed?.Invoke(obj);
         }
 
         private void UserWithGuidReceived((User user, Guid guid) obj)
@@ -69,25 +155,40 @@ namespace Multiplayer.Controllers
         private void RoomMessageReceived((Room room, User user, string Message) obj)
         {
             Debug.Log($"RoomMessageReceived={obj}");
-            //TODO: WORK OUT WHICH
-            onChatRoomMessageRecieved?.Invoke(obj);
-            onGameRoomMessageRecieved?.Invoke(obj);
+            if (obj.room.GetMeta() == ChatRoomMeta)
+            {
+                onChatRoomMessageRecieved?.Invoke(obj);
+            }
+            if (obj.room.GetMeta() == GameRoomMeta)
+            {
+                onGameRoomMessageRecieved?.Invoke(obj);
+            }
         }
 
         private void JoinedRoom(Room obj)
         {
             Debug.Log($"JoinedRoom={obj}");
-            //TODO: WORK OUT WHICH
-            onJoinedGame?.Invoke(obj);
-            onJoinedChat?.Invoke(obj);
+            if (obj.GetMeta() == ChatRoomMeta)
+            {
+                onJoinedChat?.Invoke(obj);
+            }
+            if (obj.GetMeta() == GameRoomMeta)
+            {
+                onJoinedGame?.Invoke(obj);
+            }
         }
 
         private void CreatedRoom(Room obj)
         {
             Debug.Log($"CreatedRoom={obj}");
-            //TODO: WORK OUT WHICH
-            onHostGame?.Invoke(obj);
-            onHostChat?.Invoke(obj);
+            if (obj.GetMeta() == ChatRoomMeta)
+            {
+                onHostChat?.Invoke(obj);
+            }
+            if (obj.GetMeta() == GameRoomMeta)
+            {
+                onHostGame?.Invoke(obj);
+            }
         }
 
         private void LogMessageReceived(string obj)
@@ -125,20 +226,18 @@ namespace Multiplayer.Controllers
         {
             Debug.Log($"UserLeftRoom={obj}");
             //TODO: WORK OUT WHICH
-            onUserLeftGame?.Invoke(obj);
-            onUserLeftGame?.Invoke(obj);
+            onUserLeftRoom?.Invoke(obj);
         }
 
         private void UserJoinedRoom((User user, Guid id) obj)
         {
             Debug.Log($"UserJoinedRoom={obj.user.GetUserName()}");
             //TODO: WORK OUT WHICH
-            onUserJoinedChat?.Invoke(obj);
-            onUserJoinedGame?.Invoke(obj);
+            onUserJoinedRoom?.Invoke(obj);
         }
 
 
-        private static void UserListReceived(List<MessageServer.Data.User> obj)
+        private static void UserListReceived(List<User> obj)
         {
             onUsersList?.Invoke(obj);
         }
@@ -195,9 +294,14 @@ namespace Multiplayer.Controllers
             refresh = true;
             while (refresh)
             {
+                foreach (var display in FindObjectsOfType<DisplayChatRoomUI>())
+                {
+                    display.AskForUsersOfRoom(this);
+                }
+                yield return new WaitForSeconds(5f);
                 client.RequestRoomList();
                 client.RequestUserList();
-                yield return new WaitForSeconds(5.0f);
+                yield return new WaitForSeconds(refreshTime);
             }
             Debug.Log("Stopped Asking Server For Updates");
         }
@@ -216,12 +320,12 @@ namespace Multiplayer.Controllers
         
         public void CreateNewGameRoom(int roomSize, bool isPublic, string nameOfRoom)
         {
-            client.RequestCreateRoom("ChessGameRoom", roomSize, isPublic, nameOfRoom);
+            client.RequestCreateRoom(GameRoomMeta, roomSize, isPublic, nameOfRoom);
         }
         
         public void CreateNewChatRoom(int roomSize, bool isPublic, string nameOfRoom)
         {
-            client.RequestCreateRoom("ChessChatRoom", roomSize, isPublic, nameOfRoom);
+            client.RequestCreateRoom(ChatRoomMeta, roomSize, isPublic, nameOfRoom);
         }
 
 
@@ -246,6 +350,16 @@ namespace Multiplayer.Controllers
         public void JoinRoom(Guid room)
         {
             client.RequestToAddUserToRoom(user, room);
+        }
+
+        public void AskForUsers(Room room)
+        {
+            client.RequestGetUsersInRoomAsync(room.GetGuid());
+        }
+
+        public void LeaveRoom(Room room)
+        {
+            client.RequestRemoveUserFromRoom(room, user);
         }
     }
 }
