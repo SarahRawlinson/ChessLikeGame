@@ -16,7 +16,7 @@ namespace Multiplayer.Controllers
     {
         private ClientWebSocket webSocket;
 
-        private Client client = new Client();
+        private readonly Client client = new Client();
 
         public static event Action<(User user, string message)> onMessageRecieved;
         public static event Action<bool> onAuthenicate;
@@ -117,8 +117,6 @@ namespace Multiplayer.Controllers
 
         private static void RoomListReceived(List<Room> obj)
         {
-            // Debug.Log($"RoomListReceived={obj}");
-            //TODO: WORK OUT WHICH
             onHostsList?.Invoke(obj);
             onChatRoomList?.Invoke(obj);
         }
@@ -142,7 +140,6 @@ namespace Multiplayer.Controllers
 
         private static void UserListReceived(List<MessageServer.Data.User> obj)
         {
-            // Debug.Log($"UserListReceived={obj}");
             onUsersList?.Invoke(obj);
         }
 
@@ -167,7 +164,7 @@ namespace Multiplayer.Controllers
         }
 
         // Start is called before the first frame update
-        public async void Connect(string userName, string password)
+        public async Task Connect(string userName, string password)
         {
             Debug.Log("login");
             await client.Connect();
@@ -217,14 +214,14 @@ namespace Multiplayer.Controllers
             client.RequestRoomList();
         }
         
-        public void CreateNewGameRoom(int roomSize, bool isPublic)
+        public void CreateNewGameRoom(int roomSize, bool isPublic, string nameOfRoom)
         {
-            client.RequestCreateRoom("ChessGameRoom", roomSize, isPublic);
+            client.RequestCreateRoom("ChessGameRoom", roomSize, isPublic, nameOfRoom);
         }
         
-        public void CreateNewChatRoom(int roomSize, bool isPublic)
+        public void CreateNewChatRoom(int roomSize, bool isPublic, string nameOfRoom)
         {
-            client.RequestCreateRoom("ChessChatRoom", roomSize, isPublic);
+            client.RequestCreateRoom("ChessChatRoom", roomSize, isPublic, nameOfRoom);
         }
 
 
@@ -238,7 +235,6 @@ namespace Multiplayer.Controllers
         {
             refresh = false;
             client.Disconnect();
-            // await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Stop Web Socket", CancellationToken.None);
         }
 
 
