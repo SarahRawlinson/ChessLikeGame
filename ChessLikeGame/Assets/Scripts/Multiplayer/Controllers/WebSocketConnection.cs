@@ -40,6 +40,8 @@ namespace Multiplayer.Controllers
         public static event Action<(User user, string messageSent)> onReceivedCommunicationToAll;
         public static event Action<Room> onRoomDestroyed;
         public static event Action<(Room room, List<User> users)> onReceivedUsersListInRoom;
+        public static event Action<(Room room, List<User> users)> onReceivedApprovedUsersListInRoom;
+        public static event Action<(Room room, List<User> users)> onReceivedBannedUsersListInRoom;
         public static event Action<User> onSetUser;
 
         [SerializeField] private bool refreshSubscribed = false;
@@ -77,7 +79,20 @@ namespace Multiplayer.Controllers
             client.onIncomingWebSocketMessageEvent += LogMessageReceived;
             client.onRecievedUserWithGuidEvent += UserWithGuidReceived;
             client.onMessageSentToSocketEvent += LogMessageSent;
+            client.onReceivedApprovedUsersListInRoomEvent += ApprovedUsersInRoom;
+            client.onReceivedBannedUsersListInRoomEvent += BannedUsersInRoom;
         }
+
+        private void BannedUsersInRoom((Room room, List<User> users) obj)
+        {
+            onReceivedBannedUsersListInRoom?.Invoke(obj);
+        }
+
+        private void ApprovedUsersInRoom((Room room, List<User> users) obj)
+        {
+            onReceivedApprovedUsersListInRoom?.Invoke(obj);
+        }
+
 
         private void RoomLeft(Room obj)
         {
@@ -379,6 +394,46 @@ namespace Multiplayer.Controllers
         public void LeaveRoom(Room room)
         {
             client.RequestRemoveUserFromRoom(room, user);
+        }
+
+        public void ApproveUser(User selectedUser, Room windowInfoRoom)
+        {
+            client.RequestApproveUserFromRoom(windowInfoRoom, selectedUser);
+        }
+        
+        public void RemoveApproveUser(User selectedUser, Room windowInfoRoom)
+        {
+            client.RequestRemoveApproveFromUserInRoom(windowInfoRoom, selectedUser);
+        }
+        
+        public void BanUser(User selectedUser, Room windowInfoRoom)
+        {
+            client.RequestBanUserFromRoom(windowInfoRoom, selectedUser);
+        }
+        
+        public void UnbanUser(User selectedUser, Room windowInfoRoom)
+        {
+            client.RequestRemoveBanFromUserInRoom(windowInfoRoom, selectedUser);
+        }
+        
+        public void AddUser(User selectedUser, Room windowInfoRoom)
+        {
+            client.RequestToAddUserToRoom(selectedUser, windowInfoRoom.GetGuid());
+        }
+        
+        public void RemoveUser(User selectedUser, Room windowInfoRoom)
+        {
+            client.RequestRemoveUserFromRoom(windowInfoRoom, selectedUser);
+        }
+        
+        public void GetBannedUsers(Room room)
+        {
+            client.RequestGetBannedUsersInRoomAsync(room.GetGuid());
+        }
+        
+        public void GetApprovedUsers(Room room)
+        {
+            client.RequestGetApprovedUsersInRoomAsync(room.GetGuid());
         }
     }
 }

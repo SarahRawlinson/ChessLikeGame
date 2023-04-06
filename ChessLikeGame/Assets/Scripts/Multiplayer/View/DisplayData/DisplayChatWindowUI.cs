@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using LibObjects;
 using MessageServer.Data;
+using Multiplayer.Controllers;
 using Multiplayer.View.LoadData;
 using Multiplayer.View.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Multiplayer.View.DisplayData
 {
@@ -16,16 +19,24 @@ namespace Multiplayer.View.DisplayData
         [SerializeField] private ScrollContentUI _scrollContentUI;
         [SerializeField] private TMP_Text header;
         [SerializeField] private GameObject menuGameObject;
-        [SerializeField] private ToggleButton toggleButton;
+        [FormerlySerializedAs("toggleButton")] [SerializeField] private ToggleButton toggleMenuButton;
         [SerializeField] private LoadChatUsersUI chatUsersList;
-        private WindowType _user;
+        [SerializeField] private ToggleButton joinUserToggleButton;
+        [SerializeField] private ToggleButton approveUserToggleButton;
+        [SerializeField] private ToggleButton banUserToggleButton;
+        [SerializeField] private TMP_Text userNameText;
+        private WindowType windowInfo;
         private string _userName = "Me";
+        private User selectedUser = null;
+        private List<Guid> usersInRoom = new List<Guid>();
+        private List<Guid> approvedUsersInRoom = new List<Guid>();
+        private List<Guid> bannedUsersInRoom = new List<Guid>();
 
         public event Action<(WindowType user, string message)> onSendMessage;
 
         public void SetChattingWith(string with, WindowType user, string userName)
         {
-            _user = user;
+            windowInfo = user;
             header.text = $"Chatting with {with}";
             _userName = userName;
         }
@@ -38,8 +49,8 @@ namespace Multiplayer.View.DisplayData
 
         public void SendMessage()
         {
-            onSendMessage?.Invoke((_user, _inputField.text));
-            if (_user.IsUser)
+            onSendMessage?.Invoke((windowInfo, _inputField.text));
+            if (windowInfo.IsUser)
             {
                 SendMessageToUI(_userName,_inputField.text);
             }
@@ -82,9 +93,54 @@ namespace Multiplayer.View.DisplayData
 
         private void Start()
         {
-            menuGameObject.SetActive(toggleButton.IsOn());
+            menuGameObject.SetActive(toggleMenuButton.IsOn());
             chatUsersList.onCreatedUserUI += UserUICreated;
             chatUsersList.onCreatedUserUI += UserUIDestroyed;
+            WebSocketConnection.onReceivedUsersListInRoom += RoomUsersReceived;
+            WebSocketConnection.onReceivedBannedUsersListInRoom += RoomBannedUsersReceived;
+            WebSocketConnection.onReceivedApprovedUsersListInRoom += RoomApprovedUsersReceived;
+        }
+
+        private void RoomUsersReceived((Room room, List<User> users) obj)
+        {
+            if (windowInfo.IsUser) return;
+            usersInRoom = new List<Guid>();
+            if (obj.room.GetGuid() == windowInfo.Room.GetGuid())
+            {
+                foreach (var user in obj.users)
+                {
+                    usersInRoom.Add(user.GetUserGuid());
+                }
+            }
+            UpdateUserOptionsMenu(selectedUser);
+        }
+        
+        private void RoomApprovedUsersReceived((Room room, List<User> users) obj)
+        {
+            if (windowInfo.IsUser) return;
+            approvedUsersInRoom = new List<Guid>();
+            if (obj.room.GetGuid() == windowInfo.Room.GetGuid())
+            {
+                foreach (var user in obj.users)
+                {
+                    approvedUsersInRoom.Add(user.GetUserGuid());
+                }
+            }
+            UpdateUserOptionsMenu(selectedUser);
+        }
+        
+        private void RoomBannedUsersReceived((Room room, List<User> users) obj)
+        {
+            if (windowInfo.IsUser) return;
+            bannedUsersInRoom = new List<Guid>();
+            if (obj.room.GetGuid() == windowInfo.Room.GetGuid())
+            {
+                foreach (var user in obj.users)
+                {
+                    bannedUsersInRoom.Add(user.GetUserGuid());
+                }
+            }
+            UpdateUserOptionsMenu(selectedUser);
         }
 
         private void UserUIDestroyed(DisplayChatUserUI obj)
@@ -94,18 +150,73 @@ namespace Multiplayer.View.DisplayData
 
         private void UserSelected(User obj)
         {
-            
+            selectedUser = obj;
+            UpdateUserOptionsMenu(obj);
+            WebSocketConnection webSocketConnection = FindObjectOfType<WebSocketConnection>();
+            webSocketConnection.GetApprovedUsers(windowInfo.Room);
+            webSocketConnection.GetBannedUsers(windowInfo.Room);
+            webSocketConnection.AskForUsers(windowInfo.Room);
+        }
+
+        private void UpdateUserOptionsMenu(User obj)
+        {
+            joinUserToggleButton.SetIsOn(!usersInRoom.Contains(obj.GetUserGuid()));
+            banUserToggleButton.SetIsOn(!bannedUsersInRoom.Contains(obj.GetUserGuid()));
+            approveUserToggleButton.SetIsOn(!approvedUsersInRoom.Contains(obj.GetUserGuid()));
         }
 
         private void UserUICreated(DisplayChatUserUI obj)
         {
             obj.onSelectedUser -= UserSelected;
+            var user = obj.GetUser();
         }
 
         public void ToggleMenu()
         {
-            toggleButton.Toggle();
-            menuGameObject.SetActive(toggleButton.IsOn());
+            toggleMenuButton.Toggle();
+            menuGameObject.SetActive(toggleMenuButton.IsOn());
+        }
+
+        public void ApproveUser()
+        {
+            if (windowInfo.IsUser || selectedUser == null) return;
+            approveUserToggleButton.Toggle();
+            if (approveUserToggleButton.IsOn())
+            {
+                FindObjectOfType<WebSocketConnection>().ApproveUser(selectedUser, windowInfo.Room);
+            }
+            else
+            {
+                FindObjectOfType<WebSocketConnection>().RemoveApproveUser(selectedUser, windowInfo.Room);
+            }
+        }
+        
+        public void BanUser()
+        {
+            if (windowInfo.IsUser || selectedUser == null) return;
+            banUserToggleButton.Toggle();
+            if (banUserToggleButton.IsOn())
+            {
+                FindObjectOfType<WebSocketConnection>().BanUser(selectedUser, windowInfo.Room);
+            }
+            else
+            {
+                FindObjectOfType<WebSocketConnection>().UnbanUser(selectedUser, windowInfo.Room);
+            }
+        }
+        
+        public void AddUser()
+        {
+            if (windowInfo.IsUser || selectedUser == null) return;
+            joinUserToggleButton.Toggle();
+            if (joinUserToggleButton.IsOn())
+            {
+                FindObjectOfType<WebSocketConnection>().AddUser(selectedUser, windowInfo.Room);
+            }
+            else
+            {
+                FindObjectOfType<WebSocketConnection>().RemoveUser(selectedUser, windowInfo.Room);
+            }
         }
     }
 }
