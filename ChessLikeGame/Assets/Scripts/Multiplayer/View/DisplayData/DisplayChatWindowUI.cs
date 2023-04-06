@@ -1,20 +1,23 @@
 using System;
 using LibObjects;
 using MessageServer.Data;
-using Multiplayer.View.DisplayData;
+using Multiplayer.View.LoadData;
+using Multiplayer.View.UI;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Multiplayer.View.UI
+namespace Multiplayer.View.DisplayData
 {
-    public class SendTextToWindow : MonoBehaviour
+    public class DisplayChatWindowUI : MonoBehaviour
     {
         [SerializeField] private GameObject ActivateOnOpen;
         [SerializeField] private TMP_InputField _inputField;
-        [FormerlySerializedAs("_chatMessageUIPrefab")] [SerializeField] private DisplayChatMessageUI displayChatMessageUIPrefab;
+        [SerializeField] private DisplayChatMessageUI displayChatMessageUIPrefab;
         [SerializeField] private ScrollContentUI _scrollContentUI;
         [SerializeField] private TMP_Text header;
+        [SerializeField] private GameObject menuGameObject;
+        [SerializeField] private ToggleButton toggleButton;
+        [SerializeField] private LoadChatUsersUI chatUsersList;
         private WindowType _user;
         private string _userName = "Me";
 
@@ -75,6 +78,34 @@ namespace Multiplayer.View.UI
         public void Hide()
         {
             ActivateOnOpen.SetActive(false);
+        }
+
+        private void Start()
+        {
+            menuGameObject.SetActive(toggleButton.IsOn());
+            chatUsersList.onCreatedUserUI += UserUICreated;
+            chatUsersList.onCreatedUserUI += UserUIDestroyed;
+        }
+
+        private void UserUIDestroyed(DisplayChatUserUI obj)
+        {
+            obj.onSelectedUser += UserSelected;
+        }
+
+        private void UserSelected(User obj)
+        {
+            
+        }
+
+        private void UserUICreated(DisplayChatUserUI obj)
+        {
+            obj.onSelectedUser -= UserSelected;
+        }
+
+        public void ToggleMenu()
+        {
+            toggleButton.Toggle();
+            menuGameObject.SetActive(toggleButton.IsOn());
         }
     }
 }

@@ -1,6 +1,8 @@
+using System;
 using MessageServer.Data;
 using Multiplayer.View.LoadData;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -8,8 +10,9 @@ namespace Multiplayer.View.DisplayData
 {
     public class DisplayChatUserUI : MonoBehaviour
     {
-        [FormerlySerializedAs("user")] [SerializeField] private TMP_Text userText;
+        [SerializeField] private TMP_Text userText;
         private User _user;
+        public event Action<User> onSelectedUser; 
 
         public void SetUser(User user)
         {
@@ -17,9 +20,14 @@ namespace Multiplayer.View.DisplayData
             userText.text = user.GetUserName();
         }
 
-        public void StartChat()
+        public void SelectedEvent()
         {
-            FindObjectOfType<HandleChat>().StartNewChatWithUser(_user);
+            onSelectedUser?.Invoke(_user);
+        }
+
+        public User GetUser()
+        {
+            return _user;
         }
     }
 }

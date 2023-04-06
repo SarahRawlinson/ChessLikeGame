@@ -1,9 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using MessageServer.Data;
 using Multiplayer.Controllers;
 using Multiplayer.View.DisplayData;
 using Multiplayer.View.UI;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Multiplayer.View.LoadData
@@ -14,6 +16,8 @@ namespace Multiplayer.View.LoadData
         [SerializeField] private DisplayChatUserUI _gameObjectPrefab;
         private List<User> _users = new List<User>();
         private List<DisplayChatUserUI> _usersUI = new List<DisplayChatUserUI>();
+        public event Action<DisplayChatUserUI> onCreatedUserUI; 
+        public event Action<DisplayChatUserUI> onDestroyedUserUI; 
 
         private void Start()
         {
@@ -23,10 +27,12 @@ namespace Multiplayer.View.LoadData
         private void ProcessUsers(List<User> obj)
         {
             var ls = new List<User>();
-            foreach (var user in obj)
+            for (var index = 0; index < obj.Count; index++)
             {
+                var user = obj[index];
                 ls.Add(user);
             }
+
             List<User> activeUser = new List<User>();
             
             for (var index = _users.Count -1; index >= 0; index--)
@@ -41,13 +47,13 @@ namespace Multiplayer.View.LoadData
                     RemoveHost(user);
                 }
             }
-            
-            foreach (var u in ls)
+
+            for (var index = 0; index < ls.Count; index++)
             {
+                var u = ls[index];
                 if (!activeUser.Contains(u))
                 {
                     AddHost(u);
-                    
                 }
             }
         }
@@ -65,8 +71,14 @@ namespace Multiplayer.View.LoadData
             DisplayChatUserUI ui = gObject.GetComponent<DisplayChatUserUI>();
             ui.SetUser(user);
             _usersUI.Add(ui);
+            onCreatedUserUI?.Invoke(ui);
         }
-        
+
+        public List<DisplayChatUserUI> GetUsersUI()
+        {
+            return _usersUI;
+        }
+
         public void RemoveHost(User user)
         {
             for (var index = 0; index < _users.Count; index++)
@@ -74,8 +86,9 @@ namespace Multiplayer.View.LoadData
                 var u = _users[index];
                 if (Equals(u, user))
                 {
-                    _users.Remove(u);
                     DisplayChatUserUI ui = _usersUI[index];
+                    onDestroyedUserUI?.Invoke(ui);
+                    _users.Remove(u);
                     _usersUI.Remove(ui);
                     Destroy(ui.gameObject);
                 }

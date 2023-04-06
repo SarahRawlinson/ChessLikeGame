@@ -436,6 +436,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   window: {fileID: 7013806166219672425}
   prefab: {fileID: 158502129332829577, guid: 4cb408ea78042384ab3ac5261b2c5b7d, type: 3}
+  chatUsersList: {fileID: 3625614976209391217}
 --- !u!1001 &1654782307574785466
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -443,10 +444,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3966121667470814056}
     m_Modifications:
-    - target: {fileID: 3862142477131955112, guid: 413d192a9b1588f48a1e7a163078cac3, type: 3}
-      propertyPath: m_Value
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5756215688702800774, guid: 413d192a9b1588f48a1e7a163078cac3, type: 3}
       propertyPath: m_Name
       value: ChatInfoPannel
@@ -535,16 +532,19 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8404923375614726976, guid: 413d192a9b1588f48a1e7a163078cac3, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8404923375614726976, guid: 413d192a9b1588f48a1e7a163078cac3, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 413d192a9b1588f48a1e7a163078cac3, type: 3}
+--- !u!114 &3625614976209391217 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2640853350070135755, guid: 413d192a9b1588f48a1e7a163078cac3, type: 3}
+  m_PrefabInstance: {fileID: 1654782307574785466}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66aa55722c334d4aa902bd060ecea0c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &7253212868734205285 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8241131094022887647, guid: 413d192a9b1588f48a1e7a163078cac3, type: 3}

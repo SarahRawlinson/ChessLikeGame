@@ -13,6 +13,7 @@ namespace Multiplayer.View.LoadData
         [SerializeField] private GameObject loginButton;
         [SerializeField] private GameObject hostGameButton;
         [SerializeField] private GameObject joinGameButton;
+        [SerializeField] private GameObject logOutButton;
         [SerializeField] private GameObject startMenuDisplay;
         [SerializeField] private GameObject chatMenuDisplay;
 
@@ -27,10 +28,17 @@ namespace Multiplayer.View.LoadData
             joinGameButton.SetActive(on);
             loginButton.SetActive(!on);
             chatMenuDisplay.SetActive(on);
+            logOutButton.SetActive(on);
         }
         public void ShowDisplay()
         {
             startMenuDisplay.SetActive(true);
+        }
+
+        public void LogOut()
+        {
+            Authenticated(false);
+            FindObjectOfType<WebSocketConnection>().CloseConnection();
         }
     
         public void HideDisplay()

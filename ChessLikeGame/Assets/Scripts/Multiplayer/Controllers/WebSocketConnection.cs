@@ -27,17 +27,13 @@ namespace Multiplayer.Controllers
         public static event Action<List<Room>>onChatRoomList;
         public static event Action<Room> onHostGame;
         public static event Action<Room> onHostChat;
-        
         public static event Action<Room> onRecievedYouWhereRemovedFromTheRoom;
         public static event Action<Room> onRecievedYouHaveBeenBannedFromRoom;
         public static event Action<Room> onRecievedYouAreNoLongerBannedFromRoom;
         public static event Action<Room> onRecievedYouHaveBeenApprovedForRoom;
         public static event Action<Room> onRecievedYouAreNoLongerApprovedForRoom;
-        
         public static event Action<Room> onRecievedRoomLeft;
-        
         public static event Action<Room> onJoinedChat;
-        
         public static event Action<Room> onJoinedGame;
         public static event Action<(Room room, User user, string Message)> onChatRoomMessageRecieved;
         public static event Action<(Room room, User user, string Message)> onGameRoomMessageRecieved;
@@ -45,7 +41,6 @@ namespace Multiplayer.Controllers
         public static event Action<Room> onRoomDestroyed;
         public static event Action<(Room room, List<User> users)> onReceivedUsersListInRoom;
         public static event Action<User> onSetUser;
-
 
         [SerializeField] private bool refreshSubscribed = false;
         [SerializeField] private float refreshTime = 10f;
@@ -86,31 +81,37 @@ namespace Multiplayer.Controllers
 
         private void RoomLeft(Room obj)
         {
+            Debug.Log($"RoomLeft={obj.GetRoomName()}");
             onRecievedRoomLeft?.Invoke(obj);
         }
 
         private void NoLongerApprovedForRoom(Room obj)
         {
+            Debug.Log($"NoLongerApprovedForRoom={obj.GetRoomName()}");
             onRecievedYouAreNoLongerApprovedForRoom?.Invoke(obj);
         }
 
         private void ApprovedForRoom(Room obj)
         {
+            Debug.Log($"ApprovedForRoom={obj.GetRoomName()}");
             onRecievedYouHaveBeenApprovedForRoom?.Invoke(obj);
         }
 
         private void NoLongerBannedFromRoom(Room obj)
         {
+            Debug.Log($"NoLongerBannedFromRoom={obj.GetRoomName()}");
             onRecievedYouAreNoLongerBannedFromRoom?.Invoke(obj);
         }
 
         private void BannedFromTheRoom(Room obj)
         {
+            Debug.Log($"BannedFromTheRoom={obj.GetRoomName()}");
             onRecievedYouHaveBeenBannedFromRoom?.Invoke(obj);
         }
 
         private void RemovedFromTheRoom(Room obj)
         {
+            Debug.Log($"RemovedFromTheRoom={obj.GetRoomName()}");
             onRecievedYouWhereRemovedFromTheRoom?.Invoke(obj);
         }
 
@@ -121,31 +122,35 @@ namespace Multiplayer.Controllers
 
         private void ReceivedErrorResponseFromServer((CommunicationTypeEnum comEnum, string message) obj)
         {
-            Debug.Log($"{obj.comEnum.ToString()}");
+            Debug.Log($"Error={obj.comEnum.ToString()}, Message={obj.message}");
         }
 
         private void ReceivedMessageWasReceivedByUser((User user, string messageSent) obj)
         {
-            Debug.Log($"{obj.user.GetUserName()} received message: {obj.messageSent}");
+            Debug.Log($"ReceivedMessageWasReceivedByUser={obj.user.GetUserName()}, message={obj.messageSent}");
         }
 
         private void ReceivedCommunicationToAll((User user, string messageSent) obj)
         {
+            Debug.Log($"ReceivedCommunicationToAll=from={obj.user.GetUserName()}, message={obj.messageSent}");
             onReceivedCommunicationToAll?.Invoke(obj);
         }
 
         private void UsersInRoom((Room room, List<User> users) obj)
         {
-            throw new NotImplementedException();
+            Debug.Log($"UsersInRoom={obj.room.GetRoomName()}, count={obj.users.Count}");
+            onReceivedUsersListInRoom?.Invoke(obj);
         }
 
         private void RoomDestroyed(Room obj)
         {
+            Debug.Log($"RoomDestroyed={obj.GetRoomName()}");
             onRoomDestroyed?.Invoke(obj);
         }
 
         private void UserWithGuidReceived((User user, Guid guid) obj)
         {
+            Debug.Log($"UserWithGuidReceived={obj.user.GetUserName()} {obj.guid}");
             if (obj.guid == clientID)
             {
                 user = obj.user;
@@ -154,7 +159,7 @@ namespace Multiplayer.Controllers
 
         private void RoomMessageReceived((Room room, User user, string Message) obj)
         {
-            Debug.Log($"RoomMessageReceived={obj}");
+            Debug.Log($"RoomMessageReceived={obj.user.GetUserName()} {obj.room.GetRoomName()} {obj.Message}");
             if (obj.room.GetMeta() == ChatRoomMeta)
             {
                 onChatRoomMessageRecieved?.Invoke(obj);
@@ -167,7 +172,7 @@ namespace Multiplayer.Controllers
 
         private void JoinedRoom(Room obj)
         {
-            Debug.Log($"JoinedRoom={obj}");
+            Debug.Log($"JoinedRoom={obj.GetRoomName()}");
             if (obj.GetMeta() == ChatRoomMeta)
             {
                 onJoinedChat?.Invoke(obj);
@@ -180,7 +185,7 @@ namespace Multiplayer.Controllers
 
         private void CreatedRoom(Room obj)
         {
-            Debug.Log($"CreatedRoom={obj}");
+            Debug.Log($"CreatedRoom={obj.GetRoomName()}");
             if (obj.GetMeta() == ChatRoomMeta)
             {
                 onHostChat?.Invoke(obj);
@@ -208,7 +213,6 @@ namespace Multiplayer.Controllers
                 Debug.Log($"WEB SOCKET SENT MESSAGE {obj}");
             }
         }
-        
 
         private void ClientGuidReceived(Guid obj)
         {
@@ -218,6 +222,7 @@ namespace Multiplayer.Controllers
 
         private static void RoomListReceived(List<Room> obj)
         {
+            Debug.Log($"RoomListReceived={obj.Count}");
             onHostsList?.Invoke(obj);
             onChatRoomList?.Invoke(obj);
         }
@@ -236,9 +241,9 @@ namespace Multiplayer.Controllers
             onUserJoinedRoom?.Invoke(obj);
         }
 
-
         private static void UserListReceived(List<User> obj)
         {
+            Debug.Log($"UserListReceived={obj.Count}");
             onUsersList?.Invoke(obj);
         }
 
@@ -253,7 +258,7 @@ namespace Multiplayer.Controllers
             Debug.Log($"Authentication={obj}");
             if (!obj)
             {
-                StopCoroutine(nameof(CloseSocket));
+                Task.FromResult(CloseSocket());
             }
             else
             {
@@ -267,7 +272,7 @@ namespace Multiplayer.Controllers
         {
             Debug.Log("login");
             await client.Connect();
-            StartCoroutine(nameof(StartConnection));
+            Task.FromResult(StartConnection());
             await client.RequestAuthenticate(userName, password);
         }
 
@@ -294,13 +299,25 @@ namespace Multiplayer.Controllers
             refresh = true;
             while (refresh)
             {
-                foreach (var display in FindObjectsOfType<DisplayChatRoomUI>())
+                var uis = FindObjectsOfType<DisplayChatRoomUI>();
+                for (var index = 0; index < uis.Length; index++)
                 {
+                    var display = uis[index];
                     display.AskForUsersOfRoom(this);
+                    yield return new WaitForSeconds(1f);
                 }
-                yield return new WaitForSeconds(5f);
-                client.RequestRoomList();
-                client.RequestUserList();
+
+                yield return new WaitForSeconds(1f);
+                if (!client.RequestRoomList())
+                {
+                    Debug.Log("couldnt refresh room list");
+                }
+                yield return new WaitForSeconds(1f);
+                
+                if (!client.RequestUserList())
+                {
+                    Debug.Log("couldn't refresh user list");
+                }
                 yield return new WaitForSeconds(refreshTime);
             }
             Debug.Log("Stopped Asking Server For Updates");
@@ -311,7 +328,6 @@ namespace Multiplayer.Controllers
             client.RequestSendMessageToUser(user, Message);
         }
 
-        
         public void RefreshRoomList()
         {
             Debug.Log("asked for rooms");
@@ -328,11 +344,15 @@ namespace Multiplayer.Controllers
             client.RequestCreateRoom(ChatRoomMeta, roomSize, isPublic, nameOfRoom);
         }
 
-
         // Close the WebSocket connection when the script is destroyed
         private async void OnDestroy()
         {
             await CloseSocket();
+        }
+        
+        public void CloseConnection()
+        {
+            Task.FromResult(CloseSocket());
         }
         
         private async Task CloseSocket()
@@ -340,7 +360,6 @@ namespace Multiplayer.Controllers
             refresh = false;
             client.Disconnect();
         }
-
 
         public void SendMessageToRoom(Room room, string objMessage)
         {
@@ -354,7 +373,7 @@ namespace Multiplayer.Controllers
 
         public void AskForUsers(Room room)
         {
-            client.RequestGetUsersInRoomAsync(room.GetGuid());
+            Task.FromResult(client.RequestGetUsersInRoomAsync(room.GetGuid()));
         }
 
         public void LeaveRoom(Room room)

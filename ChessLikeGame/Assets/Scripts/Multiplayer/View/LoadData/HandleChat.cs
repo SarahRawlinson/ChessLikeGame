@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using LibObjects;
 using MessageServer.Data;
 using Multiplayer.Controllers;
+using Multiplayer.View.DisplayData;
 using Multiplayer.View.UI;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -14,29 +15,32 @@ namespace Multiplayer.View.LoadData
         
         class Chat
         {
-            public SendTextToWindow window;
-            public SendTextToWindow.WindowType windowType;
+            public DisplayChatWindowUI windowUI;
+            public DisplayChatWindowUI.WindowType windowType;
 
-            public Chat(SendTextToWindow textToWindow, User chattingWith)
+            public Chat(DisplayChatWindowUI textToWindowUI, User chattingWith)
             {
-                windowType = new SendTextToWindow.WindowType(chattingWith);
-                window = textToWindow;
+                windowType = new DisplayChatWindowUI.WindowType(chattingWith);
+                windowUI = textToWindowUI;
             }
-            public Chat(SendTextToWindow textToWindow, Room chattingWith)
+            public Chat(DisplayChatWindowUI textToWindowUI, Room chattingWith)
             {
-                windowType = new SendTextToWindow.WindowType(chattingWith);
-                window = textToWindow;
+                windowType = new DisplayChatWindowUI.WindowType(chattingWith);
+                windowUI = textToWindowUI;
             }
         }
 
         [SerializeField] private Transform window;
-        [SerializeField] private SendTextToWindow prefab;
+        [SerializeField] private DisplayChatWindowUI prefab;
+        [SerializeField] private LoadChatUsersUI chatUsersList;
         private Dictionary<Guid, Chat> chatsWithUsers = new Dictionary<Guid, Chat>();
         private Dictionary<Guid, Chat> chatsWithRooms = new Dictionary<Guid, Chat>();
         private string userName = "Me";
 
         private void Start()
         {
+            chatUsersList.onCreatedUserUI += UserUICreated;
+            chatUsersList.onCreatedUserUI += UserUIDestroyed;
             WebSocketConnection.onMessageRecieved += MessageReceivedFromSocket;
             WebSocketConnection.onChatRoomMessageRecieved += RoomMessageReceivedFromSocket;
             WebSocketConnection.onUserLeftRoom += UserLeftRoom;
@@ -48,6 +52,22 @@ namespace Multiplayer.View.LoadData
             WebSocketConnection.onSetUser += SetUser;
         }
 
+        private void UserUIDestroyed(DisplayChatUserUI obj)
+        {
+            obj.onSelectedUser += ChatChat;
+        }
+
+        private void UserUICreated(DisplayChatUserUI obj)
+        {
+            obj.onSelectedUser -= ChatChat;
+            LeaveChat(obj.GetUser());
+        }
+
+        private void LeaveChat(User obj)
+        {
+            DestroyWindow(obj);
+        }
+
         private void SetUser(User obj)
         {
             userName = obj.GetUserName();
@@ -55,10 +75,32 @@ namespace Multiplayer.View.LoadData
 
         public void OpenWindow(Room room)
         {
+            HideAllChats();
             if (chatsWithRooms.ContainsKey(room.GetGuid()))
             {
-                chatsWithRooms[room.GetGuid()].window.Show();
+                chatsWithRooms[room.GetGuid()].windowUI.Show();
+            }
+        }
+        
+        public void OpenWindow(User user)
+        {
+            HideAllChats();
+            if (chatsWithUsers.ContainsKey(user.GetUserGuid()))
+            {
+                chatsWithUsers[user.GetUserGuid()].windowUI.Show();
+            }
+        }
 
+        private void HideAllChats()
+        {
+            foreach (var userKVP in chatsWithUsers)
+            {
+                chatsWithUsers[userKVP.Key].windowUI.Hide();
+            }
+
+            foreach (var roomKVP in chatsWithRooms)
+            {
+                chatsWithRooms[roomKVP.Key].windowUI.Hide();
             }
         }
 
@@ -71,8 +113,17 @@ namespace Multiplayer.View.LoadData
         {
             if (chatsWithRooms.ContainsKey(obj.GetGuid()))
             {
-                Destroy(chatsWithRooms[obj.GetGuid()].window.gameObject);
+                Destroy(chatsWithRooms[obj.GetGuid()].windowUI.gameObject);
                 chatsWithRooms.Remove(obj.GetGuid());
+            }
+        }
+        
+        private void DestroyWindow(User obj)
+        {
+            if (chatsWithUsers.ContainsKey(obj.GetUserGuid()))
+            {
+                Destroy(chatsWithUsers[obj.GetUserGuid()].windowUI.gameObject);
+                chatsWithUsers.Remove(obj.GetUserGuid());
             }
         }
 
@@ -89,46 +140,46 @@ namespace Multiplayer.View.LoadData
 
         private void UserLeftRoom((User user, Guid roomGuid) obj)
         {
-            chatsWithRooms[obj.roomGuid].window.SendMessageToUI("", $"{obj.user.GetUserName()} Has Left the Room");
+            chatsWithRooms[obj.roomGuid].windowUI.SendMessageToUI("", $"{obj.user.GetUserName()} Has Left the Room");
         }
         
         private void UserJoinedRoom((User user, Guid roomGuid) obj)
         {
-            chatsWithRooms[obj.roomGuid].window.SendMessageToUI("", $"{obj.user.GetUserName()} Has Joined the Room");
+            chatsWithRooms[obj.roomGuid].windowUI.SendMessageToUI("", $"{obj.user.GetUserName()} Has Joined the Room");
         }
 
         private void RoomMessageReceivedFromSocket((Room room, User user, string Message) obj)
         {
             if (!chatsWithRooms.ContainsKey(obj.room.GetGuid()))
             {
-                chatsWithRooms[obj.room.GetGuid()].window.SendMessageToUI("", $"A new chat with {obj.user.GetUserName()} has started");
+                chatsWithRooms[obj.room.GetGuid()].windowUI.SendMessageToUI("", $"A new chat with {obj.user.GetUserName()} has started");
                 StartNewChatWithRoom(obj.room);
             }
-            chatsWithRooms[obj.room.GetGuid()].window.SendMessageToUI(obj.user.GetUserName(), obj.Message);
+            chatsWithRooms[obj.room.GetGuid()].windowUI.SendMessageToUI(obj.user.GetUserName(), obj.Message);
         }
 
         private void MessageReceivedFromSocket((User user, string message) obj)
         {
             if (!chatsWithUsers.ContainsKey(obj.user.GetUserGuid()))
             {
-                chatsWithUsers[obj.user.GetUserGuid()].window.SendMessageToUI("", $"A new chat with {obj.user.GetUserName()} has started");
+                chatsWithUsers[obj.user.GetUserGuid()].windowUI.SendMessageToUI("", $"A new chat with {obj.user.GetUserName()} has started");
                 StartNewChatWithUser(obj.user);
             }
-            chatsWithUsers[obj.user.GetUserGuid()].window.SendMessageToUI(obj.user.GetUserName(), obj.message);
+            chatsWithUsers[obj.user.GetUserGuid()].windowUI.SendMessageToUI(obj.user.GetUserName(), obj.message);
         }
 
         public void StartNewChatWithUser(User user)
         {
             if (chatsWithUsers.ContainsKey(user.GetUserGuid()))
             {
-                chatsWithUsers[user.GetUserGuid()].window.gameObject.SetActive(true);
+                OpenWindow(user);
                 return;
             }
             GameObject obj =  Instantiate(prefab.gameObject, window);
-            SendTextToWindow sendTextToWindow = obj.GetComponent<SendTextToWindow>();
-            var value = new Chat(sendTextToWindow, user);
-            sendTextToWindow.SetChattingWith(user.GetUserName(), value.windowType, userName);
-            sendTextToWindow.onSendMessage += SendMessage;
+            DisplayChatWindowUI displayChatWindowUI = obj.GetComponent<DisplayChatWindowUI>();
+            var value = new Chat(displayChatWindowUI, user);
+            displayChatWindowUI.SetChattingWith(user.GetUserName(), value.windowType, userName);
+            displayChatWindowUI.onSendMessage += SendMessage;
             
             chatsWithUsers.Add(user.GetUserGuid(), value);
         }
@@ -137,7 +188,7 @@ namespace Multiplayer.View.LoadData
         {
             if (chatsWithRooms.ContainsKey(room.GetGuid()))
             {
-                chatsWithRooms[room.GetGuid()].window.gameObject.SetActive(true);
+                OpenWindow(room);
                 return;
             }
             FindObjectOfType<WebSocketConnection>().JoinRoom(room.GetGuid());
@@ -146,16 +197,16 @@ namespace Multiplayer.View.LoadData
         private void ChatJoined(Room obj)
         {
             GameObject objPrefab =  Instantiate(prefab.gameObject, window);
-            SendTextToWindow sendTextToWindow = objPrefab.GetComponent<SendTextToWindow>();
-            var value = new Chat(sendTextToWindow, obj);
-            sendTextToWindow.SetChattingWith(obj.GetRoomName(), value.windowType, userName);
-            sendTextToWindow.onSendMessage += SendMessage;
+            DisplayChatWindowUI displayChatWindowUI = objPrefab.GetComponent<DisplayChatWindowUI>();
+            var value = new Chat(displayChatWindowUI, obj);
+            displayChatWindowUI.SetChattingWith(obj.GetRoomName(), value.windowType, userName);
+            displayChatWindowUI.onSendMessage += SendMessage;
             chatsWithRooms.Add(obj.GetGuid(), value);
         }
         
         
 
-        private void SendMessage((SendTextToWindow.WindowType windowType, string message) obj)
+        private void SendMessage((DisplayChatWindowUI.WindowType windowType, string message) obj)
         {
             if (obj.windowType.IsUser)
             {
@@ -170,6 +221,11 @@ namespace Multiplayer.View.LoadData
         public void LeaveChat(Room room)
         {
             FindObjectOfType<WebSocketConnection>().LeaveRoom(room);
+        }
+
+        private void ChatChat(User obj)
+        {
+            StartNewChatWithUser(obj);
         }
     }
 }

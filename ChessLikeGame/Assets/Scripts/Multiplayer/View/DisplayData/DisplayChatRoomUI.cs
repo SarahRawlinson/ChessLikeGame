@@ -18,10 +18,10 @@ namespace Multiplayer.View.DisplayData
         private List<User> _users;
         private Room _room;
 
-        public void SetRoom( Room room)
+        public void SetRoom(Room room)
         {
             _room = room;
-            roomString.text = room.GetGuid().ToString();
+            roomString.text = room.GetRoomName();
             WebSocketConnection.onReceivedUsersListInRoom += CheckIfUsersInRoom;
             var webSocketConnection = FindObjectOfType<WebSocketConnection>();
             if (_room.GetCreator().GetUserName() == webSocketConnection.GetClientUser().GetUserName() )

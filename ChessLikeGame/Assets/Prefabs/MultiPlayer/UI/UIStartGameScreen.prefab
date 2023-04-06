@@ -112,33 +112,9 @@ PrefabInstance:
     m_TransformParent: {fileID: 4924267664134178301}
     m_Modifications:
     - target: {fileID: 838042206571413414, guid: 6e4fd63826d4fe448a3c6446a27a5f70, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 838042206571413414, guid: 6e4fd63826d4fe448a3c6446a27a5f70, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 838042206571413414, guid: 6e4fd63826d4fe448a3c6446a27a5f70, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 1023230698}
-    - target: {fileID: 838042206571413414, guid: 6e4fd63826d4fe448a3c6446a27a5f70, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 838042206571413414, guid: 6e4fd63826d4fe448a3c6446a27a5f70, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
-      value: ShowDisplay
-      objectReference: {fileID: 0}
-    - target: {fileID: 838042206571413414, guid: 6e4fd63826d4fe448a3c6446a27a5f70, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
-      value: Multiplayer.View.DisplayData.ScrollAllHostsUI, Assembly-CSharp
-      objectReference: {fileID: 0}
-    - target: {fileID: 838042206571413414, guid: 6e4fd63826d4fe448a3c6446a27a5f70, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
     - target: {fileID: 2725837859958276674, guid: 6e4fd63826d4fe448a3c6446a27a5f70, type: 3}
       propertyPath: loginDisplay
       value: 
@@ -381,6 +357,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4147787861088571084, guid: 7e6c3f8d89416274bbc03184c437cba3, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.65873015
+      objectReference: {fileID: 0}
     - target: {fileID: 4644907201847386624, guid: 7e6c3f8d89416274bbc03184c437cba3, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -393,9 +373,17 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0.000030517578
       objectReference: {fileID: 0}
+    - target: {fileID: 7491414410962060053, guid: 7e6c3f8d89416274bbc03184c437cba3, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -107.5
+      objectReference: {fileID: 0}
     - target: {fileID: 8299745303675391506, guid: 7e6c3f8d89416274bbc03184c437cba3, type: 3}
       propertyPath: m_Name
       value: HostPanel
+      objectReference: {fileID: 0}
+    - target: {fileID: 8299745303675391506, guid: 7e6c3f8d89416274bbc03184c437cba3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8671277919600641410, guid: 7e6c3f8d89416274bbc03184c437cba3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
@@ -424,6 +412,14 @@ PrefabInstance:
     - target: {fileID: 8671277919600641410, guid: 7e6c3f8d89416274bbc03184c437cba3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 8697216470676776484, guid: 7e6c3f8d89416274bbc03184c437cba3, type: 3}
+      propertyPath: m_Size
+      value: 0.34126985
+      objectReference: {fileID: 0}
+    - target: {fileID: 8697216470676776484, guid: 7e6c3f8d89416274bbc03184c437cba3, type: 3}
+      propertyPath: m_Value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 361933461170909306, guid: 7e6c3f8d89416274bbc03184c437cba3, type: 3}
@@ -594,6 +590,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 177972023441939936, guid: 2525173797a1fdb48b5f5cb57cb333de, type: 3}
       propertyPath: m_Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 413217748315067334, guid: 2525173797a1fdb48b5f5cb57cb333de, type: 3}
+      propertyPath: ChatList
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 848733495889667732, guid: 2525173797a1fdb48b5f5cb57cb333de, type: 3}

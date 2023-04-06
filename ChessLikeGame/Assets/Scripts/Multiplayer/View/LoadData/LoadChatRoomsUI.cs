@@ -19,6 +19,19 @@ namespace Multiplayer.View.LoadData
         private void Start()
         {
             WebSocketConnection.onChatRoomList += ProcessHosts;
+            WebSocketConnection.onRoomDestroyed += RoomDestroyed;
+        }
+
+        private void RoomDestroyed(Room obj)
+        {
+            foreach (var room in _rooms)
+            {
+                if (obj.GetGuid() == room.GetGuid())
+                {
+                    RemoveHost(room);
+                    return;
+                }
+            }
         }
 
         public void RefreshRooms()
@@ -67,12 +80,12 @@ namespace Multiplayer.View.LoadData
             _roomsUI.Add(ui);
         }
         
-        public void RemoveHost(Room user)
+        public void RemoveHost(Room room)
         {
             for (var index = 0; index < _rooms.Count; index++)
             {
                 var u = _rooms[index];
-                if (Equals(u, user))
+                if (Equals(u, room))
                 {
                     _rooms.Remove(u);
                     DisplayChatRoomUI ui = _roomsUI[index];
