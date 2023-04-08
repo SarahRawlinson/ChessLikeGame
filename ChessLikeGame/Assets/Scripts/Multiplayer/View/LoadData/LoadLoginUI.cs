@@ -16,6 +16,11 @@ namespace Multiplayer.View.LoadData
         {
             WebSocketConnection.onAuthenicate += LoginSuccess;
         }
+        
+        private void OnDestroy()
+        {
+            WebSocketConnection.onAuthenicate -= LoginSuccess;
+        }
 
         public void LoginSuccess(bool auth)
         {

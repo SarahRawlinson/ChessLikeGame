@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+using LibObjects;
 using Multiplayer;
 using Multiplayer.Controllers;
 using Multiplayer.Models;
@@ -20,9 +20,11 @@ public class MultiplayerDirector : MonoBehaviour
 
     private GameObjectController gameObjectController;
     private Rules _rules;
+    private Room gameRoom;
     
-    public bool SetupNewGame()
+    public bool SetupNewGame(Room game)
     {
+        gameRoom = game;
         int counter = 0;
         _gameStateData = new MultiGameStateData(setupFenString);
         _rules = new Rules(_gameStateData);
@@ -86,6 +88,5 @@ public class MultiplayerDirector : MonoBehaviour
     private void Start()
     {
         gameObjectController = FindObjectOfType<GameObjectController>();
-        
     }
 }

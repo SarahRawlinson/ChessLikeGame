@@ -55,41 +55,45 @@ namespace Multiplayer.Controllers
         private void Start()
         {
             client.SetDisconnectOnFailAuthentication(true);
-            client.onRecievedMessageFromUserEvent += MessageReceived;
-            client.onReceivedAuthenticateEvent += Authentication;
-            client.onRecievedRoomDestroyedEvent += RoomDestroyed;
-            client.onRecievedUserListEvent += UserListReceived;
-            client.onRecievedUserJoinedRoomEvent += UserJoinedRoom;
-            client.onRecievedUserLeftRoomEvent += UserLeftRoom;
-            client.onRecievedRoomListEvent += RoomListReceived;
-            client.onRecievedRoomCreatedEvent += CreatedRoom;
-            client.onRecievedRemovedFromTheRoomEvent += RemovedFromTheRoom;
-            client.onRecievedBannedFromRoomEvent += BannedFromTheRoom;
-            client.onRecievedNoLongerBannedFromRoomEvent += NoLongerBannedFromRoom;
-            client.onRecievedApprovedForRoomEvent += ApprovedForRoom;
-            client.onRecievedNoLongerApprovedForRoomEvent += NoLongerApprovedForRoom;
-            client.onRecievedRoomJoinedEvent += JoinedRoom;
-            client.onRecievedRoomLeftEvent += RoomLeft;
-            client.onRecievedRoomMessageEvent += RoomMessageReceived;
-            client.onReceivedUsersListInRoomEvent += UsersInRoom;
-            client.onReceivedMessageWasReceivedByUserEvent += ReceivedMessageWasReceivedByUser;
-            client.onReceivedCommunicationToAllEvent += ReceivedCommunicationToAll;
-            client.onReceivedErrorResponseFromServerEvent += ReceivedErrorResponseFromServer;
-            client.onRecievedGuidEvent += ClientGuidReceived;
-            client.onIncomingWebSocketMessageEvent += LogMessageReceived;
+            client.onMessageFromUser += MessageReceived;
+            client.onAuthenticate += Authentication;
+            client.onRoomDestroyed += RoomDestroyed;
+            client.onUserList += UserListReceived;
+            client.onUserJoinedRoom += UserJoinedRoom;
+            client.onUserLeftRoom += UserLeftRoom;
+            client.onRoomList += RoomListReceived;
+            client.onRoomCreated += CreatedRoom;
+            client.onRemovedFromRoom += RemovedFromTheRoom;
+            client.onBannedFromRoom += BannedFromTheRoom;
+            client.onNoLongerBannedFromRoom += NoLongerBannedFromRoom;
+            client.onApprovedForRoom += ApprovedForRoom;
+            client.onNoLongerApprovedForRoom += NoLongerApprovedForRoom;
+            client.onRoomJoined += JoinedRoom;
+            client.onRoomLeft += RoomLeft;
+            client.onRoomMessage += RoomMessageReceived;
+            client.onUsersListInRoom += UsersInRoom;
+            client.onMessageWasReceivedByUser += ReceivedMessageWasReceivedByUser;
+            client.onCommunicationToAll += ReceivedCommunicationToAll;
+            client.onErrorResponseFromServer += ReceivedErrorResponseFromServer;
             client.onRecievedUserWithGuidEvent += UserWithGuidReceived;
+            client.onIncomingWebSocketMessageEvent += LogMessageReceived;
+            client.onRecievedGuid += ClientGuidReceived;
             client.onMessageSentToSocketEvent += LogMessageSent;
-            client.onReceivedApprovedUsersListInRoomEvent += ApprovedUsersInRoom;
-            client.onReceivedBannedUsersListInRoomEvent += BannedUsersInRoom;
+            client.onApprovedUsersListInRoom += ApprovedUsersInRoom;
+            client.onBannedUsersListInRoom += BannedUsersInRoom;
         }
+        
+        
 
         private void BannedUsersInRoom((Room room, List<User> users) obj)
         {
+            Debug.Log($"BannedUsersInRoom={obj.room.GetRoomName()}, count={obj.users.Count}");
             onReceivedBannedUsersListInRoom?.Invoke(obj);
         }
 
         private void ApprovedUsersInRoom((Room room, List<User> users) obj)
         {
+            Debug.Log($"ApprovedUsersInRoom={obj.room.GetRoomName()}, count={obj.users.Count}");
             onReceivedApprovedUsersListInRoom?.Invoke(obj);
         }
 
@@ -174,25 +178,36 @@ namespace Multiplayer.Controllers
 
         private void RoomMessageReceived((Room room, User user, string Message) obj)
         {
-            Debug.Log($"RoomMessageReceived={obj.user.GetUserName()} {obj.room.GetRoomName()} {obj.Message}");
-            if (obj.room.GetMeta() == ChatRoomMeta)
+            Room objRoom = obj.room;
+            Debug.Log($"RoomMessageReceived={obj.user.GetUserName()} {objRoom.GetRoomName()} {obj.Message}");
+            if (IsChatRoom(objRoom))
             {
                 onChatRoomMessageRecieved?.Invoke(obj);
             }
-            if (obj.room.GetMeta() == GameRoomMeta)
+            if (IsGameRoom(objRoom))
             {
                 onGameRoomMessageRecieved?.Invoke(obj);
             }
         }
 
+        private static bool IsGameRoom(Room objRoom)
+        {
+            return objRoom.GetMeta().Contains(ChatRoomMeta);
+        }
+
+        private static bool IsChatRoom(Room objRoom)
+        {
+            return objRoom.GetMeta().Contains(ChatRoomMeta);
+        }
+
         private void JoinedRoom(Room obj)
         {
             Debug.Log($"JoinedRoom={obj.GetRoomName()}");
-            if (obj.GetMeta() == ChatRoomMeta)
+            if (IsChatRoom(obj))
             {
                 onJoinedChat?.Invoke(obj);
             }
-            if (obj.GetMeta() == GameRoomMeta)
+            if (IsGameRoom(obj))
             {
                 onJoinedGame?.Invoke(obj);
             }
@@ -201,11 +216,11 @@ namespace Multiplayer.Controllers
         private void CreatedRoom(Room obj)
         {
             Debug.Log($"CreatedRoom={obj.GetRoomName()}");
-            if (obj.GetMeta() == ChatRoomMeta)
+            if (IsChatRoom(obj))
             {
                 onHostChat?.Invoke(obj);
             }
-            if (obj.GetMeta() == GameRoomMeta)
+            if (IsGameRoom(obj))
             {
                 onHostGame?.Invoke(obj);
             }
@@ -287,6 +302,7 @@ namespace Multiplayer.Controllers
         {
             Debug.Log("login");
             await client.Connect();
+            
             Task.FromResult(StartConnection());
             await client.RequestAuthenticate(userName, password);
         }
@@ -362,6 +378,32 @@ namespace Multiplayer.Controllers
         // Close the WebSocket connection when the script is destroyed
         private async void OnDestroy()
         {
+            client.onMessageFromUser -= MessageReceived;
+            client.onAuthenticate -= Authentication;
+            client.onRoomDestroyed -= RoomDestroyed;
+            client.onUserList -= UserListReceived;
+            client.onUserJoinedRoom -= UserJoinedRoom;
+            client.onUserLeftRoom -= UserLeftRoom;
+            client.onRoomList -= RoomListReceived;
+            client.onRoomCreated -= CreatedRoom;
+            client.onRemovedFromRoom -= RemovedFromTheRoom;
+            client.onBannedFromRoom -= BannedFromTheRoom;
+            client.onNoLongerBannedFromRoom -= NoLongerBannedFromRoom;
+            client.onApprovedForRoom -= ApprovedForRoom;
+            client.onNoLongerApprovedForRoom -= NoLongerApprovedForRoom;
+            client.onRoomJoined -= JoinedRoom;
+            client.onRoomLeft -= RoomLeft;
+            client.onRoomMessage -= RoomMessageReceived;
+            client.onUsersListInRoom -= UsersInRoom;
+            client.onMessageWasReceivedByUser -= ReceivedMessageWasReceivedByUser;
+            client.onCommunicationToAll -= ReceivedCommunicationToAll;
+            client.onErrorResponseFromServer -= ReceivedErrorResponseFromServer;
+            client.onRecievedUserWithGuidEvent -= UserWithGuidReceived;
+            client.onIncomingWebSocketMessageEvent -= LogMessageReceived;
+            client.onRecievedGuid -= ClientGuidReceived;
+            client.onMessageSentToSocketEvent -= LogMessageSent;
+            client.onApprovedUsersListInRoom -= ApprovedUsersInRoom;
+            client.onBannedUsersListInRoom -= BannedUsersInRoom;
             await CloseSocket();
         }
         

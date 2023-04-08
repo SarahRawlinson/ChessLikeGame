@@ -40,7 +40,7 @@ namespace Multiplayer.View.LoadData
         private void Start()
         {
             chatUsersList.onCreatedUserUI += UserUICreated;
-            chatUsersList.onCreatedUserUI += UserUIDestroyed;
+            chatUsersList.onDestroyedUserUI += UserUIDestroyed;
             WebSocketConnection.onMessageRecieved += MessageReceivedFromSocket;
             WebSocketConnection.onChatRoomMessageRecieved += RoomMessageReceivedFromSocket;
             WebSocketConnection.onUserLeftRoom += UserLeftRoom;
@@ -52,15 +52,29 @@ namespace Multiplayer.View.LoadData
             WebSocketConnection.onSetUser += SetUser;
         }
 
+        private void OnDestroy()
+        {
+            chatUsersList.onCreatedUserUI -= UserUICreated;
+            chatUsersList.onDestroyedUserUI -= UserUIDestroyed;
+            WebSocketConnection.onMessageRecieved -= MessageReceivedFromSocket;
+            WebSocketConnection.onChatRoomMessageRecieved -= RoomMessageReceivedFromSocket;
+            WebSocketConnection.onUserLeftRoom -= UserLeftRoom;
+            WebSocketConnection.onUserJoinedRoom -= UserJoinedRoom;
+            WebSocketConnection.onJoinedChat -= ChatJoined;
+            WebSocketConnection.onRecievedRoomLeft -= RoomLeft;
+            WebSocketConnection.onRoomDestroyed -= RoomDestroyed;
+            WebSocketConnection.onRecievedYouWhereRemovedFromTheRoom -= RemovedFromRoom;
+            WebSocketConnection.onSetUser -= SetUser;
+        }
         private void UserUIDestroyed(DisplayChatUserUI obj)
         {
-            obj.onSelectedUser += ChatChat;
+            obj.onSelectedUser -= ChatChat;
+            LeaveChat(obj.GetUser());
         }
 
         private void UserUICreated(DisplayChatUserUI obj)
         {
-            obj.onSelectedUser -= ChatChat;
-            LeaveChat(obj.GetUser());
+            obj.onSelectedUser += ChatChat;
         }
 
         private void LeaveChat(User obj)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using LibObjects;
 using MessageServer.Data;
 using Multiplayer.Controllers;
@@ -24,7 +25,7 @@ namespace Multiplayer.View.DisplayData
             roomString.text = room.GetRoomName();
             WebSocketConnection.onReceivedUsersListInRoom += CheckIfUsersInRoom;
             var webSocketConnection = FindObjectOfType<WebSocketConnection>();
-            if (_room.GetCreator().GetUserName() == webSocketConnection.GetClientUser().GetUserName() )
+            if (_room.GetCreator() == webSocketConnection.GetClientUser().GetUserName() )
             {
                 _button.SetIsOn(false);
                 openButton.SetActive(true);
@@ -42,19 +43,23 @@ namespace Multiplayer.View.DisplayData
 
         public void AskForUsersOfRoom(WebSocketConnection webSocketConnection)
         {
-            webSocketConnection.AskForUsers(_room);
+            //webSocketConnection.AskForUsers(_room);
         }
 
         private void CheckIfUsersInRoom((Room room, List<User> users) obj)
         {
+            Debug.Log("checking users in room");
             User thisUser = FindObjectOfType<WebSocketConnection>().GetClientUser();
             if (obj.room.GetGuid() == _room.GetGuid())
             {
+                Debug.Log($"Room is {_room.GetRoomName()}");
                 _users = obj.users;
                 foreach (var user in obj.users)
                 {
+                    Debug.Log($"Room has user {user.GetUserName()}");
                     if (user.GetUserName() == thisUser.GetUserName())
                     {
+                        Debug.Log($"this user {user.GetUserName()} in room {_room.GetRoomName()}");
                         _button.SetIsOn(false);
                         openButton.SetActive(true);
                         return;
@@ -76,6 +81,11 @@ namespace Multiplayer.View.DisplayData
                 FindObjectOfType<HandleChat>().LeaveChat(_room);
             }
             
+        }
+
+        private void OnDestroy()
+        {
+            WebSocketConnection.onReceivedUsersListInRoom -= CheckIfUsersInRoom;
         }
     }
 }

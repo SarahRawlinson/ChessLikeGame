@@ -21,6 +21,11 @@ namespace Multiplayer.View.LoadData
         {
             WebSocketConnection.onHostsList += ProcessHosts;
         }
+        
+        private void OnDestroy()
+        {
+            WebSocketConnection.onHostsList -= ProcessHosts;
+        }
 
         private void ProcessHosts(List<Room> obj)
         {

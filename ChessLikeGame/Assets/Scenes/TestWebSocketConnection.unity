@@ -551,6 +551,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 391057207029622730, guid: 771ceff1b4ee8384ba704af37bf4560b, type: 3}
+      propertyPath: m_text
+      value: Bunnies
+      objectReference: {fileID: 0}
+    - target: {fileID: 3312908552904791122, guid: 771ceff1b4ee8384ba704af37bf4560b, type: 3}
+      propertyPath: m_text
+      value: Sarah
+      objectReference: {fileID: 0}
     - target: {fileID: 4924267664134178297, guid: 771ceff1b4ee8384ba704af37bf4560b, type: 3}
       propertyPath: m_Name
       value: UIStartGameScreen

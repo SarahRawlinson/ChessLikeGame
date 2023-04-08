@@ -21,6 +21,12 @@ namespace Multiplayer.View.LoadData
             WebSocketConnection.onChatRoomList += ProcessHosts;
             WebSocketConnection.onRoomDestroyed += RoomDestroyed;
         }
+        
+        private void OnDestroy()
+        {
+            WebSocketConnection.onChatRoomList -= ProcessHosts;
+            WebSocketConnection.onRoomDestroyed -= RoomDestroyed;
+        }
 
         private void RoomDestroyed(Room obj)
         {

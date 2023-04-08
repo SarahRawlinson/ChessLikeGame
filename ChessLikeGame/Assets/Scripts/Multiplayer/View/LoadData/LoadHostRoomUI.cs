@@ -24,6 +24,14 @@ namespace Multiplayer.View.LoadData
             WebSocketConnection.onJoinedGame += JoinedGame;
             WebSocketConnection.onJoinedChat += JoinedChat;
         }
+        
+        void OnDestroy()
+        {
+            WebSocketConnection.onHostGame -= StartGame;
+            WebSocketConnection.onHostChat -= StartChat;
+            WebSocketConnection.onJoinedGame -= JoinedGame;
+            WebSocketConnection.onJoinedChat -= JoinedChat;
+        }
 
         private void JoinedChat(Room obj)
         {
