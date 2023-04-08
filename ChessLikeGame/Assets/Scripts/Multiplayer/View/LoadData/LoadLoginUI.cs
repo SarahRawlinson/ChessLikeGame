@@ -1,4 +1,3 @@
-using MessageServer.Data;
 using Multiplayer.Controllers;
 using TMPro;
 using UnityEngine;

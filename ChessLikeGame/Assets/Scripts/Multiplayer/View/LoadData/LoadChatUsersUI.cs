@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using MessageServer.Data;
+using LibObjects;
 using Multiplayer.Controllers;
 using Multiplayer.View.DisplayData;
 using Multiplayer.View.UI;
@@ -14,18 +14,24 @@ namespace Multiplayer.View.LoadData
     {
         [SerializeField] private ScrollContentUI _scrollContentUI;
         [SerializeField] private DisplayChatUserUI _gameObjectPrefab;
+        [SerializeField] private bool AllUsers = false;
         private List<User> _users = new List<User>();
         private List<DisplayChatUserUI> _usersUI = new List<DisplayChatUserUI>();
         public event Action<DisplayChatUserUI> onCreatedUserUI; 
-        public event Action<DisplayChatUserUI> onDestroyedUserUI; 
+        public event Action<DisplayChatUserUI> onDestroyedUserUI;
+        
 
         private void Start()
         {
-            WebSocketConnection.onUsersList += ProcessUsers;
+            if (AllUsers)
+            {
+                WebSocketConnection.onUsersList += ProcessUsers;
+            }
         }
 
-        private void ProcessUsers(List<User> obj)
+        public void ProcessUsers(List<User> obj)
         {
+            // Debug.Log("add users");
             var ls = new List<User>();
             for (var index = 0; index < obj.Count; index++)
             {
@@ -60,12 +66,17 @@ namespace Multiplayer.View.LoadData
         
         public void RefreshUsers()
         {
-            Debug.Log("refreshed users button pressed");
-            FindObjectOfType<WebSocketConnection>().RefreshUsers();
+            if (AllUsers)
+            {
+                Debug.Log("refreshed users button pressed");
+                FindObjectOfType<WebSocketConnection>().RefreshUsers();
+            }
+            
         }
 
         public void AddHost(User user)
         {
+            // Debug.Log($"added {user.GetUserName()}");
             _users.Add(user);
             GameObject gObject = _scrollContentUI.AddContent(_gameObjectPrefab.gameObject);
             DisplayChatUserUI ui = gObject.GetComponent<DisplayChatUserUI>();
@@ -86,12 +97,21 @@ namespace Multiplayer.View.LoadData
                 var u = _users[index];
                 if (Equals(u, user))
                 {
+                    Debug.Log($"removed {user.GetUserName()}");
                     DisplayChatUserUI ui = _usersUI[index];
                     onDestroyedUserUI?.Invoke(ui);
                     _users.Remove(u);
                     _usersUI.Remove(ui);
                     Destroy(ui.gameObject);
                 }
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (AllUsers)
+            {
+                WebSocketConnection.onUsersList -= ProcessUsers;
             }
         }
     }

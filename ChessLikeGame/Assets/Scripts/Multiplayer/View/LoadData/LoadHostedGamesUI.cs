@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using LibObjects;
-using MessageServer.Data;
 using Multiplayer.Controllers;
 using Multiplayer.View.DisplayData;
 using Multiplayer.View.UI;

@@ -5,7 +5,6 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using LibObjects;
-using MessageServer.Data;
 using Multiplayer.View.DisplayData;
 using NetClient;
 using UnityEngine;
@@ -46,6 +45,8 @@ namespace Multiplayer.Controllers
 
         [SerializeField] private bool refreshSubscribed = false;
         [SerializeField] private float refreshTime = 10f;
+        [SerializeField] private string url = "localhost";
+        [SerializeField] private int port = 8080;
         public User user { get; set; }
         private Guid clientID = Guid.Empty;
         private bool refresh;
@@ -301,8 +302,9 @@ namespace Multiplayer.Controllers
         public async Task Connect(string userName, string password)
         {
             Debug.Log("login");
-            await client.Connect();
-            
+            // await client.Connect();
+            // await client.Connect("192.168.1.156","8080");
+            await client.Connect(url,port.ToString());
             Task.FromResult(StartConnection());
             await client.RequestAuthenticate(userName, password);
         }
@@ -330,14 +332,6 @@ namespace Multiplayer.Controllers
             refresh = true;
             while (refresh)
             {
-                var uis = FindObjectsOfType<DisplayChatRoomUI>();
-                for (var index = 0; index < uis.Length; index++)
-                {
-                    var display = uis[index];
-                    display.AskForUsersOfRoom(this);
-                    yield return new WaitForSeconds(1f);
-                }
-
                 yield return new WaitForSeconds(1f);
                 if (!client.RequestRoomList())
                 {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using LibObjects;
-using MessageServer.Data;
 using Multiplayer.Controllers;
 using Multiplayer.View.LoadData;
 using Multiplayer.View.UI;
@@ -43,7 +42,7 @@ namespace Multiplayer.View.DisplayData
 
         public void AskForUsersOfRoom(WebSocketConnection webSocketConnection)
         {
-            //webSocketConnection.AskForUsers(_room);
+            webSocketConnection.AskForUsers(_room);
         }
 
         private void CheckIfUsersInRoom((Room room, List<User> users) obj)
@@ -52,7 +51,7 @@ namespace Multiplayer.View.DisplayData
             User thisUser = FindObjectOfType<WebSocketConnection>().GetClientUser();
             if (obj.room.GetGuid() == _room.GetGuid())
             {
-                Debug.Log($"Room is {_room.GetRoomName()}");
+                // Debug.Log($"Room is {_room.GetRoomName()}");
                 _users = obj.users;
                 foreach (var user in obj.users)
                 {

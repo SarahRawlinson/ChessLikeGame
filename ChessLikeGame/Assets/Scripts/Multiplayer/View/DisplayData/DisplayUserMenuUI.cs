@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using LibObjects;
-using MessageServer.Data;
 using Multiplayer.Controllers;
 using Multiplayer.View.LoadData;
 using Multiplayer.View.UI;
@@ -17,6 +16,9 @@ namespace Multiplayer.View.DisplayData
         [SerializeField] private ToggleButton banUserToggleButton;
         [SerializeField] private LoadChatUsersUI chatUsersList;
         [SerializeField] private TMP_Text userNameText;
+        [SerializeField] private LoadChatUsersUI chatUsersInRoomList;
+        [SerializeField] private LoadChatUsersUI chatUsersApprovedInRoomList;
+        [SerializeField] private LoadChatUsersUI chatUsersBannedInRoomList;
         
         private List<Guid> usersInRoom = new List<Guid>();
         private List<Guid> approvedUsersInRoom = new List<Guid>();
@@ -32,6 +34,9 @@ namespace Multiplayer.View.DisplayData
         
         private void Awake()
         {
+            joinUserToggleButton.gameObject.SetActive(false);
+            banUserToggleButton.gameObject.SetActive(false);
+            approveUserToggleButton.gameObject.SetActive(false);
             chatUsersList.onCreatedUserUI += UserUICreated;
             chatUsersList.onDestroyedUserUI += UserUIDestroyed;
             WebSocketConnection.onReceivedUsersListInRoom += RoomUsersReceived;
@@ -54,14 +59,15 @@ namespace Multiplayer.View.DisplayData
             usersInRoom.Clear();
             if (obj.room.GetGuid() == _room.GetGuid())
             {
-                Debug.Log($"{obj.room.GetRoomName()} == this room");
+                // Debug.Log($"{obj.room.GetRoomName()} == this room");
                 foreach (var user in obj.users)
                 {
-                    Debug.Log($"{obj.room.GetRoomName()} contains {user.GetUserName()}");
+                    // Debug.Log($"{obj.room.GetRoomName()} contains {user.GetUserName()}");
                     usersInRoom.Add(user.GetUserGuid());
-                    Debug.Log($"{user.GetUserName()} was added {user.GetUserGuid().ToString()}");
+                    // Debug.Log($"{user.GetUserName()} was added {user.GetUserGuid().ToString()}");
                 }
             }
+            chatUsersInRoomList.ProcessUsers(obj.users);
             UpdateUserOptionsMenu(selectedUser);
         }
         
@@ -76,6 +82,7 @@ namespace Multiplayer.View.DisplayData
                     approvedUsersInRoom.Add(user.GetUserGuid());
                 }
             }
+            chatUsersApprovedInRoomList.ProcessUsers(obj.users);
             UpdateUserOptionsMenu(selectedUser);
         }
         
@@ -90,6 +97,7 @@ namespace Multiplayer.View.DisplayData
                     bannedUsersInRoom.Add(user.GetUserGuid());
                 }
             }
+            chatUsersBannedInRoomList.ProcessUsers(obj.users);
             UpdateUserOptionsMenu(selectedUser);
         }
 
@@ -100,9 +108,13 @@ namespace Multiplayer.View.DisplayData
 
         private void UserSelected(User obj)
         {
+            if (obj == null) return;
             selectedUser = obj;
             UpdateUserOptionsMenu(obj);
             AskForUpdates();
+            joinUserToggleButton.gameObject.SetActive(true);
+            banUserToggleButton.gameObject.SetActive(true);
+            approveUserToggleButton.gameObject.SetActive(true);
         }
 
         public void AskForUpdates()
@@ -116,6 +128,7 @@ namespace Multiplayer.View.DisplayData
 
         private void UpdateUserOptionsMenu(User obj)
         {
+            if (obj == null) return;
             userNameText.text = obj.GetUserName();
             joinUserToggleButton.SetIsOn(!usersInRoom.Contains(obj.GetUserGuid()));
             banUserToggleButton.SetIsOn(!bannedUsersInRoom.Contains(obj.GetUserGuid()));
