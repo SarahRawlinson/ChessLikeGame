@@ -6,6 +6,7 @@ using Multiplayer.View.LoadData;
 using Multiplayer.View.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Multiplayer.View.DisplayData
 {
@@ -14,7 +15,7 @@ namespace Multiplayer.View.DisplayData
         [SerializeField] private ToggleButton joinUserToggleButton;
         [SerializeField] private ToggleButton approveUserToggleButton;
         [SerializeField] private ToggleButton banUserToggleButton;
-        [SerializeField] private LoadChatUsersUI chatUsersList;
+        [FormerlySerializedAs("chatUsersList")] [SerializeField] private LoadChatUsersUI chatUsersOnlineList;
         [SerializeField] private TMP_Text userNameText;
         [SerializeField] private LoadChatUsersUI chatUsersInRoomList;
         [SerializeField] private LoadChatUsersUI chatUsersApprovedInRoomList;
@@ -37,8 +38,15 @@ namespace Multiplayer.View.DisplayData
             joinUserToggleButton.gameObject.SetActive(false);
             banUserToggleButton.gameObject.SetActive(false);
             approveUserToggleButton.gameObject.SetActive(false);
-            chatUsersList.onCreatedUserUI += UserUICreated;
-            chatUsersList.onDestroyedUserUI += UserUIDestroyed;
+            
+            chatUsersOnlineList.onCreatedUserUI += UserUICreated;
+            chatUsersOnlineList.onDestroyedUserUI += UserUIDestroyed;
+            chatUsersInRoomList.onCreatedUserUI += UserUICreated;
+            chatUsersInRoomList.onDestroyedUserUI += UserUIDestroyed;
+            chatUsersApprovedInRoomList.onCreatedUserUI += UserUICreated;
+            chatUsersApprovedInRoomList.onDestroyedUserUI += UserUIDestroyed;
+            chatUsersBannedInRoomList.onCreatedUserUI += UserUICreated;
+            chatUsersBannedInRoomList.onDestroyedUserUI += UserUIDestroyed;
             WebSocketConnection.onReceivedUsersListInRoom += RoomUsersReceived;
             WebSocketConnection.onReceivedBannedUsersListInRoom += RoomBannedUsersReceived;
             WebSocketConnection.onReceivedApprovedUsersListInRoom += RoomApprovedUsersReceived;
@@ -46,8 +54,14 @@ namespace Multiplayer.View.DisplayData
         
         private void OnDestroy()
         {
-            chatUsersList.onCreatedUserUI -= UserUICreated;
-            chatUsersList.onDestroyedUserUI -= UserUIDestroyed;
+            chatUsersOnlineList.onCreatedUserUI -= UserUICreated;
+            chatUsersOnlineList.onDestroyedUserUI -= UserUIDestroyed;
+            chatUsersInRoomList.onCreatedUserUI -= UserUICreated;
+            chatUsersInRoomList.onDestroyedUserUI -= UserUIDestroyed;
+            chatUsersApprovedInRoomList.onCreatedUserUI -= UserUICreated;
+            chatUsersApprovedInRoomList.onDestroyedUserUI -= UserUIDestroyed;
+            chatUsersBannedInRoomList.onCreatedUserUI -= UserUICreated;
+            chatUsersBannedInRoomList.onDestroyedUserUI -= UserUIDestroyed;
             WebSocketConnection.onReceivedUsersListInRoom -= RoomUsersReceived;
             WebSocketConnection.onReceivedBannedUsersListInRoom -= RoomBannedUsersReceived;
             WebSocketConnection.onReceivedApprovedUsersListInRoom -= RoomApprovedUsersReceived;
@@ -108,7 +122,7 @@ namespace Multiplayer.View.DisplayData
 
         private void UserSelected(User obj)
         {
-            if (obj == null) return;
+            if (obj == null || _room == null) return;
             selectedUser = obj;
             UpdateUserOptionsMenu(obj);
             AskForUpdates();
@@ -128,7 +142,7 @@ namespace Multiplayer.View.DisplayData
 
         private void UpdateUserOptionsMenu(User obj)
         {
-            if (obj == null) return;
+            if (obj == null || _room == null) return;
             userNameText.text = obj.GetUserName();
             joinUserToggleButton.SetIsOn(!usersInRoom.Contains(obj.GetUserGuid()));
             banUserToggleButton.SetIsOn(!bannedUsersInRoom.Contains(obj.GetUserGuid()));

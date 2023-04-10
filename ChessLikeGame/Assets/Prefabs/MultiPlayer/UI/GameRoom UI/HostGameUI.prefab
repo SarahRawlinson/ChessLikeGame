@@ -190,6 +190,7 @@ MonoBehaviour:
   _inputFieldRoomName: {fileID: 8978311177608235848}
   _button: {fileID: 4630033292334152413}
   isGameRoom: 1
+  hideFormOnJoined: 1
 --- !u!1 &3064390309087210973
 GameObject:
   m_ObjectHideFlags: 0

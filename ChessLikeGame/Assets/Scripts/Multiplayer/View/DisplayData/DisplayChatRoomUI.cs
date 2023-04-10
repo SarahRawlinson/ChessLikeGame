@@ -22,6 +22,7 @@ namespace Multiplayer.View.DisplayData
         {
             _room = room;
             roomString.text = room.GetRoomName();
+            WebSocketConnection.onChatRoomList += UpdateUsers;
             WebSocketConnection.onReceivedUsersListInRoom += CheckIfUsersInRoom;
             var webSocketConnection = FindObjectOfType<WebSocketConnection>();
             if (_room.GetCreator() == webSocketConnection.GetClientUser().GetUserName() )
@@ -33,6 +34,11 @@ namespace Multiplayer.View.DisplayData
             _button.SetIsOn(true);
             openButton.SetActive(false);
             AskForUsersOfRoom(webSocketConnection);
+        }
+
+        private void UpdateUsers(List<Room> obj)
+        {
+            AskForUsersOfRoom(FindObjectOfType<WebSocketConnection>());
         }
 
         public void ShowWindow()
@@ -84,6 +90,7 @@ namespace Multiplayer.View.DisplayData
 
         private void OnDestroy()
         {
+            WebSocketConnection.onChatRoomList -= UpdateUsers;
             WebSocketConnection.onReceivedUsersListInRoom -= CheckIfUsersInRoom;
         }
     }

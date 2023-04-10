@@ -11,22 +11,22 @@ namespace Multiplayer.View.LoadData
     public class LoadHostedGamesUI : MonoBehaviour
     {
         [SerializeField] private ScrollContentUI _scrollContentUI;
-        [SerializeField] private DisplayHostUI _gameObjectPrefab;
+        [SerializeField] private DisplayGameRoomUI _gameObjectPrefab;
         [SerializeField] private GameObject displayPanel;
         private List<Room> _rooms = new List<Room>();
-        private List<DisplayHostUI> _roomUI = new List<DisplayHostUI>();
+        private List<DisplayGameRoomUI> _roomUI = new List<DisplayGameRoomUI>();
 
         private void Start()
         {
-            WebSocketConnection.onHostsList += ProcessHosts;
+            WebSocketConnection.onGameRoomList += ProcessGameRoom;
         }
         
         private void OnDestroy()
         {
-            WebSocketConnection.onHostsList -= ProcessHosts;
+            WebSocketConnection.onGameRoomList -= ProcessGameRoom;
         }
 
-        private void ProcessHosts(List<Room> obj)
+        private void ProcessGameRoom(List<Room> obj)
         {
             List<Room> ls = new List<Room>();
             foreach (var room in obj)
@@ -79,7 +79,7 @@ namespace Multiplayer.View.LoadData
         {
             _rooms.Add(room);
             GameObject gObject = _scrollContentUI.AddContent(_gameObjectPrefab.gameObject);
-            DisplayHostUI ui = gObject.GetComponent<DisplayHostUI>();
+            DisplayGameRoomUI ui = gObject.GetComponent<DisplayGameRoomUI>();
             ui.UpdateHostInfo(room);
             _roomUI.Add(ui);
         }
@@ -92,7 +92,7 @@ namespace Multiplayer.View.LoadData
                 if (Equals(u, user))
                 {
                     _rooms.Remove(u);
-                    DisplayHostUI ui = _roomUI[index];
+                    DisplayGameRoomUI ui = _roomUI[index];
                     _roomUI.Remove(ui);
                     Destroy(ui.gameObject);
                 }

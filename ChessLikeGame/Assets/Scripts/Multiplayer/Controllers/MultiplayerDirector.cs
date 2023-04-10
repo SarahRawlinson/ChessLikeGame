@@ -7,6 +7,7 @@ using Multiplayer.Models;
 using Multiplayer.Models.BoardState;
 using Multiplayer.Models.Movement;
 using Multiplayer.Models.Rules;
+using Multiplayer.View.LoadData;
 using UnityEngine;
 
 public class MultiplayerDirector : MonoBehaviour
@@ -21,10 +22,15 @@ public class MultiplayerDirector : MonoBehaviour
     private GameObjectController gameObjectController;
     private Rules _rules;
     private Room gameRoom;
-    
-    public bool SetupNewGame(Room game)
+    private bool isHost = false;
+
+    private void StartGame((Room gameRoom, User thisPlayer, User opponent, User host) obj)
     {
-        gameRoom = game;
+        gameRoom = obj.gameRoom;
+        if (obj.thisPlayer.GetUserGuid() == obj.host.GetUserGuid())
+        {
+            isHost = true;
+        }
         int counter = 0;
         _gameStateData = new MultiGameStateData(setupFenString);
         _rules = new Rules(_gameStateData);
@@ -49,24 +55,13 @@ public class MultiplayerDirector : MonoBehaviour
             counter++;
         }
          
-        MovePiece();
-        return true;
+        if (TestMove(out var startGrid, out var move)) return;
+        MovePiece(startGrid, move);
     }
 
-    private void MovePiece()
+    private void MovePiece(ChessGrid startGrid, Move move)
     {
-        int fromKey = ChessGrid.GetIndexFromKey("H8");
-        ChessGrid startGrid = _gameStateData.GetGameBoardList()[fromKey];
-        (int x, int y) = ChessGrid.CalculateXYFromIndex(fromKey);
-        Debug.Log($"index: {fromKey}, XY: ({x},{y}), key: {startGrid.GetKey()}, piece: {startGrid.PieceOnGrid.GetPieceType()}, piece XY: ({startGrid.PieceOnGrid.X},{startGrid.PieceOnGrid.Y})");
-        var movesByPiece = _rules.GetMovesByPiece(startGrid
-            .PieceOnGrid);
-        if (movesByPiece.Count == 0)
-        {
-            Debug.Log($"cant move {startGrid.PieceOnGrid.GetPieceType()}");
-            return;
-        }
-        Move move = movesByPiece[0];
+        
         if (_gameStateData.MakeMoveOnBoard(move))
         {
             ChessGrid endGrid = _gameStateData.GetGameBoardList()[move.EndPosition];
@@ -82,11 +77,31 @@ public class MultiplayerDirector : MonoBehaviour
             gameObjectsPieces[endGrid.GetKey()] = gameObjectIndex;
             gameObjectsPieces[startGrid.GetKey()] = -1;
         }
-        
+    }
+
+    private bool TestMove(out ChessGrid startGrid, out Move move)
+    {
+        move = new Move(MoveTypes.Backward, 0, 0, TeamColor.Black);
+        int fromKey = ChessGrid.GetIndexFromKey("H8");
+        startGrid = _gameStateData.GetGameBoardList()[fromKey];
+        (int x, int y) = ChessGrid.CalculateXYFromIndex(fromKey);
+        Debug.Log(
+            $"index: {fromKey}, XY: ({x},{y}), key: {startGrid.GetKey()}, piece: {startGrid.PieceOnGrid.GetPieceType()}, piece XY: ({startGrid.PieceOnGrid.X},{startGrid.PieceOnGrid.Y})");
+        var movesByPiece = _rules.GetMovesByPiece(startGrid
+            .PieceOnGrid);
+        if (movesByPiece.Count == 0)
+        {
+            Debug.Log($"cant move {startGrid.PieceOnGrid.GetPieceType()}");
+            return true;
+        }
+
+        move = movesByPiece[0];
+        return false;
     }
 
     private void Start()
     {
         gameObjectController = FindObjectOfType<GameObjectController>();
+        StartGameScreenUI.onGameStarted += StartGame;
     }
 }

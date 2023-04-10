@@ -45,7 +45,7 @@ namespace Multiplayer.Models.BoardState
                 ChessGrid chessGrid = new ChessGrid(new MultiPiece(x, y), counter);
                 (int bx, int by) = ChessGrid.CalculateXYFromKey(chessGrid.GetKey());
                 int checkIndex = ChessGrid.CalculateIndexFromXY(x, y);
-                Debug.Log($"creating board position, index:{GameBoard.Count.ToString()}/{checkIndex}, position: {chessGrid.GetKey()}, aXY: ({x},{y}), bXY: ({bx},{by})");
+                // Debug.Log($"creating board position, index:{GameBoard.Count.ToString()}/{checkIndex}, position: {chessGrid.GetKey()}, aXY: ({x},{y}), bXY: ({bx},{by})");
                 GameBoard.Add(chessGrid);
             }
         }
@@ -105,7 +105,7 @@ namespace Multiplayer.Models.BoardState
                 {
                     tmpPiece.SetKey("");
                 }
-                Debug.Log($"Adding Piece to Board: {tmpPiece.Colour} {tmpPiece.GetPieceType()}  / Index: {index} / key: {chessGrid.GetKey()}, XY: ({x},{y})");
+                // Debug.Log($"Adding Piece to Board: {tmpPiece.Colour} {tmpPiece.GetPieceType()}  / Index: {index} / key: {chessGrid.GetKey()}, XY: ({x},{y})");
                 
                 chessGrid.SetPieceOnGrid(tmpPiece);
 

@@ -5,6 +5,7 @@ using Multiplayer.Controllers;
 using Multiplayer.View.LoadData;
 using Multiplayer.View.UI;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -38,12 +39,17 @@ namespace Multiplayer.View.DisplayData
                 displayChatRoomInfoUI.SetData(window.Room);
                 displayUserMenuUI.SetRoom(window.Room);
             }
+            else
+            {
+                toggleRoomInfoButton.gameObject.SetActive(false);
+                toggleMenuButton.gameObject.SetActive(false);
+            }
         }
-        public void SendMessageToUI(string user, string message)
+        public void SendMessageToUI(string user, string message, bool isPrivate=false)
         {
             GameObject o = _scrollContentUI.AddContent(displayChatMessageUIPrefab.gameObject);
             DisplayChatMessageUI messageUI = o.GetComponent<DisplayChatMessageUI>();
-            messageUI.SetMessage(user, message);
+            messageUI.SetMessage(user, message, isPrivate);
         }
 
         public void SendMessage()

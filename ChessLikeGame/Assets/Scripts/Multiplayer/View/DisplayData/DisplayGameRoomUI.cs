@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 
 namespace Multiplayer.View.DisplayData
 {
-    public class DisplayHostUI : MonoBehaviour
+    public class DisplayGameRoomUI : MonoBehaviour
     {
         [FormerlySerializedAs("_tmpText")] [SerializeField] private TMP_Text _roomNameText;
         private Guid id;
