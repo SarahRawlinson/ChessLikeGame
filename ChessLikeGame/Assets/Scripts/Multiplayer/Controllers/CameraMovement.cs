@@ -1,68 +1,82 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
     [SerializeField] private float rotationSpeed = 50f;
-    [SerializeField] private float movementSpeed = 2f;
-    // Update is called once per frame
+    [SerializeField] private float zoomSpeed = 2f;
+    [SerializeField] private float minDistanceFromTarget = 5f;
+    [SerializeField] private float maxDistanceFromTarget = 15f;
+    [SerializeField] private float minPitchAngle = 10f;
+    [SerializeField] private float maxPitchAngle = 80f;
+    [SerializeField] private GameObject target;
+
+    private Vector3 currentRotation;
+    private float currentDistanceFromTarget;
+    private Quaternion initialRotation;
+
+    private void Start()
+    {
+        currentRotation = transform.eulerAngles;
+        currentDistanceFromTarget = Vector3.Distance(transform.position, target.transform.position);
+        initialRotation = transform.rotation;
+    }
+
     private void Update()
     {
+        float deltaTime = Time.deltaTime;
+
+        // Rotation input from keyboard
+        if (Input.GetKey(KeyCode.W))
+            currentRotation.x -= rotationSpeed * deltaTime;
+
+        if (Input.GetKey(KeyCode.S))
+            currentRotation.x += rotationSpeed * deltaTime;
+
+        if (Input.GetKey(KeyCode.A))
+            currentRotation.y -= rotationSpeed * deltaTime;
+
+        if (Input.GetKey(KeyCode.D))
+            currentRotation.y += rotationSpeed * deltaTime;
+
+        // Rotation input from joystick
+        float joystickPitch = Input.GetAxis("Vertical");
+        float joystickYaw = Input.GetAxis("Horizontal");
+
+        currentRotation.x -= joystickPitch * rotationSpeed * deltaTime;
+        currentRotation.y += joystickYaw * rotationSpeed * deltaTime;
+
+        // Clamp pitch rotation
+        currentRotation.x = Mathf.Clamp(currentRotation.x, minPitchAngle, maxPitchAngle);
+
+        // Zoom in and out with Q and E keys
         if (Input.GetKey(KeyCode.Q))
-            transform.Rotate(Time.deltaTime * rotationSpeed * Vector3.right);
+            currentDistanceFromTarget -= zoomSpeed * deltaTime;
 
         if (Input.GetKey(KeyCode.E))
-            transform.Rotate(Time.deltaTime * rotationSpeed * Vector3.left);
-        
-        if (Input.GetKey(KeyCode.Z))
-            transform.Rotate(Time.deltaTime * rotationSpeed * Vector3.forward);
+            currentDistanceFromTarget += zoomSpeed * deltaTime;
 
-        if (Input.GetKey(KeyCode.C))
-            transform.Rotate(Time.deltaTime * rotationSpeed * Vector3.back);
+        // Clamp the distance from the target
+        currentDistanceFromTarget = Mathf.Clamp(currentDistanceFromTarget, minDistanceFromTarget, maxDistanceFromTarget);
 
-        if (Input.GetKey(KeyCode.D) && transform.position.x < 5)
-            transform.position += Time.deltaTime * movementSpeed * transform.right;
+        // Apply rotation and calculate new position
+        Quaternion rotation = Quaternion.Euler(currentRotation);
+        Vector3 direction = rotation * Vector3.back;
+        transform.position = target.transform.position + direction * currentDistanceFromTarget;
 
-        if (Input.GetKey(KeyCode.A) && transform.position.x > -5)
-            transform.position += Time.deltaTime * movementSpeed * -transform.right;
+        // Look at the target
+        transform.LookAt(target.transform);
 
-        if (Input.GetKey(KeyCode.W) && transform.position.z < 5)
-            transform.position += Time.deltaTime * movementSpeed * transform.forward;
-
-        if (Input.GetKey(KeyCode.S) && transform.position.z > -5)
-            transform.position += Time.deltaTime * movementSpeed * -transform.forward;
-
-        if (Input.GetKey(KeyCode.Space) && transform.position.y < 5)
-            transform.position += Time.deltaTime * movementSpeed * transform.up;
-
-        if (Input.GetKey(KeyCode.LeftControl) && transform.position.y > -5)
-            transform.position += Time.deltaTime * movementSpeed * -transform.up;
-
-        if (Input.GetKey(KeyCode.RightArrow) && transform.position.x < 5)
-            transform.position += Time.deltaTime * movementSpeed * Vector3.right;
-
-        if (Input.GetKey(KeyCode.LeftArrow) && transform.position.x > -5)
-            transform.position += Time.deltaTime * movementSpeed * Vector3.left;
-
-        if (Input.GetKey(KeyCode.UpArrow) && transform.position.z < 5)
-            transform.position += Time.deltaTime * movementSpeed * Vector3.forward;
-
-        if (Input.GetKey(KeyCode.DownArrow) && transform.position.z > -5)
-            transform.position += Time.deltaTime * movementSpeed * Vector3.back;
-
-        if (Input.GetKey(KeyCode.Home) && transform.position.y < 5)
-            transform.position += Time.deltaTime * movementSpeed * new Vector3(0, 0.5f, 0);
-
-        if (Input.GetKey(KeyCode.End) && transform.position.y > -5)
-            transform.position += Time.deltaTime * movementSpeed * new Vector3(0, -0.5f, 0);
-
-        if (Input.GetKeyDown(KeyCode.Delete))
+        // Reset rotation
+        if (Input.GetKeyDown(KeyCode.R) || Input.GetButtonDown("Fire3")) // Assuming "Fire3" is the button to reset on the joystick
         {
-            transform.position = new Vector3(0, 0, 0);
-            //transform.rotation = ;
+            transform.rotation = initialRotation;
+            currentRotation = initialRotation.eulerAngles;
         }
-            
+
+        // Flip camera to the opposite side
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            currentRotation.y += 180f;
+        }
     }
-    
 }
