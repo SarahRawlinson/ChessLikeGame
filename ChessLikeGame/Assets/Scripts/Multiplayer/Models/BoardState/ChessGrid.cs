@@ -23,7 +23,7 @@ public class ChessGrid
         this.location = location;
     }
 
-    private GridColor CalculateGridColorFromLocation(int location) 
+    public static  GridColor CalculateGridColorFromLocation(int location) 
     {
         int x, y;
         x = location % 8;
