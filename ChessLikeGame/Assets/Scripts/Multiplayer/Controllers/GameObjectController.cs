@@ -28,8 +28,12 @@ namespace Multiplayer.Controllers
         [SerializeField] private ChessSquare positionGameObjectPrefab; // Size of a Sqaure on the board.
         [SerializeField] private EventSystem eventSystem;
         [SerializeField] private Camera mainCamera;
-   
-
+        [SerializeField] private float cameraAngleOffset = 0;
+        [SerializeField] private bool invertXAxis = false;
+        [SerializeField] private bool invertYAxis = false;
+        [SerializeField] private float angleTolerance = 30f;
+        [SerializeField] private float axisFlipOffset = 0;
+        
         public  void CreateBoardPositions(int x, int y)
         {
             float size = positionGameObjectPrefab.transform.localScale.x;
@@ -119,7 +123,7 @@ namespace Multiplayer.Controllers
             return -1;
         }
         
-private void Update()
+       private void Update()
 {
     // Check for cursor key inputs
     if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
@@ -132,44 +136,91 @@ private void Update()
         Vector3 cameraForwardXZ = new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z).normalized;
         Vector3 cameraRightXZ = new Vector3(mainCamera.transform.right.x, 0, mainCamera.transform.right.z).normalized;
 
+        // Apply the camera angle offset
+        Quaternion rotation = Quaternion.Euler(0, cameraAngleOffset, 0);
+        cameraForwardXZ = rotation * cameraForwardXZ;
+        cameraRightXZ = rotation * cameraRightXZ;
+
+        // Determine the current camera quadrant
+        int cameraQuadrant = 0;
+        
+        bool isFacingBlackSide = mainCamera.transform.eulerAngles.y > 90 + axisFlipOffset && mainCamera.transform.eulerAngles.y < 270 + axisFlipOffset;
+
+        
+        if (cameraForwardXZ.z >= 0)
+        {
+            cameraQuadrant = cameraRightXZ.x >= 0 ? 1 : 4;
+        }
+        else
+        {
+            cameraQuadrant = cameraRightXZ.x >= 0 ? 2 : 3;
+        }
+
+        // Remap arrow keys based on the camera quadrant
+        Vector3 upDirection = Vector3.zero;
+        Vector3 downDirection = Vector3.zero;
+        Vector3 leftDirection = Vector3.zero;
+        Vector3 rightDirection = Vector3.zero;
+
+        switch (cameraQuadrant)
+        {
+            case 1:
+                upDirection = isFacingBlackSide ? -cameraForwardXZ : cameraForwardXZ;
+                downDirection = isFacingBlackSide ? cameraForwardXZ : -cameraForwardXZ;
+                leftDirection = isFacingBlackSide ? cameraRightXZ : -cameraRightXZ;
+                rightDirection = isFacingBlackSide ? -cameraRightXZ : cameraRightXZ;
+                break;
+            case 2:
+                upDirection = isFacingBlackSide ? -cameraRightXZ : cameraRightXZ;
+                downDirection = isFacingBlackSide ? cameraRightXZ : -cameraRightXZ;
+                leftDirection = isFacingBlackSide ? -cameraForwardXZ : cameraForwardXZ;
+                rightDirection = isFacingBlackSide ? cameraForwardXZ : -cameraForwardXZ;
+                break;
+            case 3:
+                upDirection = isFacingBlackSide ? cameraForwardXZ : -cameraForwardXZ;
+                downDirection = isFacingBlackSide ? -cameraForwardXZ : cameraForwardXZ;
+                leftDirection = isFacingBlackSide ? -cameraRightXZ : cameraRightXZ;
+                rightDirection = isFacingBlackSide ? cameraRightXZ : -cameraRightXZ;
+                break;
+            case 4:
+                upDirection = isFacingBlackSide ? cameraRightXZ : -cameraRightXZ;
+                downDirection = isFacingBlackSide ? -cameraRightXZ : cameraRightXZ;
+                leftDirection = isFacingBlackSide ? cameraForwardXZ : -cameraForwardXZ;
+                rightDirection = isFacingBlackSide ? -cameraForwardXZ : cameraForwardXZ;
+                break;
+        }
+
         // Calculate the next game object index based on the camera-relative input
         int nextIndex = currentIndex;
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            if (Vector3.Dot(cameraForwardXZ, Vector3.forward) > 0.5f && currentIndex >= 8) nextIndex -= 8;
-            if (Vector3.Dot(cameraForwardXZ, Vector3.back) > 0.5f && currentIndex < 56) nextIndex += 8;
-            if (Vector3.Dot(cameraForwardXZ, Vector3.right) > 0.5f && currentIndex % 8 < 7) nextIndex += 1;
-            if (Vector3.Dot(cameraForwardXZ, Vector3.left) > 0.5f && currentIndex % 8 > 0) nextIndex -= 1;
+            nextIndex = GetNextIndexBasedOnCameraDirection(currentIndex, invertYAxis ? downDirection : upDirection);
         }
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            if (Vector3.Dot(cameraForwardXZ, Vector3.forward) > 0.5f && currentIndex < 56) nextIndex += 8;
-            if (Vector3.Dot(cameraForwardXZ, Vector3.back) > 0.5f && currentIndex >= 8) nextIndex -= 8;
-            if (Vector3.Dot(cameraForwardXZ, Vector3.right) > 0.5f && currentIndex % 8 > 0) nextIndex -= 1;
-            if (Vector3.Dot(cameraForwardXZ, Vector3.left) > 0.5f && currentIndex % 8 < 7) nextIndex += 1;
+            nextIndex = GetNextIndexBasedOnCameraDirection(currentIndex, invertYAxis ? upDirection : downDirection);
         }
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            if (Vector3.Dot(cameraRightXZ, Vector3.forward) > 0.5f && currentIndex >= 8) nextIndex -= 8;
-            if (Vector3.Dot(cameraRightXZ, Vector3.back) > 0.5f && currentIndex < 56) nextIndex += 8;
-            if (Vector3.Dot(cameraRightXZ, Vector3.right) > 0.5f && currentIndex % 8 < 7) nextIndex += 1;
-            if (Vector3.Dot(cameraRightXZ, Vector3.left) > 0.5f && currentIndex % 8 > 0) nextIndex -= 1;
+            nextIndex = GetNextIndexBasedOnCameraDirection(currentIndex, invertXAxis ? rightDirection : leftDirection);
         }
-        
+        if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            if (Vector3.Dot(cameraRightXZ, Vector3.forward) > 0.5f && currentIndex < 56) nextIndex += 8;
-            if (Vector3.Dot(cameraRightXZ, Vector3.back) > 0.5f && currentIndex >= 8) nextIndex -= 8;
-            if (Vector3.Dot(cameraRightXZ, Vector3.right) > 0.5f && currentIndex % 8 > 0) nextIndex -= 1;
-            if (Vector3.Dot(cameraRightXZ, Vector3.left) > 0.5f && currentIndex % 8 < 7) nextIndex += 1;
+            nextIndex = GetNextIndexBasedOnCameraDirection(currentIndex, invertXAxis ? leftDirection : rightDirection);
         }
 
-// Make sure nextIndex is within the range of gameSquares
+        // Make sure nextIndex is within the range of gameSquares
+       
         nextIndex = Mathf.Clamp(nextIndex, 0, gameSquares.Count - 1);
 
-// Set the new selected game object
+        // Set the new selected game object
         GameObject nextSelected = GetGameObjectFromArray(gameSquares[nextIndex]);
         eventSystem.SetSelectedGameObject(nextSelected);
     }
+
+
+
+
 
     // Check for mouse input
     if (Input.GetMouseButtonDown(0))
@@ -201,6 +252,37 @@ private void Update()
     }
 }
 
+
+private int GetNextIndexBasedOnCameraDirection(int currentIndex, Vector3 direction)
+{
+   int nextIndex = currentIndex;
+
+   Vector3[] cardinalDirections = { Vector3.forward, Vector3.back, Vector3.right, Vector3.left };
+   Vector3 nearestDirection = Vector3.zero;
+   float minAngle = float.MaxValue;
+
+   foreach (Vector3 cardinalDirection in cardinalDirections)
+   {
+       float angle = Vector3.Angle(direction, cardinalDirection);
+       if (angle < minAngle)
+       {
+           minAngle = angle;
+           nearestDirection = cardinalDirection;
+       }
+   }
+
+   if (minAngle > angleTolerance)
+   {
+       return currentIndex;
+   }
+
+   if (nearestDirection == Vector3.forward && currentIndex >= 8) nextIndex -= 8;
+   if (nearestDirection == Vector3.back && currentIndex < 56) nextIndex += 8;
+   if (nearestDirection == Vector3.right && currentIndex % 8 < 7) nextIndex += 1;
+   if (nearestDirection == Vector3.left && currentIndex % 8 > 0) nextIndex -= 1;
+
+   return nextIndex;
+}
 
 
 private void SelectNextSquare()

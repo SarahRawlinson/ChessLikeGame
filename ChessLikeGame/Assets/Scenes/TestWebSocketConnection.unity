@@ -173,7 +173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_FirstSelected: {fileID: 0}
+  m_FirstSelected: {fileID: 707241385}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
 --- !u!4 &5376299
@@ -498,6 +498,22 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 5376298}
     - target: {fileID: 5551687700442423765, guid: 9ffdae0dd20efc040b03422dd754d779, type: 3}
+      propertyPath: invertYAxis
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5551687700442423765, guid: 9ffdae0dd20efc040b03422dd754d779, type: 3}
+      propertyPath: angleTolerance
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 5551687700442423765, guid: 9ffdae0dd20efc040b03422dd754d779, type: 3}
+      propertyPath: axisFlipOffset
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 5551687700442423765, guid: 9ffdae0dd20efc040b03422dd754d779, type: 3}
+      propertyPath: cameraAngleOffset
+      value: 270
+      objectReference: {fileID: 0}
+    - target: {fileID: 5551687700442423765, guid: 9ffdae0dd20efc040b03422dd754d779, type: 3}
       propertyPath: StartGameSquarePosition
       value: 
       objectReference: {fileID: 9178368312338319281}
@@ -507,6 +523,11 @@ PrefabInstance:
       objectReference: {fileID: 2494779629644884193, guid: b5d0fc15cc86ac84e8bcde85ff85bf6a, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9ffdae0dd20efc040b03422dd754d779, type: 3}
+--- !u!1 &707241385 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8029278701937905880, guid: 771ceff1b4ee8384ba704af37bf4560b, type: 3}
+  m_PrefabInstance: {fileID: 1910435727}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &719955306 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3856626339953374218, guid: b530e4f38cf3bb6ac9d09407190a13c0, type: 3}
@@ -791,14 +812,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1761647807}
-  m_LocalRotation: {x: 0.5616245, y: -0, z: -0, w: 0.82739216}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.507, z: -0.244}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 68.336, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1897309294 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4200708479692140527, guid: b530e4f38cf3bb6ac9d09407190a13c0, type: 3}

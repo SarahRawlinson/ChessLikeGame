@@ -120,7 +120,12 @@ namespace Multiplayer.Models.Rules
                 switch (validate)
                 {
                     case MoveValidationTypes.CheckForClearPath:
-                        //todo: need to work this out
+                        if (!IsPathClear(move.StartPosition, move.EndPosition))
+                        {
+                            Debug.Log($"{move.MoveType}: {piece.GetPieceType()} {startPos.GetKey()} cant move to {endPos.GetKey()} path not clear");
+                            return false;
+                        }
+                        
                         break;
                     case MoveValidationTypes.CheckEmpty:
                         if (endPos.PieceOnGrid.GetPieceType() != ChessPieceTypes.NONE)
@@ -137,7 +142,10 @@ namespace Multiplayer.Models.Rules
                         }
                         break;
                     case MoveValidationTypes.CheckKingCantBeTaken:
-                        //todo: need to work this out
+                        if (!IsKingSafeAfterMove(move, _gameStateData.GetGameBoardList()))
+                        {
+                            return false;
+                        }
                         break;
                     case MoveValidationTypes.CheckHasNotMoved:
                         if (piece.HasMoved())
@@ -160,6 +168,92 @@ namespace Multiplayer.Models.Rules
 
             return canAdd;
         }
+        
+        private bool IsKingSafeAfterMove(Move move, List<ChessGrid> gameBoard)
+        {
+            int startPosition = move.StartPosition;
+            int endPosition = move.EndPosition;
+            ChessPieceTypes originalEndPiece = gameBoard[endPosition].PieceOnGrid.GetPieceType();
+
+            // Temporarily simulate the move
+            gameBoard[startPosition].PieceOnGrid.SetType(ChessPieceTypes.NONE);
+            var pieceType = gameBoard[startPosition].PieceOnGrid.GetPieceType();
+            gameBoard[endPosition].PieceOnGrid.SetType(pieceType);
+
+            int kingPosition = FindKingPosition(move.ColorToMove, gameBoard);
+
+            // Check if any enemy piece has a valid move to capture the king
+            for (int i = 0; i < gameBoard.Count; i++)
+            {
+                ChessGrid enemyPiece = gameBoard[i];
+                if (enemyPiece.PieceOnGrid.Colour != move.ColorToMove)
+                {
+                    foreach (var potentialCapture in GetMovesByPiece(gameBoard[i].PieceOnGrid))
+                    {
+                        if (isMoveValid(potentialCapture) && potentialCapture.EndPosition == kingPosition)
+                        {
+                            // Revert the simulated move and return false (unsafe)
+                            gameBoard[startPosition].PieceOnGrid.SetType(pieceType);
+                            gameBoard[endPosition].PieceOnGrid.SetType(originalEndPiece);
+                            return false;
+                        }
+                    }
+                   
+                }
+            }
+
+            // Revert the simulated move and return true (safe)
+            gameBoard[startPosition].PieceOnGrid.SetType(pieceType);
+            gameBoard[endPosition].PieceOnGrid.SetType(originalEndPiece);
+            return true;
+        }
+
+        private int FindKingPosition(TeamColor player, List<ChessGrid> gameBoard)
+        {
+            for (int i = 0; i < gameBoard.Count; i++)
+            {
+                ChessGrid piece = gameBoard[i];
+                if (piece.PieceOnGrid.GetPieceType() == ChessPieceTypes.KING && piece.PieceOnGrid.Colour == player)
+                {
+                    return i;
+                }
+            }
+
+            throw new InvalidOperationException($"King not found for player {player}");
+        }
+        
+        private bool IsPathClear(int startPosition, int endPosition)
+        {
+            (int startX, int startY) = ChessGrid.CalculateXYFromIndex(startPosition);
+            (int endX, int endY) = ChessGrid.CalculateXYFromIndex(endPosition);
+
+            int deltaX = endX - startX;
+            int deltaY = endY - startY;
+
+            int stepX = Math.Sign(deltaX);
+            int stepY = Math.Sign(deltaY);
+
+            int currentX = startX + stepX;
+            int currentY = startY + stepY;
+
+            while (currentX != endX || currentY != endY)
+            {
+                int currentIndex = ChessGrid.CalculateIndexFromXY(currentX, currentY);
+                MultiPiece piece = _gameStateData.GetGameBoardList()[currentIndex].PieceOnGrid;
+
+                if (piece.GetPieceType() != ChessPieceTypes.NONE)
+                {
+                    return false;
+                }
+
+                currentX += stepX;
+                currentY += stepY;
+            }
+
+            return true;
+        }
+        
+      
 
         private static void GetMovesByType(MoveTypes moveType, TeamColor color, int startPos, (int x, int y) basePos, 
             int steps, List<Move> moves)
