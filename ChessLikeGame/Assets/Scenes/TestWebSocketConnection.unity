@@ -503,7 +503,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5551687700442423765, guid: 9ffdae0dd20efc040b03422dd754d779, type: 3}
       propertyPath: angleTolerance
-      value: 45
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 5551687700442423765, guid: 9ffdae0dd20efc040b03422dd754d779, type: 3}
       propertyPath: axisFlipOffset

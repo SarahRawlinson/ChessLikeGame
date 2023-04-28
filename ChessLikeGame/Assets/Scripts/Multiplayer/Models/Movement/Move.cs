@@ -54,7 +54,7 @@ namespace Multiplayer.Models.Movement
         public override string ToString()
         {
             return
-                $"{_colorToMove}  Move from: {_startPosition} To: {_endPosition} / Capture?: {_willResultInCapture} : {_capturedPiece} ";
+                $"{_colorToMove}  Move from: {ChessGrid.GetKeyFromIndex(_startPosition)} To: {ChessGrid.GetKeyFromIndex(_endPosition)} / Capture?: {_willResultInCapture} : {_capturedPiece} ";
         }
 
         public static bool CheckEqual(Move move, Move moveToTest)

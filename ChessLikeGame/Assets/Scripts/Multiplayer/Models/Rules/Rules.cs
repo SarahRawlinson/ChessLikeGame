@@ -8,7 +8,7 @@ namespace Multiplayer.Models.Rules
 {
     public class Rules
     {
-        private  MultiGameStateData _gameStateData;
+        private  ChessEngine _gameStateData;
         public static int boardSize;
 
         public static int BoardSize
@@ -17,16 +17,16 @@ namespace Multiplayer.Models.Rules
             set => boardSize = value;
         }
 
-        public Rules(MultiGameStateData game)
+        public Rules(ChessEngine game)
         {
             SetGameStateData(game);
         }
 
-        public bool isMoveValid(Move moveToTest)
+        public bool isMoveValid(Move moveToTest) //Todo : This will not check for obstacles. amend
         {
             MultiPiece piece =
                 _gameStateData.GetGameBoardList()[moveToTest.StartPosition].PieceOnGrid;
-            foreach (var move in GetMovesByPiece(piece))
+            foreach (var move in GetMovesByPiece(piece, moveToTest.StartPosition))
             {
                 if (Move.CheckEqual(move, moveToTest))
                 {
@@ -36,13 +36,13 @@ namespace Multiplayer.Models.Rules
             return false;
         }
 
-        private void SetGameStateData(MultiGameStateData game)
+        private void SetGameStateData(ChessEngine game)
         {
             _gameStateData = game;
             boardSize = game.GetGameBoardList().Count;
         }
 
-        public List<Move> GetMovesByPiece(MultiPiece piece)
+        public List<Move> GetMovesByPiece(MultiPiece piece, int startPos)
         {
             List<Move> moves = new List<Move>();
             IPieceMovement movement;
@@ -75,7 +75,7 @@ namespace Multiplayer.Models.Rules
             List<MoveToValidate> movesToValidate = movement.possibleMoves();
             foreach (var moveToValidate in movesToValidate)
             {
-                moves.AddRange(GenerateValidatedMoves(moveToValidate, piece.Colour, ChessGrid.CalculateIndexFromXY(piece.X, piece.Y)));
+                moves.AddRange(GenerateValidatedMoves(moveToValidate, piece.Colour, startPos));
             }
             return moves;
         }
@@ -188,7 +188,7 @@ namespace Multiplayer.Models.Rules
                 ChessGrid enemyPiece = gameBoard[i];
                 if (enemyPiece.PieceOnGrid.Colour != move.ColorToMove)
                 {
-                    foreach (var potentialCapture in GetMovesByPiece(gameBoard[i].PieceOnGrid))
+                    foreach (var potentialCapture in GetMovesByPiece(gameBoard[i].PieceOnGrid, i))
                     {
                         if (isMoveValid(potentialCapture) && potentialCapture.EndPosition == kingPosition)
                         {

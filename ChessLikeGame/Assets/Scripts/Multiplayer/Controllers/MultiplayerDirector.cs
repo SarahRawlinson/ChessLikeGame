@@ -14,14 +14,12 @@ public class MultiplayerDirector : MonoBehaviour
 {
     private bool _gameOver = false;
 
-    private MultiGameStateData _gameStateData;
     private Dictionary<string, int> gameObjectsPieces = new Dictionary<string, int>();
-
     private string setupFenString = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-
     private GameObjectController gameObjectController;
-    private Rules _rules;
     private Room gameRoom;
+
+    private ChessEngine _chessEngine = new ChessEngine();
     private bool isHost = false;
 
     private void StartGame((Room gameRoom, User thisPlayer, User opponent, User host) obj)
@@ -31,14 +29,15 @@ public class MultiplayerDirector : MonoBehaviour
         {
             isHost = true;
         }
-        int counter = 0;
-        _gameStateData = new MultiGameStateData(setupFenString);
-        _rules = new Rules(_gameStateData);
-        var gameBoardList = _gameStateData.GetGameBoardList();
+    
+        _chessEngine.CreateBoard();
+        _chessEngine.GetFenController().SetUpBoardFromFen(setupFenString);
+        
+ 
         gameObjectController.CreateBoardPositions(8,8);
-        counter = 0;
 
-         foreach (var square in gameBoardList)
+        int counter = 0;
+         foreach (var square in _chessEngine.GetGameBoardList())
         {
             if (square.PieceOnGrid.GetPieceType() != ChessPieceTypes.NONE)
             {
@@ -54,17 +53,23 @@ public class MultiplayerDirector : MonoBehaviour
             }
             counter++;
         }
+       
          
-        if (TestMove(out var startGrid, out var move)) return;
-        MovePiece(startGrid, move);
+        if (!TestMove(out var move)) return;
+        
+        MovePiece(move);
     }
 
-    private void MovePiece(ChessGrid startGrid, Move move)
+    private void MovePiece(Move move)
     {
-        
-        if (_gameStateData.MakeMoveOnBoard(move))
+        Debug.Log("Attempting to move (in MovePiece) :" + move);
+        if (_chessEngine.MakeMoveOnBoard(move))
         {
-            ChessGrid endGrid = _gameStateData.GetGameBoardList()[move.EndPosition];
+            Debug.Log("GameBoard Data Array update with move (in MovePiece) :" + move);
+            
+            ChessGrid endGrid = _chessEngine.GetGameBoardList()[move.EndPosition];
+            ChessGrid startGrid = _chessEngine.GetGameBoardList()[move.StartPosition];
+            //checking for null position
             if (gameObjectsPieces[endGrid.GetKey()] != -1)
             {
                 gameObjectController.RemoveGameObjectFromGame(gameObjectsPieces[endGrid.GetKey()]);
@@ -75,28 +80,29 @@ public class MultiplayerDirector : MonoBehaviour
                 gameObjectController.GetPositionVectorfromGameSquare(move.EndPosition)
                 );
             gameObjectsPieces[endGrid.GetKey()] = gameObjectIndex;
+            // removed from game without breaking indexing of game objects?
             gameObjectsPieces[startGrid.GetKey()] = -1;
         }
     }
 
-    private bool TestMove(out ChessGrid startGrid, out Move move)
+    private bool TestMove(out Move move)
     {
         move = new Move(MoveTypes.Backward, 0, 0, TeamColor.Black);
-        int fromKey = ChessGrid.GetIndexFromKey("H8");
-        startGrid = _gameStateData.GetGameBoardList()[fromKey];
+        int fromKey = ChessGrid.GetIndexFromKey("B2");
+        var startGrid = _chessEngine.GetGameBoardList()[fromKey];
         (int x, int y) = ChessGrid.CalculateXYFromIndex(fromKey);
         Debug.Log(
-            $"index: {fromKey}, XY: ({x},{y}), key: {startGrid.GetKey()}, piece: {startGrid.PieceOnGrid.GetPieceType()}, piece XY: ({startGrid.PieceOnGrid.X},{startGrid.PieceOnGrid.Y})");
-        var movesByPiece = _rules.GetMovesByPiece(startGrid
-            .PieceOnGrid);
+            $"index: {fromKey}, XY: ({x},{y}), key: {startGrid.GetKey()}, piece: {startGrid.PieceOnGrid.GetPieceType()})");
+        var movesByPiece = _chessEngine.GetRules().GetMovesByPiece(startGrid.PieceOnGrid, fromKey);
         if (movesByPiece.Count == 0)
         {
             Debug.Log($"cant move {startGrid.PieceOnGrid.GetPieceType()}");
-            return true;
+            return false;
         }
 
         move = movesByPiece[0];
-        return false;
+        
+        return true;
     }
 
     private void Start()
