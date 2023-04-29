@@ -57,4 +57,12 @@ MonoBehaviour:
   blackQueenPrefab: {fileID: 2159701217042013166, guid: 140e47b6d0c9ac8499e287c56dc49486, type: 3}
   blackKingPrefab: {fileID: 2999871336804723636, guid: 1455e063dcad7a9409427f761b35ebb0, type: 3}
   StartGameSquarePosition: {fileID: 0}
-  positionGameObjectPrefab: {fileID: 9178368310937145661, guid: b5d0fc15cc86ac84e8bcde85ff85bf6a, type: 3}
+  positionGameObjectPrefab: {fileID: 2494779629644884193, guid: b5d0fc15cc86ac84e8bcde85ff85bf6a, type: 3}
+  eventSystem: {fileID: 0}
+  mainCamera: {fileID: 0}
+  cameraAngleOffset: 270
+  invertXAxis: 0
+  invertYAxis: 1
+  angleTolerance: 180
+  axisFlipOffset: 45
+  yOffset: 0.025

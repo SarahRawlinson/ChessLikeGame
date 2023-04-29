@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using UnityEngine;
 
 namespace Multiplayer.Models.BoardState
 {
@@ -39,10 +40,12 @@ namespace Multiplayer.Models.BoardState
                 
                 MultiPiece tmpPiece = new MultiPiece();
                 ChessGrid chessGrid = engine.GetGameBoardList()[index];
+                Debug.Log("Creating piece in LoadPositionFromFEN: Color" + tmpPiece.Colour + " For CHAR:" + character);
                 
                 if (Char.IsLetter(character))
                 {
                     WorkOutCharacter(tmpPiece, character);
+                    Debug.Log("Worked Out Character in LoadPositionFromFEN: Color" + tmpPiece.Colour + " For CHAR:" + character);
                 }
                 else
                 {
@@ -91,11 +94,13 @@ namespace Multiplayer.Models.BoardState
 
             if (Char.IsLower(character))
             {
+                Debug.Log("Setting piece to black");
                 tmpPiece.Colour = TeamColor.Black;
                 currentDataSet.blackPiece.Add(tmpPiece);
             }
             else
             {
+                Debug.Log("Setting piece to white");
                 tmpPiece.Colour = TeamColor.White;
                 currentDataSet.whitePiece.Add(tmpPiece);
             }
@@ -171,7 +176,7 @@ namespace Multiplayer.Models.BoardState
 
         #region GenerateFen
 
-        private string FenBuilder()
+        public string FenBuilder()
         {
             return $"{GetBoardString()} {GetActivePlayerString()} {GetCastleString()} {GetEnPassentString()} {currentDataSet.HalfMoveCounter.ToString()} {currentDataSet.FullMoveNumber.ToString()}";
         }

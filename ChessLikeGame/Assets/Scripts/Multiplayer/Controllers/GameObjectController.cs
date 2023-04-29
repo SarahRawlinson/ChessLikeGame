@@ -33,7 +33,14 @@ namespace Multiplayer.Controllers
         [SerializeField] private bool invertYAxis;
         [SerializeField] private float angleTolerance = 30f;
         [SerializeField] private float axisFlipOffset;
+        [SerializeField] private float yOffset = 1;
 
+
+        public ChessSquare GetChessCube(int index)
+        {
+           return  _objectsInUse[gameSquares[index]].GetComponent<ChessSquare>();
+        }
+        
         public void CreateBoardPositions(int x, int y)
         {
             var size = positionGameObjectPrefab.transform.localScale.x;
@@ -70,6 +77,7 @@ namespace Multiplayer.Controllers
 
         public int SpawnPiece(ChessPieceTypes type, TeamColor teamColor, Vector3 position)
         {
+            position.y += yOffset;
             switch (teamColor)
             {
                 case TeamColor.Black:
@@ -286,7 +294,7 @@ namespace Multiplayer.Controllers
 
         public void MoveGameObject(int gameObjectIndex, Vector3 moveVector)
         {
-            _objectsInUse[gameObjectIndex].transform.position = moveVector;
+            _objectsInUse[gameObjectIndex].transform.position = new Vector3( moveVector.x, moveVector.y + yOffset, moveVector.z) ;
         }
 
         public void RemoveGameObjectFromGame(int gameObjectIndex)

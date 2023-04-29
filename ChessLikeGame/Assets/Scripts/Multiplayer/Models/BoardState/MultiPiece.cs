@@ -2,32 +2,22 @@
 {
     public class MultiPiece
     {
-        // private int x;
-        // private int y;
-        //
-        // public int X => x;
-        // public int Y => y;
-
         public TeamColor Colour { get; set; }
         public string key;
-        
-
         private bool _hasMoved;
         private ChessPieceTypes type;
         
         public MultiPiece(TeamColor color, bool hasMoved)
         {
-            // x = xa;
-            // y = ya;
             Colour = color;
             _hasMoved = hasMoved;
         }
 
         public MultiPiece()
         {
-            // x = xa;
-            // y = ya;
             _hasMoved = false;
+            Colour = TeamColor.Empty;
+            type = ChessPieceTypes.NONE;
         }
 
         public void SetType(ChessPieceTypes pieceType)
@@ -55,10 +45,14 @@
             return _hasMoved;
         }
 
-        // public void SetXY(int xa, int ya)
-        // {
-        //     x = xa;
-        //     y = ya;
-        // }
+        public void SetMoved(bool value)
+        {
+            _hasMoved = value;
+        }
+
+        public override string ToString()
+        {
+            return $"Piece Color:{Colour} / Type:{type} / Key:{key} " ;
+        }
     } 
 }

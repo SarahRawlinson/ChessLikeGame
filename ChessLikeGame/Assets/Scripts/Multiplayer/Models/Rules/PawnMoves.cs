@@ -10,8 +10,8 @@ namespace Multiplayer.Models.Rules
         {
             List<MoveToValidate> myMoves = new List<MoveToValidate>();
             List<MoveValidationTypes> diagonal = new List<MoveValidationTypes>() {MoveValidationTypes.CheckOccupied};
-            List<MoveValidationTypes> forward = new List<MoveValidationTypes>() {MoveValidationTypes.CheckEmpty};
-            List<MoveValidationTypes> forwardIfNotMoved = new List<MoveValidationTypes>() {MoveValidationTypes.CheckEmpty, MoveValidationTypes.CheckHasNotMoved};
+            List<MoveValidationTypes> forward = new List<MoveValidationTypes>() {MoveValidationTypes.CheckEmpty, MoveValidationTypes.CheckForClearPath};
+            List<MoveValidationTypes> forwardIfNotMoved = new List<MoveValidationTypes>() {MoveValidationTypes.CheckEmpty, MoveValidationTypes.CheckHasNotMoved, MoveValidationTypes.CheckForClearPath};
             myMoves.Add(new MoveToValidate(MoveTypes.Forward, forward,1));
             myMoves.Add(new MoveToValidate(MoveTypes.Forward, forwardIfNotMoved,2));
             myMoves.Add(new MoveToValidate(MoveTypes.DiagonalUpLeft, diagonal,1));

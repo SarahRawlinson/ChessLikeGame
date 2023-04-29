@@ -11,6 +11,7 @@ namespace Multiplayer.Models.BoardState
         private Rules.Rules _rules;
         private MultiGameStateData _gameStateData = new MultiGameStateData();
         private FENController _fenController;
+
         public ChessEngine()
         {
             _fenController = new FENController(_gameStateData, this);
@@ -21,8 +22,8 @@ namespace Multiplayer.Models.BoardState
         {
             return _rules;
         }
-        
-        
+
+
         public List<ChessGrid> GetGameBoardList()
         {
             return _gameBoard;
@@ -32,12 +33,11 @@ namespace Multiplayer.Models.BoardState
         {
             return _fenController;
         }
-        
-       public void CreateBoard()
+
+        public void CreateBoard()
         {
-            
             ChessGrid.SetBoardWidth(8);
-            
+
             int counter = 0;
             _gameBoard.Clear();
             for (; counter < 64; counter++)
@@ -51,24 +51,30 @@ namespace Multiplayer.Models.BoardState
             }
         }
 
-       public bool MakeMoveOnBoard(Move move)
-       {
-           if (_rules.isMoveValid(move))
-           {
-                //Clear out the enemy piece
-               if (_gameBoard[move.EndPosition].PieceOnGrid.GetPieceType() != ChessPieceTypes.NONE)
-               {
-                   _gameBoard[move.EndPosition].SetPieceOnGrid(null); //Todo: Do something with the dead piece in future
-                   _gameBoard[move.EndPosition].SetPieceOnGrid( _gameBoard[move.StartPosition].PieceOnGrid);
-                   _gameBoard[move.StartPosition].SetPieceOnGrid(new MultiPiece()) ;
-                   
-               }
-               return true;    
-           }
-           return false;
-       }
+        public bool MakeMoveOnBoard(Move move)
+        {
+            if (_rules.isMoveValid(move))
+            {
+                // Clear out the enemy piece
+                if (_gameBoard[move.EndPosition].PieceOnGrid.GetPieceType() != ChessPieceTypes.NONE)
+                {
+                    Debug.Log("Adjusting gameBoard data: Removing " +
+                              _gameBoard[move.EndPosition].PieceOnGrid.GetPieceType());
+                    // _gameBoard[move.EndPosition].SetPieceOnGrid(null); // Todo: Do something with the dead piece in future
+                }
 
-        
-        
+                // Move the piece from the start position to the end position
+                _gameBoard[move.EndPosition].SetPieceOnGrid(_gameBoard[move.StartPosition].PieceOnGrid);
+                _gameBoard[move.StartPosition].SetPieceOnGrid(new MultiPiece());
+                _gameBoard[move.EndPosition].PieceOnGrid.SetMoved(true);
+
+                Debug.Log("After adjustment:" + " Start Position:" + _gameBoard[move.StartPosition].PieceOnGrid);
+
+                return true;
+            }
+
+            return false;
+        }
+
     }
 }

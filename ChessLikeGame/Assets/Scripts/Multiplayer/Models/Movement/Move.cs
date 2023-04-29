@@ -19,6 +19,7 @@ namespace Multiplayer.Models.Movement
 
         public Move SecondMove => _secondMove;
 
+  
         public Move(MoveTypes type, int startPosition, int endPosition, TeamColor colorToMove)
         {
             _type = type;
