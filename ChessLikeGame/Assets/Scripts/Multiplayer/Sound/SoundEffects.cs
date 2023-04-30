@@ -1,21 +1,23 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
-namespace Chess.Sound
+namespace Multiplayer.Sound
 {
-    public class SoundEffects : MonoBehaviour
+    public class SoundEffects : AbstractSoundController
     {
         [SerializeField] private AudioClip ChessPieceDownSound;
         [SerializeField] private AudioClip ChessPieceCaptureSound;
-        [SerializeField] private AudioSource _source;
+
         public void PlayChessPieceDownSound()
         {
-            _source.clip = ChessPieceDownSound;
-            _source.Play();
+            audioSource.clip = ChessPieceDownSound;
+            audioSource.Play();
         }
         public void PlayChessPieceCaptureSound()
         {
-            _source.clip = ChessPieceCaptureSound;
-            _source.Play();
+            audioSource.clip = ChessPieceCaptureSound;
+            audioSource.Play();
         }
+
     }
 }

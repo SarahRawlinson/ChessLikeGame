@@ -151,7 +151,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5637737350753178186
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1284,7 +1284,7 @@ MonoBehaviour:
   joinUserToggleButton: {fileID: 7048247626746999133}
   approveUserToggleButton: {fileID: 2903117757541652963}
   banUserToggleButton: {fileID: 162129137523812440}
-  chatUsersList: {fileID: 7447510446013956701}
+  chatUsersOnlineList: {fileID: 7447510446013956701}
   userNameText: {fileID: 9180717312819467269}
   chatUsersInRoomList: {fileID: 1091793777787928555}
   chatUsersApprovedInRoomList: {fileID: 7131052718456468047}
@@ -2778,11 +2778,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6628546501071635713, guid: fa0319ccae3ec0941b145ee598e4bec4, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6628546501071635713, guid: fa0319ccae3ec0941b145ee598e4bec4, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fa0319ccae3ec0941b145ee598e4bec4, type: 3}
@@ -4101,11 +4101,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3307690714697563072, guid: 887ec4c4129ec354f84cf54351d59028, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3307690714697563072, guid: 887ec4c4129ec354f84cf54351d59028, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3307690714697563072, guid: 887ec4c4129ec354f84cf54351d59028, type: 3}
       propertyPath: m_AnchorMin.y
@@ -4221,7 +4221,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8331230004446344729, guid: 887ec4c4129ec354f84cf54351d59028, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -250.00003
+      value: -250
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 887ec4c4129ec354f84cf54351d59028, type: 3}

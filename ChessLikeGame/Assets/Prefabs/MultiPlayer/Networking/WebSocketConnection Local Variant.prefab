@@ -9,11 +9,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 194010489341548161, guid: f472d916dcfa0e44896a5942177a9258, type: 3}
       propertyPath: m_Name
-      value: WebSocketConnection Local
+      value: WebSocketConnection Local Variant
       objectReference: {fileID: 0}
     - target: {fileID: 194010489341548161, guid: f472d916dcfa0e44896a5942177a9258, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 194010489341548175, guid: f472d916dcfa0e44896a5942177a9258, type: 3}
       propertyPath: m_RootOrder

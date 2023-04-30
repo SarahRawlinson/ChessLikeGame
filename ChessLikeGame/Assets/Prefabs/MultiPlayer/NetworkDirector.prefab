@@ -44,3 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d4d9f056b0e6d1468702b95192d5a3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pieceMovementSpeed: 1.25
+  pieceYMaxHeight: 0.125

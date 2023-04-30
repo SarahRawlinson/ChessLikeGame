@@ -7,6 +7,7 @@ using Multiplayer.Controllers;
 using Multiplayer.Models;
 using Multiplayer.Models.BoardState;
 using Multiplayer.Models.Movement;
+using Multiplayer.Sound;
 using Multiplayer.View.LoadData;
 using UnityEngine;
 
