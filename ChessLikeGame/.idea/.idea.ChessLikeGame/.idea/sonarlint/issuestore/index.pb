@@ -21,5 +21,3 @@ k
 ;Assets/Scripts/Multiplayer/View/LoadData/LoadChatUsersUI.cs,0\b\0beebe8c3b420d4d849b7ac031181cded4bf6687
 h
 8Assets/Scripts/Multiplayer/Controllers/CameraMovement.cs,a\c\ac584672064351c9e10e1a423a64e0b3ac8f8d80
-_
-/Assets/Scripts/Multiplayer/Models/MultiPiece.cs,3\6\3669048d95a02887cf11e7ff110adc78ade12ab1
