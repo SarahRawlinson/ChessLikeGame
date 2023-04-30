@@ -54,7 +54,7 @@ PrefabInstance:
     - target: {fileID: 2149001559361592489, guid: c7d454de31918ac4fa01dc93b7c82f65, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 7456a8e266d7b8a66878f5438d7298f1, type: 2}
+      objectReference: {fileID: 2100000, guid: d2b8c1999f5905f45a2807e795953808, type: 2}
     - target: {fileID: 6654848327017699857, guid: c7d454de31918ac4fa01dc93b7c82f65, type: 3}
       propertyPath: m_Name
       value: Black Pawn

@@ -9,8 +9,12 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 639462883557838429, guid: 9ac485c9a60df30458db7fa03019ee0b, type: 3}
       propertyPath: m_Name
-      value: Rook
+      value: White Rook
       objectReference: {fileID: 0}
+    - target: {fileID: 2373214772811410716, guid: 9ac485c9a60df30458db7fa03019ee0b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: e233109381314ed44b5c22cc15eadb8f, type: 2}
     - target: {fileID: 4668054420045069119, guid: 9ac485c9a60df30458db7fa03019ee0b, type: 3}
       propertyPath: m_RootOrder
       value: 0

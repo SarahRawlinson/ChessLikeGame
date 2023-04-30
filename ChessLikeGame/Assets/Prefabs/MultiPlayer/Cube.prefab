@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 2ac979e00106b914ead2f9e52487ceaa, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -111,12 +111,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d8d800384758354db244606db71f623, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  normalColor: {r: 1, g: 1, b: 1, a: 1}
-  hoverColor: {r: 0.754717, g: 0.6570305, b: 0.08187969, a: 1}
-  selectedColor: {r: 0.11213954, g: 0.6792453, b: 0.11213954, a: 1}
-  possibleMoveColor: {r: 0.49056602, g: 0.0763617, b: 0.49056602, a: 1}
-  whiteColor: {r: 1, g: 1, b: 1, a: 1}
-  blackColor: {r: 0, g: 0, b: 0, a: 1}
+  normalColor: {r: 1, g: 1, b: 1, a: 0.49019608}
+  hoverColor: {r: 0.990566, g: 0.85153925, b: 0, a: 0.74509805}
+  selectedColor: {r: 0.11213954, g: 0.6792453, b: 0.11213954, a: 0.74509805}
+  possibleMoveColor: {r: 0.49056602, g: 0.0763617, b: 0.49056602, a: 0.74509805}
+  whiteColor: {r: 1, g: 1, b: 1, a: 0.47058824}
+  blackColor: {r: 0, g: 0.11261428, b: 0.85882354, a: 0.47058824}
   _text: {fileID: 2289950476025521804}
 --- !u!1001 &8756388207524273816
 PrefabInstance:

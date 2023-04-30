@@ -21,6 +21,13 @@ namespace Multiplayer.Models.BoardState
             _gridColor = CalculateGridColorFromLocation(location);
             this.location = location;
         }
+
+        public ChessGrid(ChessGrid incomingObject)
+        {
+            this.pieceOnGrid = new MultiPiece(incomingObject.PieceOnGrid);
+            this.location = incomingObject.location;
+       
+        }
         
         
 

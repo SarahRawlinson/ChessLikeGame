@@ -33,7 +33,7 @@ namespace Multiplayer.View.UI
         [SerializeField] private TMP_Dropdown _dropdown;
         public void DoSomething(int i)
         {
-            Debug.Log($"Chosen option {i}");
+//            Debug.Log($"Chosen option {i}");
             foreach (var o in options)
             {
                 o.showOnSelectGameObject.SetActive(false);

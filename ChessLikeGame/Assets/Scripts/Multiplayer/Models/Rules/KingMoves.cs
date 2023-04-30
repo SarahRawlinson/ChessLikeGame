@@ -8,7 +8,7 @@ namespace Multiplayer.Models.Rules
         public List<MoveToValidate> possibleMoves()
         {
             List<MoveToValidate> myMoves = new List<MoveToValidate>();
-            List<MoveValidationTypes> K = new List<MoveValidationTypes>() {MoveValidationTypes.CheckKingCantBeTaken};
+            List<MoveValidationTypes> K = new List<MoveValidationTypes>() { MoveValidationTypes.CheckForClearPath};
             
             myMoves.Add(new MoveToValidate(MoveTypes.Forward, K, 1));
             myMoves.Add(new MoveToValidate(MoveTypes.Backward, K, 1));
@@ -19,20 +19,20 @@ namespace Multiplayer.Models.Rules
             myMoves.Add(new MoveToValidate(MoveTypes.DiagonalUpLeft, K, 1));
             myMoves.Add(new MoveToValidate(MoveTypes.DiagonalUpRight, K, 1));
             
-            myMoves.Add(new MoveToValidate(
-                MoveTypes.CastleKingSide, 
-                new List<MoveValidationTypes>()
-                {
-                    MoveValidationTypes.CheckKingCantBeTaken, MoveValidationTypes.CheckHasNotMoved, MoveValidationTypes.CheckIsKingOrRook
-                },
-                1));
-            myMoves.Add(new MoveToValidate(
-                MoveTypes.CastleQueenSide, 
-                new List<MoveValidationTypes>()
-                {
-                    MoveValidationTypes.CheckKingCantBeTaken, MoveValidationTypes.CheckHasNotMoved, MoveValidationTypes.CheckIsKingOrRook
-                },
-                1));
+            // myMoves.Add(new MoveToValidate(
+            //     MoveTypes.CastleKingSide, 
+            //     new List<MoveValidationTypes>()
+            //     {
+            //         MoveValidationTypes.CheckHasNotMoved, MoveValidationTypes.CheckIsKingOrRook
+            //     },
+            //     1));
+            // myMoves.Add(new MoveToValidate(
+            //     MoveTypes.CastleQueenSide, 
+            //     new List<MoveValidationTypes>()
+            //     {
+            //         MoveValidationTypes.CheckHasNotMoved, MoveValidationTypes.CheckIsKingOrRook
+            //     },
+            //     1));
 
             return myMoves;
         }

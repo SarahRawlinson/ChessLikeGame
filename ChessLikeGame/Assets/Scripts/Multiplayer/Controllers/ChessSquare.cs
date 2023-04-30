@@ -65,6 +65,7 @@ public class ChessSquare : MonoBehaviour, ISelectHandler, IDeselectHandler
     private void SetColor(Color color)
     {
         squareRenderer.material.color = color;
+        
     }
 
     public void OnMouseOver()
@@ -105,6 +106,7 @@ public class ChessSquare : MonoBehaviour, ISelectHandler, IDeselectHandler
 
     public void OnDeselect(BaseEventData eventData)
     {
+        
         isSelected = false;
         SetColor(isPossibleMove ? possibleMoveColor : normalColor);
     }

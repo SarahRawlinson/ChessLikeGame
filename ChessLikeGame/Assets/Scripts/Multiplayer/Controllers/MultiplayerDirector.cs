@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Chess.Sound;
 using JetBrains.Annotations;
 using LibObjects;
 using Multiplayer.Controllers;
+using Multiplayer.Models;
 using Multiplayer.Models.BoardState;
 using Multiplayer.Models.Movement;
 using Multiplayer.View.LoadData;
@@ -21,6 +23,11 @@ public class MultiplayerDirector : MonoBehaviour
     private ChessEngine _chessEngine = new ChessEngine();
     private bool isHost = false;
     private int currentSelection;
+    private WebSocketConnection _connection;
+    private SoundEffects _soundEffects;
+    [SerializeField] private float pieceMovementSpeed = 1.25f;
+    [SerializeField] private float pieceYMaxHeight = 0.25f;
+    public static event Action NetGameStarted;   
 
     public ChessEngine getChessEngine()
     {
@@ -29,6 +36,8 @@ public class MultiplayerDirector : MonoBehaviour
 
     private void Awake()
     {
+        _connection = FindObjectOfType<WebSocketConnection>();
+        _soundEffects = FindObjectOfType<SoundEffects>();
         ChessSquare.onSelectedSquareEvent += ChessSquareOnSelectedSquareEvent; 
         ChessSquare.onPossibleMoveSelected += ChessSquareOnPossibleMoveSelected;
         WebSocketConnection.onGameRoomMessageRecieved += WebSocketConnectionOnonGameRoomMessageRecieved;
@@ -36,19 +45,101 @@ public class MultiplayerDirector : MonoBehaviour
 
     private void WebSocketConnectionOnonGameRoomMessageRecieved((Room room, User user, string Message) obj)
     {
-        if (!isHost)
+        gameRoom = obj.room;
+        var MessageArray = obj.Message.Split(':',StringSplitOptions.None);
+
+        switch (MessageArray[0])
+        { case "FEN_Setup":
+                ProcessBoardSetup(MessageArray[1]);
+                break;
+            case "Request_To_Move":
+                ProcessMoveRequest(MessageArray[1]);
+                break;
+            case "Request_Rejected":
+                ProcessRejected(MessageArray[1]);
+                break;
+            case "Make_Move":
+                ProcessNetworkMove(MessageArray[1], MessageArray[2]);
+                break;
+            default:
+                Console.WriteLine("UNEXPECTED MESSAGE: " + MessageArray[0]);
+                break;
+        }
+
+        void ProcessRejected(string data)
         {
+            if (!isHost)
+            {
+                Debug.Log("SERVER SENT REJECTION:"+ data);
+            }
+        }
+
+        void ProcessMoveRequest(string data)
+        {
+            if (isHost)
+            {
+                Move testMove = new Move(data);
+                if (_chessEngine.GetRules().isMoveValid(testMove))
+                {
+                    MovePiece(testMove);
+                    SendMakeMoveMessage(testMove);
+                }
+                else
+                {
+                    string reason = "Move Failed Validation!";
+                    _connection.SendMessageToRoom(gameRoom, "Request_Rejected:" + reason);
+                }
+
+            }
+        }
+
+        void ProcessBoardSetup(string data)
+        { 
+            if (!isHost){
+                InitBoard(data);
+                StartGame((gameRoom, _connection.GetClientUser(), obj.user, obj.user));
+                FindObjectOfType<StartGameScreenUI>().HideStartScreen();
+            }
             
+        }
+
+        void ProcessNetworkMove(string data, string currentTurn)
+        {
+            if (!isHost)
+            {
+               // _chessEngine.SetActivePlayerColor(Enum.Parse<TeamColor>(currentTurn));
+                MovePiece(new Move(data));
+            }
         }
     }
 
     private void ChessSquareOnPossibleMoveSelected(int obj)
     {
+  
         foreach (var mv in _chessEngine.GetRules().GetMovesByPiece(_chessEngine.GetGameBoardList()[currentSelection].PieceOnGrid, currentSelection))
         {
             if (mv.EndPosition == obj)
             {
-                MovePiece(mv);
+                Debug.Log("Sending Move:"+ mv.GetNetworkData());
+                Debug.Log("In GameRoom:" + gameRoom.GetGuid().ToString());
+                if (isHost)
+                {
+                    if (isWhite == true && _chessEngine.GetActivePlayer() == TeamColor.White ||
+                        isWhite == false && _chessEngine.GetActivePlayer() == TeamColor.Black)
+                    {
+                        MovePiece(mv);
+                        SendMakeMoveMessage(mv);
+                    }
+                }
+                else
+                {
+                    if (isWhite == true && _chessEngine.GetActivePlayer() == TeamColor.White ||
+                        isWhite == false && _chessEngine.GetActivePlayer() == TeamColor.Black)
+                    {
+                        _connection.SendMessageToRoom(gameRoom, "Request_To_Move:" + mv.GetNetworkData());
+                    }
+                }
+
                 ClearChessSquarePossibleMoves();
                 return;
             }
@@ -56,6 +147,11 @@ public class MultiplayerDirector : MonoBehaviour
         
         
      
+    }
+
+    private void SendMakeMoveMessage(Move mv)
+    {
+        _connection.SendMessageToRoom(gameRoom, "Make_Move:" + mv.GetNetworkData()+ ":" + _chessEngine.GetActivePlayer());
     }
 
     private void ChessSquareOnSelectedSquareEvent(int obj)
@@ -78,27 +174,39 @@ public class MultiplayerDirector : MonoBehaviour
     }
 
 
-    private void StartGame((Room gameRoom, User thisPlayer, User opponent, User host) obj)
+    private void StartGame((Room gameRoom, User thisPlayer, User oponent, User host) obj)
     {
+        Debug.Log("Starting New Game.. Server?:" + isHost);
         gameRoom = obj.gameRoom;
         if (obj.thisPlayer.GetUserGuid() == obj.host.GetUserGuid())
         {
             isHost = true;
             isWhite = true;
         }
-    
+
+        if (isHost)
+        {
+            InitBoard(setupFenString);
+            _connection.SendMessageToRoom(obj.gameRoom, "FEN_Setup:"+ _chessEngine.GetFenController().FenBuilder());
+            
+        }
+        NetGameStarted?.Invoke();
+    }
+
+    private void InitBoard(string startingFENString)
+    {
         _chessEngine.CreateBoard();
-        _chessEngine.GetFenController().SetUpBoardFromFen(setupFenString);
-        
-        gameObjectController.CreateBoardPositions(8,8);
+        _chessEngine.GetFenController().SetUpBoardFromFen(startingFENString);
+
+        gameObjectController.CreateBoardPositions(8, 8);
 
         int counter = 0;
-         foreach (var square in _chessEngine.GetGameBoardList())
+        foreach (var square in _chessEngine.GetGameBoardList())
         {
             if (square.PieceOnGrid.GetPieceType() != ChessPieceTypes.NONE)
             {
-                gameObjectsPieces.Add(square.GetKey(),gameObjectController.SpawnPiece(
-                    square.PieceOnGrid.GetPieceType(), 
+                gameObjectsPieces.Add(square.GetKey(), gameObjectController.SpawnPiece(
+                    square.PieceOnGrid.GetPieceType(),
                     square.PieceOnGrid.Colour,
                     gameObjectController.GetPositionVectorfromGameSquare(counter)
                 ));
@@ -107,31 +215,9 @@ public class MultiplayerDirector : MonoBehaviour
             {
                 gameObjectsPieces.Add(square.GetKey(), -1);
             }
+
             counter++;
         }
-        MovePiece(TestMove("H7"));
-        MovePiece(TestMove("F7"));
-        MovePiece(TestMove("G8"));
-        MovePiece(TestMove("A2"));
-        MovePiece(TestMove("B2"));
-        MovePiece(TestMove("C2"));
-        MovePiece(TestMove("D2"));
-        MovePiece(TestMove("E2"));
-        MovePiece(TestMove("F2"));
-        MovePiece(TestMove("G2"));
-        MovePiece(TestMove("H2"));
-        MovePiece(TestMove("G8"));
-        MovePiece(TestMove("B8"));
-        MovePiece(TestMove("A7"));
-        MovePiece(TestMove("B7"));
-        MovePiece(TestMove("C7"));
-        MovePiece(TestMove("D7"));
-        MovePiece(TestMove("E7"));
-        MovePiece(TestMove("F7"));
-        MovePiece(TestMove("G7"));
-        MovePiece(TestMove("H7"));
-        
-
     }
 
     private void MovePiece(Move move)
@@ -143,7 +229,7 @@ public class MultiplayerDirector : MonoBehaviour
         }
         
         Debug.Log("Attempting to move (in MovePiece) :" + move);
-        if (_chessEngine.MakeMoveOnBoard(move))
+        if (_chessEngine.MakeMoveOnBoard(ref move))
         {
             Debug.Log("GameBoard Data Array update with move (in MovePiece) :" + move);
             
@@ -155,13 +241,21 @@ public class MultiplayerDirector : MonoBehaviour
                 gameObjectController.RemoveGameObjectFromGame(gameObjectsPieces[endGrid.GetKey()]);
             }
             int gameObjectIndex = gameObjectsPieces[startGrid.GetKey()];
-            gameObjectController.MoveGameObject(
+            StartCoroutine(gameObjectController.MoveGameObject(
                 gameObjectIndex,
                 gameObjectController.GetPositionVectorfromGameSquare(move.EndPosition)
-                );
+               ,pieceMovementSpeed, pieceYMaxHeight ));
             gameObjectsPieces[endGrid.GetKey()] = gameObjectIndex;
             // removed from game without breaking indexing of game objects?
             gameObjectsPieces[startGrid.GetKey()] = -1;
+            ClearChessSquarePossibleMoves();
+            if(move.WillResultInCapture){
+                _soundEffects.PlayChessPieceCaptureSound();
+            }
+            else
+            {
+                _soundEffects.PlayChessPieceDownSound();
+            }
         }
     }
 

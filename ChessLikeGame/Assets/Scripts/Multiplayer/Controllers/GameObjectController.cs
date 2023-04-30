@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Multiplayer.Models.BoardState;
@@ -292,10 +293,36 @@ namespace Multiplayer.Controllers
             eventSystem.SetSelectedGameObject(nextSelected);
         }
 
-        public void MoveGameObject(int gameObjectIndex, Vector3 moveVector)
+        public IEnumerator MoveGameObject(int gameObjectIndex, Vector3 moveVector, float duration, float peakHeight)
         {
-            _objectsInUse[gameObjectIndex].transform.position = new Vector3( moveVector.x, moveVector.y + yOffset, moveVector.z) ;
+            Vector3 startPosition = _objectsInUse[gameObjectIndex].transform.position;
+            Vector3 midPosition = (startPosition + moveVector) * 0.5f;
+            midPosition.y += yOffset + peakHeight;
+            Vector3 endPosition = new Vector3(moveVector.x, moveVector.y + yOffset, moveVector.z);
+            float elapsed = 0;
+
+            while (elapsed < duration * 0.5f)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / (duration * 0.5f));
+                _objectsInUse[gameObjectIndex].transform.position = Vector3.Lerp(startPosition, midPosition, t);
+                yield return null;
+            }
+
+            elapsed = 0;
+
+            while (elapsed < duration * 0.5f)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / (duration * 0.5f));
+                _objectsInUse[gameObjectIndex].transform.position = Vector3.Lerp(midPosition, endPosition, t);
+                yield return null;
+            }
+
+            _objectsInUse[gameObjectIndex].transform.position = endPosition;
         }
+
+        
 
         public void RemoveGameObjectFromGame(int gameObjectIndex)
         {

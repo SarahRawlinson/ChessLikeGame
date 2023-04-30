@@ -10,7 +10,7 @@ PrefabInstance:
     - target: {fileID: 1633494532112061426, guid: 599c25e3cf9514845a8a229c04ea9b99, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: a3e9a6e1569d842a684694318c91552c, type: 2}
+      objectReference: {fileID: 2100000, guid: e233109381314ed44b5c22cc15eadb8f, type: 2}
     - target: {fileID: 2696452455311785636, guid: 599c25e3cf9514845a8a229c04ea9b99, type: 3}
       propertyPath: m_Name
       value: White Knight

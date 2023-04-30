@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq; 
 using Multiplayer.Models.BoardState;
 using Multiplayer.Models.Movement;
 using UnityEngine;
@@ -24,12 +25,20 @@ namespace Multiplayer.Models.Rules
 
         public bool isMoveValid(Move moveToTest) //Todo : This will not check for obstacles. amend
         {
+            if (moveToTest.ColorToMove != _gameStateData.GetActivePlayer())
+            {
+                return false;
+            }
             MultiPiece piece =
                 _gameStateData.GetGameBoardList()[moveToTest.StartPosition].PieceOnGrid;
             foreach (var move in GetMovesByPiece(piece, moveToTest.StartPosition))
             {
                 if (Move.CheckEqual(move, moveToTest))
                 {
+                    // if (IsKingSafeAfterMove(move, _gameStateData.GetGameBoardList()))
+                    // {
+                    //     return true;
+                    // }
                     return true;
                 }
             }
@@ -89,6 +98,7 @@ namespace Multiplayer.Models.Rules
             List<Move> validMoves = new List<Move>();
             foreach (Move move in moves)
             {
+                move.SetColorToMove(color);
                 bool canAdd = ValidateMove(toValidate, move);
                 if (canAdd) validMoves.Add(move);
             }
@@ -141,12 +151,7 @@ namespace Multiplayer.Models.Rules
                             return false;
                         }
                         break;
-                    case MoveValidationTypes.CheckKingCantBeTaken:
-                        if (!IsKingSafeAfterMove(move, _gameStateData.GetGameBoardList()))
-                        {
-                            return false;
-                        }
-                        break;
+                   
                     case MoveValidationTypes.CheckHasNotMoved:
                         if (piece.HasMoved())
                         {
@@ -171,49 +176,57 @@ namespace Multiplayer.Models.Rules
         
         private bool IsKingSafeAfterMove(Move move, List<ChessGrid> gameBoard)
         {
+            List<ChessGrid> copiedGameBoard = DeepCopyGameBoard(gameBoard);
+
             int startPosition = move.StartPosition;
             int endPosition = move.EndPosition;
-            ChessPieceTypes originalEndPiece = gameBoard[endPosition].PieceOnGrid.GetPieceType();
+            ChessPieceTypes originalEndPiece = copiedGameBoard[endPosition].PieceOnGrid.GetPieceType();
+            ChessPieceTypes pieceType = copiedGameBoard[startPosition].PieceOnGrid.GetPieceType();
 
             // Temporarily simulate the move
-            gameBoard[startPosition].PieceOnGrid.SetType(ChessPieceTypes.NONE);
-            var pieceType = gameBoard[startPosition].PieceOnGrid.GetPieceType();
-            gameBoard[endPosition].PieceOnGrid.SetType(pieceType);
+            copiedGameBoard[startPosition].PieceOnGrid.SetType(ChessPieceTypes.NONE);
+            copiedGameBoard[endPosition].PieceOnGrid.SetType(pieceType);
 
-            int kingPosition = FindKingPosition(move.ColorToMove, gameBoard);
+            int kingPosition = FindKingPosition(move.ColorToMove, copiedGameBoard);
 
             // Check if any enemy piece has a valid move to capture the king
-            for (int i = 0; i < gameBoard.Count; i++)
+            for (int i = 0; i < copiedGameBoard.Count; i++)
             {
-                ChessGrid enemyPiece = gameBoard[i];
+                ChessGrid enemyPiece = copiedGameBoard[i];
                 if (enemyPiece.PieceOnGrid.Colour != move.ColorToMove)
                 {
-                    foreach (var potentialCapture in GetMovesByPiece(gameBoard[i].PieceOnGrid, i))
+                    foreach (var potentialCapture in GetMovesByPiece(copiedGameBoard[i].PieceOnGrid, i))
                     {
                         if (isMoveValid(potentialCapture) && potentialCapture.EndPosition == kingPosition)
                         {
-                            // Revert the simulated move and return false (unsafe)
-                            gameBoard[startPosition].PieceOnGrid.SetType(pieceType);
-                            gameBoard[endPosition].PieceOnGrid.SetType(originalEndPiece);
                             return false;
                         }
                     }
-                   
                 }
             }
 
-            // Revert the simulated move and return true (safe)
-            gameBoard[startPosition].PieceOnGrid.SetType(pieceType);
-            gameBoard[endPosition].PieceOnGrid.SetType(originalEndPiece);
             return true;
         }
+
+        private List<ChessGrid> DeepCopyGameBoard(List<ChessGrid> originalGameBoard)
+        {
+            List<ChessGrid> copiedGameBoard = new List<ChessGrid>(originalGameBoard.Count);
+            for (int i = 0; i < originalGameBoard.Count; i++)
+            {
+                ChessGrid originalChessGrid = originalGameBoard[i];
+                ChessGrid copiedChessGrid = new ChessGrid(originalChessGrid);
+                copiedGameBoard.Add(copiedChessGrid);
+            }
+
+            return copiedGameBoard;
+        }
+
 
         private int FindKingPosition(TeamColor player, List<ChessGrid> gameBoard)
         {
             for (int i = 0; i < gameBoard.Count; i++)
             {
-                ChessGrid piece = gameBoard[i];
-                if (piece.PieceOnGrid.GetPieceType() == ChessPieceTypes.KING && piece.PieceOnGrid.Colour == player)
+                if (gameBoard[i].PieceOnGrid.GetPieceType() == ChessPieceTypes.KING && gameBoard[i].PieceOnGrid.Colour == player )
                 {
                     return i;
                 }
@@ -279,11 +292,11 @@ namespace Multiplayer.Models.Rules
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forwardDirection * steps), basePos.y);
                     moves.Add(new Move(moveType, startPos, endPos, color));
                     break;
-                case MoveTypes.DiagonalUpRight:
+                case MoveTypes.DiagonalUpLeft:
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x - (forwardDirection * steps), basePos.y + (forwardDirection * steps));
                     moves.Add(new Move(moveType, startPos, endPos, color));
                     break;
-                case MoveTypes.DiagonalUpLeft:
+                case MoveTypes.DiagonalUpRight:
                     endPos = ChessGrid.CalculateIndexFromXY(basePos.x + (forwardDirection * steps), basePos.y + (forwardDirection * steps));
                     moves.Add(new Move(moveType, startPos, endPos, color));
                     break;

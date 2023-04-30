@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using LibObjects;
 using Multiplayer.Controllers;
@@ -18,15 +19,29 @@ namespace Multiplayer.View.LoadData
         private List<User> users;
         private User opponent;
         private User host;
+        
+        private bool keepShowingStartGameScreen = true;
         public static event Action<(Room gameRoom, User thisPlayer, User opponent, User host)> onGameStarted;
 
         public void Awake()
         {
             WebSocketConnection.onJoinedGame += ShowStartGameScreen;
             WebSocketConnection.onLeftGame += HideStartGameScreen;
-            WebSocketConnection.onGameRoomMessageRecieved += CheckGameStarted;
+            // WebSocketConnection.onGameRoomMessageRecieved += CheckGameStarted;
             WebSocketConnection.onReceivedUsersListInRoom += UpdateUsers;
             _connection = FindObjectOfType<WebSocketConnection>();
+            WebSocketConnection.onUserJoinedGameRoom += UserJoinedChessGame;
+            WebSocketConnection.onUserLeftGameRoom += UserLeftChessGame;
+        }
+
+        private void UserLeftChessGame((User user, Guid roomGuid) obj)
+        {
+            _connection.AskForUsers(gameRoom);
+        }
+
+        private void UserJoinedChessGame((User user, Guid roomGuid) obj)
+        {
+          _connection.AskForUsers(gameRoom);
         }
 
         private void UpdateUsers((Room room, List<User> users) obj)
@@ -46,28 +61,34 @@ namespace Multiplayer.View.LoadData
             users = obj.users;
         }
 
-        private void CheckGameStarted((Room room, User user, string message) obj)
-        {
-            if (obj.room.GetGuid() != gameRoom.GetGuid())
-            {
-                return;
-            }
-            if (obj.room.GetCreator() != obj.user.GetUserName())
-            {
-                return;
-            }
-            
-            if (obj.message == StartGameString)
-            {
-                Debug.Log("Start Game!");
-                showOnStart.SetActive(false);
-                onGameStarted?.Invoke((gameRoom, _connection.GetClientUser(), opponent, host));
-            }
-        }
+        // private void CheckGameStarted((Room room, User user, string message) obj)
+        // {
+        //     // if (obj.room.GetGuid() != gameRoom.GetGuid())
+        //     // {
+        //     //     return;
+        //     // }
+        //     // if (obj.room.GetCreator() != obj.user.GetUserName())
+        //     // {
+        //     //     return;
+        //     // }
+        //     //
+        //     // if (obj.message == StartGameString)
+        //     // {
+        //     //     Debug.Log("Start Game!");
+        //     //     showOnStart.SetActive(false);
+        //     //     onGameStarted?.Invoke((gameRoom, _connection.GetClientUser(), opponent, host));
+        //     // }
+        // }
 
         private void HideStartGameScreen(Room obj)
         {
             gameRoom = null;
+            HideStartScreen();
+        }
+
+        public void HideStartScreen()
+        {
+        
             showOnStart.SetActive(false);
         }
 
@@ -75,8 +96,9 @@ namespace Multiplayer.View.LoadData
         {
             WebSocketConnection.onJoinedGame -= ShowStartGameScreen;
             WebSocketConnection.onLeftGame -= HideStartGameScreen;
-            WebSocketConnection.onChatRoomMessageRecieved -= CheckGameStarted;
+            // WebSocketConnection.onChatRoomMessageRecieved -= CheckGameStarted;
             WebSocketConnection.onReceivedUsersListInRoom -= UpdateUsers;
+            
         }
 
         private void ShowStartGameScreen(Room obj)
@@ -87,13 +109,23 @@ namespace Multiplayer.View.LoadData
             showOnStart.SetActive(true);
         }
         
-
+      
         public void StartGame()
         {
-            if (_connection.GetClientUser().GetUserName() == gameRoom.GetCreator())
+            if (users.Count > 1)
             {
-                _connection.SendMessageToRoom(gameRoom, StartGameString);
+                if (_connection.GetClientUser().GetUserName() == gameRoom.GetCreator())
+                {
+                    User client = users[1];
+                    onGameStarted?.Invoke((gameRoom, host, client, host));
+                    HideStartScreen();
+                }
             }
+            else
+            {
+                _connection.AskForUsers(gameRoom);
+            }
+            
         }
         
         public void ExitGame()

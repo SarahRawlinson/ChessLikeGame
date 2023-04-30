@@ -1,4 +1,5 @@
-﻿using Multiplayer.Models.BoardState;
+﻿using System;
+using Multiplayer.Models.BoardState;
 
 namespace Multiplayer.Models.Movement
 {
@@ -38,7 +39,21 @@ namespace Multiplayer.Models.Movement
             _hasSecondMove = true;
         }
 
+        public Move(string NetworkText)
+        {
+            ParseNetworkData(NetworkText);
+        }
 
+        public void SetColorToMove(TeamColor color)
+        {
+            _colorToMove = color;
+        }
+
+        public void SetWillResultInCapture(bool value)
+        {
+            _willResultInCapture = value;
+        }
+        
         public int EndPosition => _endPosition;
         public bool WillResultInCapture => _willResultInCapture;
         public ChessPieceTypes CapturedPiece => _capturedPiece;
@@ -49,8 +64,32 @@ namespace Multiplayer.Models.Movement
             get => _startPosition;
         }
 
-        
+        public string GetNetworkData()
+        {
+            string secondMoveData = _hasSecondMove ? $"|{_secondMove.GetNetworkData()}" : "";
+            return $"{_type}|{_startPosition}|{_endPosition}|{_colorToMove}|{_willResultInCapture}{secondMoveData}";
+        }
 
+        private void ParseNetworkData(string input)
+        {
+            var moveText = input.Split('|', StringSplitOptions.None);
+            _type = Enum.Parse<MoveTypes>(moveText[0]);
+            _startPosition = Int32.Parse(moveText[1]);
+            _endPosition = Int32.Parse(moveText[2]);
+            _colorToMove = Enum.Parse<TeamColor>(moveText[3]);
+            _willResultInCapture = Boolean.Parse(moveText[4]);
+
+            if (moveText.Length > 5)
+            {
+                _hasSecondMove = true;
+                _secondMove = new Move(moveText[5]);
+            }
+            else
+            {
+                _hasSecondMove = false;
+                _secondMove = null;
+            }
+        }
 
         public override string ToString()
         {
@@ -72,7 +111,7 @@ namespace Multiplayer.Models.Movement
                 }
             }
             return move.StartPosition == moveToTest.StartPosition && move._endPosition == moveToTest._endPosition
-                && move.WillResultInCapture == moveToTest.WillResultInCapture && move.ColorToMove == moveToTest.ColorToMove;
+                 && move.ColorToMove == moveToTest.ColorToMove;
         }
     }
 }

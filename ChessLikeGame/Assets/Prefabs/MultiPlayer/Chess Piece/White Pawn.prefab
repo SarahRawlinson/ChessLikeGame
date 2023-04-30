@@ -54,7 +54,7 @@ PrefabInstance:
     - target: {fileID: 2149001559361592489, guid: c7d454de31918ac4fa01dc93b7c82f65, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: a3e9a6e1569d842a684694318c91552c, type: 2}
+      objectReference: {fileID: 2100000, guid: e233109381314ed44b5c22cc15eadb8f, type: 2}
     - target: {fileID: 6654848327017699857, guid: c7d454de31918ac4fa01dc93b7c82f65, type: 3}
       propertyPath: m_Name
       value: White Pawn

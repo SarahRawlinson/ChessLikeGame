@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Chess.Enums;
 using Chess.Pieces;
 using Multiplayer.Models.Movement;
 using UnityEngine;
@@ -16,11 +17,22 @@ namespace Multiplayer.Models.BoardState
         {
             _fenController = new FENController(_gameStateData, this);
             _rules = new Rules.Rules(this);
+            _gameStateData.ActivePlayer = TeamColor.White;
         }
 
         public Rules.Rules GetRules()
         {
             return _rules;
+        }
+
+        public void SetActivePlayerColor(TeamColor color)
+        {
+            _gameStateData.ActivePlayer = color;
+        }
+
+        public TeamColor GetActivePlayer()
+        {
+            return _gameStateData.ActivePlayer;
         }
 
 
@@ -51,7 +63,7 @@ namespace Multiplayer.Models.BoardState
             }
         }
 
-        public bool MakeMoveOnBoard(Move move)
+        public bool MakeMoveOnBoard(ref Move  move)
         {
             if (_rules.isMoveValid(move))
             {
@@ -61,15 +73,24 @@ namespace Multiplayer.Models.BoardState
                     Debug.Log("Adjusting gameBoard data: Removing " +
                               _gameBoard[move.EndPosition].PieceOnGrid.GetPieceType());
                     // _gameBoard[move.EndPosition].SetPieceOnGrid(null); // Todo: Do something with the dead piece in future
+                    move.SetWillResultInCapture(true);
                 }
 
                 // Move the piece from the start position to the end position
                 _gameBoard[move.EndPosition].SetPieceOnGrid(_gameBoard[move.StartPosition].PieceOnGrid);
                 _gameBoard[move.StartPosition].SetPieceOnGrid(new MultiPiece());
                 _gameBoard[move.EndPosition].PieceOnGrid.SetMoved(true);
-
+                
+                if (move.ColorToMove == TeamColor.Black && move.HasSecondMove == false)
+                {
+                    SetActivePlayerColor(TeamColor.White);
+                }else if (move.ColorToMove == TeamColor.White && move.HasSecondMove == false)
+                {
+                    SetActivePlayerColor(TeamColor.Black);
+                }
+                
                 Debug.Log("After adjustment:" + " Start Position:" + _gameBoard[move.StartPosition].PieceOnGrid);
-
+                
                 return true;
             }
 

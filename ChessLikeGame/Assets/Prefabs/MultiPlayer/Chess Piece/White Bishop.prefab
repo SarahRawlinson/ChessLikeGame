@@ -54,7 +54,7 @@ PrefabInstance:
     - target: {fileID: 1494056942169809457, guid: 9225b129dccedf6479b2182e8fcf63c7, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: a3e9a6e1569d842a684694318c91552c, type: 2}
+      objectReference: {fileID: 2100000, guid: e233109381314ed44b5c22cc15eadb8f, type: 2}
     - target: {fileID: 4850956372782421308, guid: 9225b129dccedf6479b2182e8fcf63c7, type: 3}
       propertyPath: m_Name
       value: White Bishop

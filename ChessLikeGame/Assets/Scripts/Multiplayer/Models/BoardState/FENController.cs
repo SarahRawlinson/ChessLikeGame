@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -40,12 +41,12 @@ namespace Multiplayer.Models.BoardState
                 
                 MultiPiece tmpPiece = new MultiPiece();
                 ChessGrid chessGrid = engine.GetGameBoardList()[index];
-                Debug.Log("Creating piece in LoadPositionFromFEN: Color" + tmpPiece.Colour + " For CHAR:" + character);
+             
                 
                 if (Char.IsLetter(character))
                 {
                     WorkOutCharacter(tmpPiece, character);
-                    Debug.Log("Worked Out Character in LoadPositionFromFEN: Color" + tmpPiece.Colour + " For CHAR:" + character);
+             
                 }
                 else
                 {
@@ -213,8 +214,9 @@ namespace Multiplayer.Models.BoardState
         private string GetBoardString()
         {
             StringBuilder mapStringBuilder = new StringBuilder();
+            StringBuilder rowText = new StringBuilder();
             int freeSpaces = 0;
-
+            
             for (int i =engine.GetGameBoardList().Count -1; i >= 0; i--)
             {
                 ChessGrid pos = engine.GetGameBoardList()[i];
@@ -227,11 +229,11 @@ namespace Multiplayer.Models.BoardState
                 {
                     if (piece.Colour == TeamColor.Black)
                     {
-                        mapStringBuilder.Append(piece.GetKey().ToLower());
+                       rowText.Append(piece.GetKey().ToLower());
                     }
                     else if (piece.Colour == TeamColor.White)
                     {
-                        mapStringBuilder.Append(piece.GetKey().ToUpper());
+                        rowText.Append(piece.GetKey().ToUpper());
                     }
                     else
                     {
@@ -244,12 +246,16 @@ namespace Multiplayer.Models.BoardState
                 {
                     if (freeSpaces > 0)
                     {
-                        mapStringBuilder.Append(freeSpaces.ToString());
+                       rowText.Append(freeSpaces.ToString());
                         freeSpaces = 0;
                     }
-                    if (i > 0)
+                    if (i >= 0)
                     {
-                        mapStringBuilder.Append("/");
+                        char[] reversedRowText = rowText.ToString().Reverse().ToArray();
+                        mapStringBuilder.Append(reversedRowText);
+                        rowText.Clear();
+                        if(i>0)
+                            mapStringBuilder.Append("/");
                     }
                 }
                 

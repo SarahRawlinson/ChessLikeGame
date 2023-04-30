@@ -1,4 +1,6 @@
-﻿namespace Multiplayer.Models.BoardState
+﻿using Unity.VisualScripting;
+
+namespace Multiplayer.Models.BoardState
 {
     public class MultiPiece
     {
@@ -18,6 +20,14 @@
             _hasMoved = false;
             Colour = TeamColor.Empty;
             type = ChessPieceTypes.NONE;
+        }
+
+        public MultiPiece(MultiPiece incomingData)
+        {
+            type = incomingData.GetPieceType();
+            Colour = incomingData.Colour;
+            _hasMoved = incomingData._hasMoved;
+            key = incomingData.GetKey();
         }
 
         public void SetType(ChessPieceTypes pieceType)

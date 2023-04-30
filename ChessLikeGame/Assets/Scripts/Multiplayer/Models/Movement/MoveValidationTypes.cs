@@ -5,7 +5,6 @@
         CheckForClearPath,
         CheckEmpty,
         CheckOccupied,
-        CheckKingCantBeTaken,
         CheckHasNotMoved,
         CheckIsKingOrRook
     }

@@ -19,21 +19,24 @@ namespace Multiplayer.View.LoadData
         private void Start()
         {
             WebSocketConnection.onAuthenicate += Authenticated;
-            StartGameScreenUI.onGameStarted += HideOnStartGame;
+            //StartGameScreenUI.onGameStarted += HideOnStartGame;
+            MultiplayerDirector.NetGameStarted += HideOnStartGame;
         }
 
-        public void HideOnStartGame((Room gameRoom, User thisPlayer, User opponent, User host) obj)
+        public void HideOnStartGame()
         {
             Debug.Log("Hide Displays");
             hostGameDisplay.SetActive(false);
             joinGameDisplay.SetActive(false);
             startMenuDisplay.SetActive(false);
+            
         }
 
         private void OnDestroy()
         {
             WebSocketConnection.onAuthenicate -= Authenticated;
-            StartGameScreenUI.onGameStarted -= HideOnStartGame;
+            //StartGameScreenUI.onGameStarted -= HideOnStartGame;
+            MultiplayerDirector.NetGameStarted -= HideOnStartGame;
         }
 
         public void Authenticated(bool on)
