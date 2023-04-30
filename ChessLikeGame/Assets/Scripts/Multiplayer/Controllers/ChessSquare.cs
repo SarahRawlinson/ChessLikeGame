@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Multiplayer.Models.BoardState;
+using Multiplayer.View.DisplayData;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -20,6 +21,7 @@ public class ChessSquare : MonoBehaviour, ISelectHandler, IDeselectHandler
     private bool isSelected;
     private bool isPossibleMove;
     [SerializeField] public TMP_Text _text;
+    private ChessGridInfoPanel info;
 
     public static event Action<int> onSelectedSquareEvent; 
     public static event Action<int> onPossibleMoveSelected; 
@@ -33,6 +35,7 @@ public class ChessSquare : MonoBehaviour, ISelectHandler, IDeselectHandler
         teamColors.Add(GridColor.BLACK, blackColor);
         teamColors.Add(GridColor.WHITE, whiteColor);
         SetColor(normalColor);
+        info = FindObjectOfType<ChessGridInfoPanel>();
     }
 
     private void Update()
@@ -79,7 +82,7 @@ public class ChessSquare : MonoBehaviour, ISelectHandler, IDeselectHandler
 
     public void OnMouseEnter()
     {
-        Debug.Log(FindObjectOfType<MultiplayerDirector>().getChessEngine().GetGameBoardList()[id].PieceOnGrid.ToString());
+       info.UpdateInfoText(FindObjectOfType<MultiplayerDirector>().getChessEngine().GetGameBoardList()[id].PieceOnGrid.ToString());
         
     }
 
