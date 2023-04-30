@@ -1787,6 +1787,62 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3711310123293100059}
     m_Modifications:
+    - target: {fileID: 2548308889317589193, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TurnVolumeOnOffEffects
+      objectReference: {fileID: 0}
+    - target: {fileID: 2548308889317589193, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Chess.Sound.SoundController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2990943127408580492, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TurnVolumeOnOffEffects
+      objectReference: {fileID: 0}
+    - target: {fileID: 2990943127408580492, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Chess.Sound.SoundController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364934154542115928, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TurnVolumeDownMusic
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364934154542115928, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Chess.Sound.SoundController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3889496521615013789, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TurnVolumeUpEffects
+      objectReference: {fileID: 0}
+    - target: {fileID: 3889496521615013789, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Chess.Sound.SoundController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 5242882747143393039, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TurnVolumeUpMusic
+      objectReference: {fileID: 0}
+    - target: {fileID: 5242882747143393039, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Chess.Sound.SoundController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 6019790595675165898, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TurnVolumeDownEffects
+      objectReference: {fileID: 0}
+    - target: {fileID: 6019790595675165898, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Chess.Sound.SoundController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 6105126838943543070, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TurnVolumeOnOffMusic
+      objectReference: {fileID: 0}
+    - target: {fileID: 6105126838943543070, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Chess.Sound.SoundController, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 6587314288634631268, guid: dc6836c6938936d45802184bec1cf946, type: 3}
       propertyPath: m_Name
       value: Sound UI
@@ -1794,6 +1850,14 @@ PrefabInstance:
     - target: {fileID: 6587314288634631268, guid: dc6836c6938936d45802184bec1cf946, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6801942871777065051, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TurnVolumeOnOffMusic
+      objectReference: {fileID: 0}
+    - target: {fileID: 6801942871777065051, guid: dc6836c6938936d45802184bec1cf946, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Chess.Sound.SoundController, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 8936415876437440765, guid: dc6836c6938936d45802184bec1cf946, type: 3}
       propertyPath: m_Pivot.x
