@@ -189,6 +189,8 @@ namespace Multiplayer.Models.Rules
 
             int kingPosition = FindKingPosition(move.ColorToMove, copiedGameBoard);
 
+            Console.WriteLine($"King position: {kingPosition}");
+
             // Check if any enemy piece has a valid move to capture the king
             for (int i = 0; i < copiedGameBoard.Count; i++)
             {
@@ -199,6 +201,7 @@ namespace Multiplayer.Models.Rules
                     {
                         if (isMoveValid(potentialCapture) && potentialCapture.EndPosition == kingPosition)
                         {
+                            Console.WriteLine($"Unsafe move detected: {potentialCapture}");
                             return false;
                         }
                     }
@@ -207,6 +210,7 @@ namespace Multiplayer.Models.Rules
 
             return true;
         }
+
 
         private List<ChessGrid> DeepCopyGameBoard(List<ChessGrid> originalGameBoard)
         {
